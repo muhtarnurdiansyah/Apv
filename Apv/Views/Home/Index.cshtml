@@ -1,0 +1,290 @@
+﻿@model IEnumerable<Apv.Models.Transaksi.MainDetail>
+@{
+    ViewBag.Title = "Home Page";
+    Layout = "~/Views/Shared/_LayoutHome.cshtml";
+}
+
+@*<section class="content-header">
+        <h1>
+            Dashboard
+        </h1>
+    </section>*@
+<section class="content">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="box box-solid">
+                <div class="box-body">
+                    <div class="row">
+                        <div class="form-group">
+                            <div class="col-sm-12" id="divMainId">
+                                <select required="required" class="form-control select2" id="MainId" onchange="GetList3()" style="width: 100%;">
+                                    <option value="0">Choose Vendor</option>
+                                    @foreach (var data in Model)
+                                    {
+                                        <option value="@data.Main.VendorId">@data.Main.Vendor.Nama</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row" id="Content">
+    </div>
+    <div class="hide" id="Content3">
+        <div class="row">
+            <div class="col-md-12">
+                <table id="example1" class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Nomor Kontrak</th>
+                            <th>Total</th>
+                            <th>Terbayar</th>
+                            <th>Sisa</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody" class="tbody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" id="Content2">
+        <div class="col-xs-12 col-md-12">
+            <div class="text-center">
+                <img src="~/Content/img/dash.png" alt="SafeLogo" style="width:700px;">
+            </div>
+        </div>
+    </div>
+</section>
+
+@*<section class="content3">
+        <div class="row">
+            @foreach (var item in Model)
+                {
+                <div class="col-md-3 col-sm-3 col-xs-6">
+                    <div class="small-box bg-@item.Warna">
+                        <div class="inner">
+                            <a href="@Url.Action(item.Controller, "Home")" style="color:white;">
+                                <h5>@item.Total</h5>
+                                <p>@item.Judul</p>
+                            </a>
+                        </div>
+                        <div class="icon">
+                            <i class="fa fa-@item.Icon"></i>
+                        </div>
+                        <div class="small-box-footer no-padding" style="background-color:white;">
+                            <ul class="nav nav-stacked text-left">
+                                @foreach (var item2 in item.DashItemVM)
+                                {
+                                    <li><a href="#">@item2.Judul <span class="pull-right">@item2.Count</span></a></li>
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </section>*@
+
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            $('.select2').select2();
+            GetList3();
+        });
+
+        @*function GetList() {
+            var MainId = $("#MainId").val();
+
+            if (MainId != 0) {
+                $.ajax({
+                    url: "@Url.Action("Get", "Home")",
+                    type: "GET",
+                    data: { 'Id': MainId },
+                    dataType: "json",
+                    success: function (result) {
+                        $('#Content').html('');
+                        var html = '';
+                        $.each(result, function (i, value) {
+                            html += '<tr>';
+                            html += '<td>' + value.Judul + '</td>';
+                            $.each(value.DashItemVM, function (i, value2) {
+                                html += '<td>' + value2.Judul + '</td>';
+                                html += '<td>' + value2.Count + '</td>';
+                                html += '<td><a class="btn btn-primary" href="@Url.Action("Detail", "Home")/' + value.Id + '">edit</a></td>'
+
+                            })
+                            html += '</tr>';
+
+                        });
+                        $('#tbody').html(html);
+                        $('#Content2').addClass('hide');
+                    },
+                    error: function (errormessage) {
+                        alert(errormessage.responseText);
+                    }
+                })
+            } else {
+
+                $('#Content3').html('');
+                $('#Content2').removeClass('hide');
+            }
+        }*@
+
+        @*function GetList2() {
+            var MainId = $("#MainId").val();
+
+            if (MainId != 0) {
+                $.ajax({
+                    url: "@Url.Action("Get", "Home")",
+                    type: "GET",
+                    data: { 'Id': MainId },
+                    dataType: "json",
+                    success: function (result) {
+                        $('#Content').html('');
+                        var html = '';
+                        $.each(result, function (i, value) {
+                            html += '<div class="col-md-3 col-sm-3 col-xs-6">';
+                            html += '<div class="small-box bg-' + value.Warna + '">';
+                            html += '<div class="inner">';
+                            html += '<a href="@Url.Action("Detail", "Home")/' + value.Id + '" target="_blank" style="color:white;">';
+                            html += '<h4>' + value.Judul + '</h4>';
+                            html += '<p>' + value.Judul2 + '</p>';
+                            html += '</a>';
+                            html += '</div>';
+                            html += '<div class="icon">';
+                            html += '<i class="fa fa-' + value.Icon + '"></i>';
+                            html += '</div>';
+                            html += '<div class="small-box-footer no-padding" style="background-color:white;">';
+                            html += '<ul class="nav nav-stacked text-left">';
+                            $.each(value.DashItemVM, function (i, value2) {
+                                html += '<li><a href="@Url.Action("Detail", "Home")/' + value.Id + '">' + value2.Judul + ' <span class="pull-right">' + value2.Count + '</span></a></li>';
+                            })
+                            html += '</ul>';
+                            html += '</div>';
+                            html += '</div>';
+                            html += '</div>';
+                        });
+                        $('#Content').html(html);
+                        $('#Content2').addClass('hide');
+                    },
+                    error: function (errormessage) {
+                        alert(errormessage.responseText);
+                    }
+                })
+            } else {
+
+                $('#Content3').html('');
+                $('#Content2').removeClass('hide');
+            }
+        }*@
+
+        function GetList3() {
+            //$("#example1").DataTable().fnClearTable();
+            $("#example1").DataTable().destroy();
+            var MainId = $("#MainId").val();
+            if (MainId != 0) {
+
+                var t = $("#example1").DataTable({
+                    "orderCellsTop": true,
+                    "ajax": {
+                        "url": "@Url.Action("Get", "Home")",
+                        "type": "GET",
+                        "data": { 'Id': MainId },
+                        "datatype": "json",
+                        "dataSrc": ""
+                    },
+                    "columns": [
+                        { "data": null },
+                        { "data": "Judul" },
+                        {
+                            "render": function (data, type, row) {
+                                return row.DashItemVM[0].Count;
+                            }
+                        },
+                         {
+                             "render": function (data, type, row) {
+                                 return row.DashItemVM[1].Count;
+                             }
+                         },
+                         {
+                            "render": function (data, type, row) {
+                                return row.DashItemVM[2].Count;
+                            }
+                         },
+                        {
+                            "render": function (data, type, row) {
+                                html = '<a href="@Url.Action("Detail", "Home")/' + row.Id + '" class="btn btn-sm btn-info" data-toggle="tooltip" data-placement="bottom" ><i class="fa fa-eye"></i></a>';
+
+                                return html
+                            }
+                        },
+
+                    ],
+                    "pageLength": 25,
+                    "scrollCollapse": true,
+                    //"dom": "<'row'<'col-sm-1'B><'col-sm-1'l>>" + "<'row'<'col-sm-12'tr>>" + "<'row'<'col-sm-5'i><'col-sm-7'p>>",
+                    //"dom": "<'row'<'col-sm-3'B><'col-sm-1'l>>" + "<'row'<'col-sm-12'tr>>" + "<'row'<'col-sm-5'i><'col-sm-7'p>>",
+                    "columnDefs": [
+                        {
+                            "searchPanes": {
+                                "show": true,
+                            },
+                            "targets": [1, 2, 3],
+                        }, {
+                            "searchPanes": {
+                                "show": false,
+                            },
+                            "targets": [0, 5],
+                        }, {
+                            "sortable": false,
+                            "class": "index",
+                            "targets": [5]
+                        }, {
+                            "className": 'text-right',
+                            "targets": [2,3,4]
+                        }],
+                    "searchPanes": {
+                        "layout": 'columns-6'
+                    },
+                    "buttons": {
+                        "buttons": [
+                            {
+                                "extend": 'searchPanes',
+                                "config": {
+                                    "cascadePanes": true
+                                },
+                                "className": 'btn-info'
+                            },
+                        ],
+
+                    },
+                    "language": {
+                        "searchPanes": {
+                            "clearMessage": 'Clear',
+                            "collapse": { 0: '<i class="fa fa-search"></i> Search', _: '<i class="fa fa-search"></i> Search (%d)' }
+                        }
+                    }
+                });
+
+                t.on('order.dt search.dt', function () {
+                    t.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+                        cell.innerHTML = i + 1;
+                    });
+                }).draw();
+
+                $('#Content3').removeClass('hide');
+                $('#Content2').addClass('hide');
+            }
+            else {
+                $('#Content3').addClass('hide');
+                $('#Content2').removeClass('hide');
+            }
+        };
+    </script>
+}

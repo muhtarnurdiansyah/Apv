@@ -1,0 +1,371 @@
+﻿@model IEnumerable<Apv.Models.Master.SubJenisPotongan>
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_LayoutConfigs.cshtml";
+}
+
+<section class="content-header">
+    <h1>
+        Pajak
+    </h1>
+</section>
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box">
+                <div class="box-header with-border">
+                    <button type="button" class="btn btn-success pull-right" data-toggle="modal" data-target="#myModal" onclick="AddModal()"><i class="fa fa-plus-circle"></i> Tambah Data</button>
+                </div>
+                <div class="box-body">
+                    <table id="example1" class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Jenis Pajak</th>
+                                <th>Nama</th>
+                                <th>Nilai</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{var no = 0; }
+                            @foreach (var data in Model)
+                            {
+                                { no++; }
+                                <tr>
+                                    <td>@no</td>
+                                    <td>@data.JenisPotongan.Nama</td>
+                                    <td>@data.Nama</td>
+                                    <td class="text-right">@data.Nilai %</td>
+                                    <td>
+                                        <a href="#" onclick="ViewModal(@data.Id)" class="btn btn-sm  btn-primary"><i class="fa fa-eye"></i> View</a>
+                                        <a href="#" onclick="EditModal(@data.Id)" class="btn btn-sm btn-info"><i class="fa fa-pencil"></i> Edit</a>
+                                        <a href="#" onclick="DeleteModal(@data.Id, '@data.Nama')" class="btn btn-sm btn-danger"><i class="fa fa-trash-o"></i> Delete</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="example-modal">
+    <div id="myModal" class="modal fade" role="dialog" style="display:none;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel"></h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-horizontal">
+                        <input type="hidden" class="form-control" id="Id" />
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Jenis Pajak</label>
+                            <div class="col-sm-9" id="divJenisPajak">
+                                <input type="hidden" class="modalhide" id="JenisPajakHidden" value="0">
+                                <select required="required" class="form-control select2" id="JenisPajak" style="width: 100%;"></select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Nama</label>
+                            <div class="col-sm-9" id="divNama">
+                                <input type="text" class="form-control" id="Nama" placeholder="Nama" required />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Nama Kredit</label>
+                            <div class="col-sm-9" id="divNama2">
+                                <input type="text" class="form-control" id="Nama2" placeholder="Nama Kredit" required />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">No Rekening</label>
+                            <div class="col-sm-9" id="divNoRek">
+                                <input type="text" class="form-control" id="NoRek" placeholder="No Rekening" required />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">No Rekening 2</label>
+                            <div class="col-sm-9" id="divNoRek2">
+                                <input type="text" class="form-control" id="NoRek2" placeholder="No Rekening 2" required />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Nilai</label>
+                            <div class="col-sm-9" id="divNilai">
+                                <div class="input-group">
+                                    <input type="text" class="form-control text-right" id="Nilai" @*oninput="this.value = decimal(this.value.replace(/[^0-9.]/g, '').replace(/\.(?=.*\.)/g, ''));"*@ placeholder="Nilai Presentase" required />
+                                    <span class="input-group-addon">%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="pull-right">
+                        <button type="button" class="btn btn-default" data-dismiss="modal" onclick="ClearScreen()" ;>Close</button>
+                        <button type="button" class="btn btn-success" id="Save" onclick="Save();">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            $('#example1').DataTable();
+        });
+
+        function decimal(num) {
+            var parts = num.toString().split(".");
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            return parts.join(".");
+        }
+
+        function minkoma(angka) {
+            var bil = angka;
+            var loop = Math.floor(angka.length / 3);
+            for (var i = 0; i < loop; i++) {
+                bil = bil.replace(',', '');
+            }
+            return bil;
+        }
+
+        function AddModal() {
+            ClearError();
+            ClearScreen();
+            LoadJenis();
+            $('#myModalLabel').html('Tambah Data');
+            $('#Save').show();
+        }
+
+        function LoadJenis() {
+            var data = $('#JenisPajakHidden').val();
+            $.ajax({
+                url: "@Url.Action("GetJenisPajak", "MasTaxs")",
+                type: 'GET',
+                dataType: 'json',
+                success: function (result) {
+                    var JenisPajak = $("#JenisPajak");
+                    JenisPajak.html('');
+                    $.each(result, function (i, value) {
+                        $("<option></option>").val(value.Id).text(value.Nama).appendTo(JenisPajak);
+                    });
+                    if (data != 0) {
+                        $("#JenisPajak").val(data).trigger('change');
+                    }
+                }
+            });
+        }
+
+        function ViewModal(Id) {
+            $.ajax({
+                url: "@Url.Action("GetById", "MasTaxs")",
+                type: "GET",
+                data: { 'Id': Id },
+                dataType: "json",
+                success: function (result) {
+                    ClearError();
+                    ClearScreen();
+                    $('#Id').val(result.Id);
+                    $('#Nama').val(result.Nama);
+                    $('#Nama2').val(result.Nama2);
+                    $('#NoRek').val(result.NoRek);
+                    $('#NoRek2').val(result.NoRek2);
+                    $('#Nilai').val(decimal(result.Nilai));
+                    $('#JenisPajakHidden').val(result.JenisPotonganId);
+                    LoadJenis();
+
+                    $('input[type=text],input[type=email],select,input:checkbox').prop("readonly", "readonly");
+                    $('input[type=text],input[type=email],select,input:checkbox').prop("disabled", "disabled");
+
+                    $('#myModalLabel').html('View Data');
+                    $('#myModal').modal('show');
+                    $('#Save').hide();
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            })
+        }
+
+        function EditModal(Id) {
+            $.ajax({
+                url: "@Url.Action("GetById", "MasTaxs")",
+                type: "GET",
+                data: { 'Id': Id },
+                dataType: "json",
+                success: function (result) {
+                    ClearError();
+                    ClearScreen();
+                    $('#Id').val(result.Id);
+                    $('#Nama').val(result.Nama);
+                    $('#Nama2').val(result.Nama2);
+                    $('#NoRek').val(result.NoRek);
+                    $('#NoRek2').val(result.NoRek2);
+                    $('#Nilai').val(decimal(result.Nilai));
+                    $('#JenisPajakHidden').val(result.JenisPotonganId);
+                    LoadJenis();
+                    $('#Nilai').on('change', function () {
+                        console.log($('#Nilai').val());
+                    })
+                    $('#myModalLabel').html('Edit Data');
+                    $('#myModal').modal('show');
+                    $('#Save').show();
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            })
+        }
+
+        function ClearError() {
+            $(".has-error").removeClass("has-error");
+        }
+
+        @*function Save() {
+            debugger;
+            ClearError();
+            var eror = false;
+            if ($.trim($("#JenisPajak").val()) == "") { $("#divJenisPajak").addClass("has-error"); eror = true; }
+            if ($.trim($("#Nama").val()) == "") { $("#divNama").addClass("has-error"); eror = true; }
+            if ($.trim($("#Nama2").val()) == "") { $("#divNama2").addClass("has-error"); eror = true; }
+            if ($.trim($("#NoRek").val()) == "") { $("#divNoRek").addClass("has-error"); eror = true; }
+            if ($.trim($("#Nilai").val()) == "") { $("#divNilai").addClass("has-error"); eror = true; }
+
+            if (!eror) {
+                var data = new Object();
+                if ($.trim($("#Id").val()) != "") { data.Id = $("#Id").val(); }
+                data.Nama = $('#Nama').val();
+                data.Nama2 = $('#Nama2').val();
+                data.NoRek = $('#NoRek').val();
+                data.NoRek2 = $('#NoRek2').val();
+                data.Nilai = parseFloat($('#Nilai').val());
+                data.JenisPotonganId = $('#JenisPajak').val();
+
+                $.ajax({
+                    url: "@Url.Action("Save", "MasTaxs")",
+                    type: 'POST',
+                    data: { 'data': data },
+                    dataType: 'json',
+                    success: function (result) {
+                        ClearScreen();
+                        $('#myModal').modal('hide');
+                        swal({
+                            title: "Success!",
+                            text: "The data has been saved!",
+                            type: "success",
+                            showCancelButton: false,
+                            showConfirmButton: false,
+                            timer: 1000,
+                        },
+                        function () {
+                            window.location.href = '@Url.Action("Index", "MasTaxs")';
+                        });
+                    },
+                    error: function (response) {
+                        swal("Oops", "We couldn't connect to the server!", "error");
+                    }
+                });
+            } else {
+                swal("Oops", "Data not completed!", "error");
+            }
+        }*@
+
+        function Save() {
+            ClearError();
+            var eror = false;
+            if ($.trim($("#JenisPajak").val()) == "") { $("#divJenisPajak").addClass("has-error"); eror = true; }
+            if ($.trim($("#Nama").val()) == "") { $("#divNama").addClass("has-error"); eror = true; }
+            if ($.trim($("#Nama2").val()) == "") { $("#divNama2").addClass("has-error"); eror = true; }
+            if ($.trim($("#NoRek").val()) == "") { $("#divNoRek").addClass("has-error"); eror = true; }
+            if ($.trim($("#Nilai").val()) == "") { $("#divNilai").addClass("has-error"); eror = true; }
+
+            if (!eror) {
+                //var nilaiper = $('#Nilai').val().toFixed(2);
+                var data = new Object();
+                if ($.trim($("#Id").val()) != "") { data.Id = $("#Id").val(); }
+                data.Nama = $('#Nama').val();
+                data.Nama2 = $('#Nama2').val();
+                data.NoRek = $('#NoRek').val();
+                data.NoRek2 = $('#NoRek2').val();
+                data.Nilai = $('#Nilai').val();
+                data.JenisPotonganId = $('#JenisPajak').val();
+
+
+                $.ajax({
+                    url: "@Url.Action("Save", "MasTaxs")",
+                    type: 'POST',
+                    data: { 'data': data },
+                    dataType: 'json',
+                    success: function (result) {
+                        ClearScreen();
+                        $('#myModal').modal('hide');
+                        swal({
+                            title: "Success!",
+                            text: "The data has been saved!",
+                            type: "success",
+                            showCancelButton: false,
+                            showConfirmButton: false,
+                            timer: 1000,
+                        },
+                        function () {
+                            window.location.href = '@Url.Action("Index", "MasTaxs")';
+                        });
+                    },
+                    error: function (response) {
+                        swal("Oops", "We couldn't connect to the server!", "error");
+                    }
+                });
+            } else {
+                swal("Oops", "Data not completed!", "error");
+            }
+        }
+
+
+        function DeleteModal(Id, Nama) {
+            swal({
+                title: "Are you sure to delete this?",
+                text: "Vendor : " + Nama,
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                closeOnConfirm: false
+            }, function () {
+                $.ajax({
+                    url: "@Url.Action("Delete", "MasTaxs")",
+                    type: "POST",
+                    data: { 'Id': Id },
+                    success: function (response) {
+                        swal({
+                            title: "Deleted!",
+                            text: "That data has been delete!",
+                            type: "success"
+                        },
+                        function () {
+                            window.location.href = '@Url.Action("Index", "MasTaxs")';
+                        });
+                    },
+                    error: function (response) {
+                        swal("Oops", "We couldn't connect to the server!", "error");
+                    }
+                });
+            });
+        }        
+
+        function ClearScreen() {
+            $('#Save').show();
+            $('input[type=text],input[type=hidden],select').val('');
+            $('input[type=text],input[type=email],select,input:checkbox').prop("readonly", false);
+            $('input[type=text],input[type=email],select,input:checkbox').prop("disabled", false);
+        }
+    </script>
+}

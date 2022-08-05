@@ -1,0 +1,364 @@
+﻿@model IEnumerable<Apv.Models.Setting.MappingRole>
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_LayoutConfigs.cshtml";
+}
+
+<section class="content-header">
+    <h1>
+        Mapping Role
+    </h1>
+</section>
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box">
+                <div class="box-header with-border">
+                    <button type="button" class="btn btn-success pull-right" data-toggle="modal" data-target="#myModal" onclick="AddModal()"><i class="fa fa-plus-circle"></i> Tambah Data</button>
+                </div>
+                <div class="box-body">
+                    <table id="example1" class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Jabatan</th>
+                                <th>Kelompok</th>
+                                <th>Unit</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{var no = 0; }
+                            @foreach (var data in Model)
+                            {
+                                {
+                                    no++;
+                                }
+                                <tr>
+                                    <td>@no</td>
+                                    <td>@data.Jabatan.Nama</td>
+                                    <td>@data.Unit.Kelompok.Nama</td>
+                                    <td>@data.Unit.Nama</td>
+                                    <td style="width:20%;">
+                                        <a href="#" onclick="ViewModal(@data.Id)" class="btn btn-sm  btn-primary" data-toggle="tooltip" data-placement="bottom" title="View"><i class="fa fa-eye"></i></a>
+                                        <a href="#" onclick="EditModal(@data.Id)" class="btn btn-sm btn-info" data-toggle="tooltip" data-placement="bottom" title="Edit"><i class="fa fa-pencil"></i></a>
+                                        <a href="#" onclick="DeleteModal(@data.Id, '@data.Jabatan.Nama', '@data.Unit.Kelompok.Singkatan', '@data.Unit.Nama')" class="btn btn-sm btn-danger" data-toggle="tooltip" data-placement="bottom" title="Delete"><i class="fa fa-trash-o"></i></a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="example-modal">
+    <div id="myModal" class="modal fade" role="dialog" style="display:none;">
+        <div class="modal-dialog" style="width:50%;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel"></h4>
+                </div>
+                <div class="modal-body">
+                    <form class="form-horizontal">
+                        <input type="hidden" class="form-control" id="Id" />
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Jabatan</label>
+                            <div class="col-sm-9" id="divJabatan">
+                                <input type="hidden" class="modalhide" id="JabatanHidden" value="0">
+                                <select required="required" class="form-control select2" id="Jabatan" style="width: 100%;"></select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Kelompok</label>
+                            <div class="col-sm-9" id="divKelompok">
+                                <input type="hidden" class="modalhide" id="KelompokHidden" value="0">
+                                <select required="required" class="form-control select2" id="Kelompok" onchange="LoadUnit();" style="width: 100%;"></select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Unit</label>
+                            <div class="col-sm-9" id="divUnit">
+                                <input type="hidden" class="modalhide" id="UnitHidden" value="0">
+                                <select required="required" class="form-control select2" id="Unit" style="width: 100%;"></select>
+                            </div>
+                        </div>
+                        <div class="well">
+                            <h5 class="text-center"><b>Kewenangan Modul</b></h5>
+                            <div class="form-group" id="Roles">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <div class="pull-right">
+                        <button type="button" class="btn btn-default" data-dismiss="modal" onclick="ClearScreen()" ;>Close</button>
+                        <button type="button" class="btn btn-success" id="Add" onclick="Save();">Save</button>
+                        <button type="button" class="btn btn-primary" id="Edit" style="display:none;" onclick="Save();">Update</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            $('#example1').DataTable({
+                "pageLength": 25
+            });
+        });
+
+        function AddModal() {
+            ClearError();
+            ClearScreen();
+            LoadRoles(null);
+            LoadJabatan();
+            LoadKelompok();
+            $('#myModalLabel').html('Tambah Data User');
+            $('#Edit').hide();
+            $('#Add').show();
+        }
+
+        function ViewModal(Id) {
+            $.ajax({
+                url: "@Url.Action("GetMappingById", "MasAccounts")",
+                type: "GET",
+                data: { 'Id': Id },
+                dataType: "json",
+                success: function (result) {
+                    ClearError();
+                    ClearScreen();
+                    $('#Id').val(result.Trans.Id);
+                    $('#JabatanHidden').val(result.Trans.JabatanId);
+                    $('#KelompokHidden').val(result.Trans.Unit.KelompokId);
+                    $('#UnitHidden').val(result.Trans.UnitId);
+                    LoadRoles(result.Detail);
+                    LoadJabatan();
+                    LoadKelompok();
+
+                    $('input[type=text],input[type=email],select,input:checkbox').prop("readonly", "readonly");
+                    $('input[type=text],input[type=email],select,input:checkbox').prop("disabled", "disabled");
+
+                    $('#myModalLabel').html('View Data User');
+                    $('#myModal').modal('show');
+                    $('#Edit').hide();
+                    $('#Add').hide();
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            })
+        }
+
+        function EditModal(Id) {
+            $.ajax({
+                url: "@Url.Action("GetMappingById", "MasAccounts")",
+                type: "GET",
+                data: { 'Id': Id },
+                dataType: "json",
+                success: function (result) {
+                    ClearError();
+                    ClearScreen();
+                    $('#Id').val(result.Trans.Id);
+                    $('#JabatanHidden').val(result.Trans.JabatanId);
+                    $('#KelompokHidden').val(result.Trans.Unit.KelompokId);
+                    $('#UnitHidden').val(result.Trans.UnitId);
+                    LoadRoles(result.Detail);
+                    LoadJabatan();
+                    LoadKelompok();
+
+                    $('#myModalLabel').html('Edit Data User');
+                    $('#myModal').modal('show');
+                    $('#Edit').show();
+                    $('#Add').hide();
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            })
+        }
+
+        function LoadRoles(roles) {
+            $.ajax({
+                url: "@Url.Action("GetRoles", "Account")",
+                type: 'GET',
+                dataType: 'json',
+                success: function (result) {
+                    var html = '';
+                    $.each(result, function (i, value) {
+                        html += '<div class="checkbox col-sm-4"><label><input type="checkbox" name="' + value.Id + '" value="' + value.Id + '">' + value.Name + '</label></div>';
+                    });
+                    $('#Roles').html(html);
+                    if (roles != null) {
+                        $.each(roles, function (i, value) {
+                            $('input[name="' + value.RoleId + '"]').prop('checked', true).trigger('change');
+                        });
+                    }
+                }
+            });
+        }
+
+        function LoadJabatan() {
+            var data = $('#JabatanHidden').val();
+            $.ajax({
+                url: "@Url.Action("GetJabatan", "Account")",
+                type: 'GET',
+                dataType: 'json',
+                success: function (result) {
+                    var Jabatan = $("#Jabatan");
+                    $.each(result, function (i, value) {
+                        $("<option></option>").val(value.Id).text(value.Nama).appendTo(Jabatan);
+                    });
+                    if (data != 0) {
+                        $("#Jabatan").val(data).trigger('change');
+                    }
+                }
+            });
+        }
+
+        function LoadKelompok() {
+            var data = $('#KelompokHidden').val();
+            $.ajax({
+                url: "@Url.Action("GetKelompok", "Account")",
+                type: 'GET',
+                dataType: 'json',
+                success: function (result) {
+                    var Kelompok = $("#Kelompok");
+                    $.each(result, function (i, value) {
+                        $("<option></option>").val(value.Id).text(value.Nama).appendTo(Kelompok);
+                    });
+                    if (data != 0) {
+                        $("#Kelompok").val(data).trigger('change');
+                    }
+                    LoadUnit();
+                }
+            });
+        }
+
+
+        function LoadUnit() {
+            var Id = $('#Kelompok').val();
+            var data = $('#UnitHidden').val();
+            $.ajax({
+                url: "@Url.Action("GetUnit", "Account")",
+                type: 'GET',
+                data: { 'Id': Id },
+                dataType: 'json',
+                success: function (result) {
+                    var Unit = $("#Unit");
+                    Unit.html('');
+                    $.each(result, function (i, value) {
+                        $("<option></option>").val(value.Id).text(value.Nama).appendTo(Unit);
+                    });
+                    if (data != 0) {
+                        $("#Unit").val(data).trigger('change');
+                    }
+                }
+            });
+        }
+
+        function ClearError() {
+            $(".has-error").removeClass("has-error");
+        }
+
+        function Save() {
+            ClearError();
+            if ($.trim($("#Jabatan").val()) == "") { $("#divJabatan").addClass("has-error"); return; }
+            if ($.trim($("#Unit").val()) == "") { $("#divUnit").addClass("has-error"); return; }
+
+            var RoleId = new Array();
+            $('input:checkbox:checked').each(function () {
+                var roleid = $(this).val();
+                RoleId.push(roleid);
+            })
+
+            var Item = new Object();
+            if ($.trim($("#Id").val()) != "") { Item.Id = $("#Id").val(); } else { Item.Id = 0; }
+            Item.JabatanId = $('#Jabatan').val();
+            Item.UnitId = $("#Unit").val();
+            Item.RoleId = RoleId;
+
+            $.ajax({
+                url: "@Url.Action("SaveMapping", "MasAccounts")",
+                type: 'POST',
+                data: { 'Item': Item },
+                dataType: 'json',
+                success: function (result) {
+                    ClearScreen();
+                    $('#myModal').modal('hide');
+                    swal({
+                        title: "Success!",
+                        text: "The data has been saved!",
+                        type: "success",
+                        showCancelButton: false,
+                        showConfirmButton: false,
+                        timer: 1000,
+                    },
+                    function () {
+                        window.location.href = '@Url.Action("Mapping", "MasAccounts")';
+                    });
+                },
+                error: function (response) {
+                    swal("Oops", "We couldn't connect to the server!", "error");
+                }
+            });
+        }
+
+        function DeleteModal(Id, Jabatan, Kelompok, Unit) {
+            swal({
+                title: "Are you sure to delete this?",
+                text: Jabatan + " - " + Unit + " (" + Kelompok + ")",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                closeOnConfirm: false
+            }, function () {
+                $.ajax({
+                    url: "@Url.Action("DeleteMapping", "MasAccounts")",
+                    type: "POST",
+                    data: { 'Id': Id },
+                    success: function (response) {
+                        swal({
+                            title: "Deleted!",
+                            text: "That data has been delete!",
+                            type: "success"
+                        },
+                        function () {
+                            window.location.href = '@Url.Action("Mapping", "MasAccounts")';
+                        });
+                    },
+                    error: function (response) {
+                        swal("Oops", "We couldn't connect to the server!", "error");
+                    }
+                });
+            });
+        }
+
+
+        function ClearScreen() {
+            $('#Update').hide();
+            $('#Save').show();
+            $('#Id').val('');
+            $('#Jabatan').val('');
+            $('#Jabatan').html('');
+            $('#Kelompok').val('');
+            $('#Kelompok').html('');
+            $('#Unit').val('');
+            $('#Unit').html('');
+            $('#JabatanHidden').val(0);
+            $('#KelompokHidden').val(0);
+            $('#StatusHidden').val(0);
+            $('#Roles').html('');
+            $('input:checkbox').prop('checked', false);
+            $('input[type=text],input[type=email],select,input:checkbox').prop("readonly", false);
+            $('input[type=text],input[type=email],select,input:checkbox').prop("disabled", false);
+        }
+    </script>
+}

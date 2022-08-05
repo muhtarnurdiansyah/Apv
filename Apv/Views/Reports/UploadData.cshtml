@@ -1,0 +1,113 @@
+﻿
+@{
+    ViewBag.Title = "UploadData";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<section class="content-header">
+    <h1>
+        Upload Data
+    </h1>
+</section>
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box box-solid">
+                <div class="box-header">
+                </div>
+                <div class="box-body">
+                    <div class="row">
+
+                        <div class="form-group col-md-12">
+                            <label class="col-sm-2 control-label text-right">Data</label>
+                            <div class="col-sm-offset-5 col-sm-1">
+                                <button class="btn btn-sm btn-success" onclick="ModalDebit()"><i class="fa fa-upload"></i> Upload</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<div class="example-modal">
+    <div id="UploadModal" class="modal fade" role="dialog" style="display:none;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="UploadModalLabel"></h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="form-group col-md-12">
+                            <label for="total" class="col-sm-3 control-label text-right">Files</label>
+                            <div class="col-sm-6" id="divUploadFile">
+                                <input type="file" class="form-control" accept="application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" id="UploadFile" style="min-width:100%">
+                            </div>
+                        </div>
+                        <div class="col-md-10 col-md-offset-2">
+                            <p>Download Format Template <a href="@Url.Content(" ~/Files/File Format E-Voucher.rar")" style="color:red;" target="_blank">klik disini</a></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="pull-right">
+                        <button type="button" class="btn btn-default" data-dismiss="modal" onclick="ClearScreenModal()" ;>Close</button>
+                        <button type="submit" name="submit" class="btn btn-primary" onclick="Upload()">Upload</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script>
+        function ClearError() {
+            $(".has-error").removeClass("has-error");
+        }
+
+        function ClearScreenModal() {
+            $('input[type=file]').val('');
+        }
+
+        function ModalDebit() {
+            ClearError();
+            ClearScreenModal();
+            $('#UploadModalLabel').html('Tambah Data Debit');
+            $('#UploadModal').modal('show');
+        }
+
+        function Upload() {
+            ClearError();
+            if ($.trim($("#UploadFile").val()) == "") { $("#divUploadFile").addClass("has-error"); return; }
+            $("body").addClass("loading");
+
+            var formData = new FormData();
+
+            var file = $("#UploadFile").get(0).files[0];
+            formData.append("file", file);
+
+            $.ajax({
+                url: "@Url.Action("UploadDebit", "Reports")",
+                type: "POST",
+                contentType: false,
+                processData: false,
+                data: formData,
+                success: function (result) {
+                    $("body").removeClass("loading");
+                    $('#UploadModal').modal('hide');
+                    if (result.result) {
+                        swal("Success!", "The data has been uploaded!", "success");
+                    } else {
+                        swal("Oops", "Please check format file!", "error");
+                    }
+                },
+                error: function (err) {
+                    swal("Oops", "We couldn't connect to the server!", "error");
+                }
+            });
+        }
+    </script>
+}

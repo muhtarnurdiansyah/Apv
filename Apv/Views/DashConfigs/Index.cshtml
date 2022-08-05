@@ -1,0 +1,31 @@
+﻿@model IEnumerable<Apv.ViewModels.DashConfigVM>
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_LayoutConfigs.cshtml";
+}
+
+<section class="content-header">
+    <h1>
+        Dashboard Admin
+    </h1>
+</section>
+
+<section class="content">
+    <div class="row">
+        @foreach (var data in Model)
+        {
+            <div class="col-lg-3 col-xs-6">
+                <div class="small-box bg-@data.Warna">
+                    <div class="inner">
+                        <h3>@data.Count.ToString("n0")</h3>
+                        <p>@data.Judul</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fa fa-@data.Icon"></i>
+                    </div>
+                    <a href="@Url.Action(data.Method, data.Controller)" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+                </div>
+            </div>
+        }
+    </div>
+</section>

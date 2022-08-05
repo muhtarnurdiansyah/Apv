@@ -1,0 +1,361 @@
+﻿
+@{
+    ViewBag.Title = "List Input Payment";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<section class="content-header">
+    <h1>
+        List Input Payment
+    </h1>
+</section>
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box">
+                <div class="box-header with-border">
+                    <div class="col-md-12">
+                        <div class="pull-right">
+                            <a href="@Url.Action("Add", "Inputs")" class="btn btn-sm btn-success"><i class="fa fa-plus-circle"></i> Tambah Pembayaran</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <table id="example1" class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Tanggal</th>
+                                <th>Nomor</th>
+                                <th>Vendor</th>
+                                <th>Uraian</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody class="tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<div class="example-modal">
+    <div id="InfoModal" class="modal fade" role="dialog" style="display:none;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header" id="InfoModalBG">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="InfoModalLabel"></h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="form-group">
+                            <label for="total" class="col-sm-3 control-label text-right">Keterangan</label>
+                            <div class="col-sm-8">
+                                <textarea class="form-control" rows="3" id="InfoKeterangan" readonly></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="pull-right">
+                        <button type="button" class="btn btn-default" data-dismiss="modal" onclick="ClearScreen()" ;>Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            $('.select2').select2();
+            $('.tanggalrange').daterangepicker()
+            var t = $("#example1").DataTable({
+                "orderCellsTop": true,
+                "ajax": {
+                    "url": "@Url.Action("GetList", "Inputs")",
+                    "type": "POST",
+                    "datatype": "json"
+                },
+                "columns": [
+                    { "data": null },
+                    {
+                        "render": function (data, type, val) {
+                            return formatDates(val.DocDate);
+                        }
+                    },
+                    {
+                        "render": function (data, type, val) {
+                            return val.KodeSurat.Nama + '' + val.Nomor;
+                        }
+                    },
+                    { "data": "Vendor.Nama" },
+                    { "data": "Uraian" },
+                    {
+                        "render": function (data, type, val) {
+                            return plustitik(val.TotalNominal);
+                        }
+                    },
+                    {
+                        "render": function (data, type, val) {
+                            return '<span class="label label-' + val.Status.Warna + '">' + val.Status.Nama + '</span>';
+                        }
+                    },
+                    {
+                        "render": function (data, type, val) {
+                            html = '';
+                            html += '<a href="@Url.Action("View", "Inputs")/' + val.Id + '" class="btn btn-sm btn-info" data-toggle="tooltip" data-placement="bottom" title="View"><i class="fa fa-eye"></i></a>';
+                            //if (val.Status.Id != 2) {
+                            html += ' <a href="@Url.Action("Edit", "Inputs")/' + val.Id + '" class="btn btn-sm btn-primary" data-toggle="tooltip" data-placement="bottom" title="Edit"><i class="fa fa-pencil"></i></a>';
+                            //} else {
+                            //    html += ' <button class="btn btn-sm btn-primary" disabled readonly data-placement="bottom" title="Edit"><i class="fa fa-pencil"></i></button>';
+                            //}
+
+                            if (val.Status.Id == 2) {
+                                html += ' <button class="btn btn-sm btn-primary" onclick="SendModal(' + val.Id + ')" data-toggle="tooltip" data-placement="bottom" title="Send"><i class="fa fa-send"></i></button>';
+                            } else {
+                                html += ' <button class="btn btn-sm btn-primary" disabled readonly data-toggle="tooltip" data-placement="bottom" title="Send"><i class="fa fa-send"></i></button>';
+                            }
+
+                            disable = '';
+                            if (val.Status.Id == 1 || val.Status.Id == 2 || val.Status.Id == 3) {
+                                disable = 'readonly disabled ';
+                            }
+                            html += ' <button class="btn btn-sm btn-default" onclick="InfoModal(' + val.Id + ')" ' + disable + ' data-placement="bottom" title="Info"><i class="fa fa-info"></i></button>';
+                            return html;
+                        }
+                    }
+                ],
+                "pageLength": 25,
+                //"rowReorder": true,
+                //"scrollX": true,
+                "scrollCollapse": true,
+                "dom": "<'row'<'col-sm-4'B><'col-sm-2'l><'col-sm-6'p>>" + "<'row'<'col-sm-12'tr>>" + "<'row'<'col-sm-5'i><'col-sm-7'p>>",
+                "columnDefs": [
+                    {
+                        "searchPanes": {
+                            "show": true,
+                        },
+                        "targets": [1, 2, 3, 4, 5, 6],
+                    }, {
+                        "searchPanes": {
+                            "show": false,
+                        },
+                        "targets": [0, 7],
+                    }, {
+                        "sortable": false,
+                        "class": "index",
+                        "targets": [0, 7]
+                    }, {
+                        "width": 150,
+                        "targets": 7
+                    }],
+                "searchPanes": {
+                    "layout": 'columns-6'
+                },
+                "buttons": {
+                    "buttons": [
+                        {
+                            "extend": 'searchPanes',
+                            "config": {
+                                "cascadePanes": true
+                            },
+                            "className": 'btn-info'
+                        }
+                    ],
+                    "dom": {
+                        "button": {
+                            "className": 'btn btn-sm'
+                        },
+                        "buttonLiner": {
+                            "tag": null
+                        }
+                    }
+                },
+                "language": {
+                    "searchPanes": {
+                        "clearMessage": 'Clear',
+                        "collapse": { 0: '<i class="fa fa-search"></i> Search', _: '<i class="fa fa-search"></i> Search (%d)' }
+                    }
+                }
+            });
+
+            t.on('order.dt search.dt', function () {
+                t.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+                    cell.innerHTML = i + 1;
+                });
+            }).draw();
+        });
+
+        function plustitik(angka) {
+            var rupiah = '';
+            var angkarev = angka.toString().split('').reverse().join('');
+            for (var i = 0; i < angkarev.length; i++) if (i % 3 == 0) rupiah += angkarev.substr(i, 3) + ',';
+            return rupiah.split('', rupiah.length - 1).reverse().join('');
+        }
+
+        function decimal(num) {
+            var parts = num.toString().split(".");
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            return parts.join(".");
+        }
+
+        function minkoma(angka) {
+            var bil = angka;
+            var loop = Math.floor(angka.length / 3);
+            for (var i = 0; i < loop; i++) {
+                bil = bil.replace(',', '');
+            }
+            return bil;
+        }
+
+        function formatDateTime(dates) {
+            date = new Date(parseInt(dates.substr(6)));
+            var year = date.getFullYear();
+            var month = (1 + date.getMonth()).toString();
+            month = month.length > 1 ? month : '0' + month;
+            var day = date.getDate().toString();
+            day = day.length > 1 ? day : '0' + day;
+            var hour = date.getHours().toString();
+            hour = hour.length > 1 ? hour : '0' + hour;
+            var minutes = date.getMinutes().toString();
+            minutes = minutes.length > 1 ? minutes : '0' + minutes;
+            var second = date.getSeconds().toString();
+            second = second.length > 1 ? second : '0' + second;
+            return day + '/' + month + '/' + year + ' ' + hour + ':' + minutes + ':' + second;
+        }
+
+        function formatDates(dates) {
+            date = new Date(parseInt(dates.substr(6)));
+            var year = date.getFullYear();
+            var month = (1 + date.getMonth()).toString();
+            month = month.length > 1 ? month : '0' + month;
+            var day = date.getDate().toString();
+            day = day.length > 1 ? day : '0' + day;
+            return day + '/' + month + '/' + year;
+        }
+
+        function formatDatesRange(dates) {
+            date = new Date(parseInt(dates.substr(6)));
+            var year = date.getFullYear();
+            var month = (1 + date.getMonth()).toString();
+            month = month.length > 1 ? month : '0' + month;
+            var day = date.getDate().toString();
+            day = day.length > 1 ? day : '0' + day;
+            return month + '-' + day + '-' + year;
+        }
+
+        function formatDate(dates) {
+            date = new Date(dates);
+            var year = date.getFullYear();
+            var month = (1 + date.getMonth()).toString();
+            month = month.length > 1 ? month : '0' + month;
+            var day = date.getDate().toString();
+            day = day.length > 1 ? day : '0' + day;
+            return year + '-' + month + '-' + day;
+        }
+
+        function ClearError() {
+            $(".has-error").removeClass("has-error");
+        }
+
+        function SendModal(id) {
+            var Ids = new Array();
+            Ids.push(id);
+
+            $.ajax({
+                type: "GET",
+                url: "@Url.Action("GetSendReceiver", "Inputs")",
+                async: false,
+                dataType: "JSON",
+                success: function (data) {
+                    bootbox.prompt({
+                        title: "Please select an receiver below to approve the selected data!",
+                        inputType: 'select',
+                        inputOptions: data,
+                        buttons: {
+                            cancel: {
+                                label: 'Cancel'
+                            },
+                            confirm: {
+                                label: 'Submit',
+                                className: 'btn-primary'
+                            }
+                        },
+                        callback: function (result) {
+                            if (result) {
+                                items = JSON.stringify({ 'Ids': Ids, 'ReceiverId': result });
+                                $("body").addClass("loading");
+                                $.ajax({
+                                    url: "@Url.Action("Send", "Inputs")",
+                                    type: 'POST',
+                                    dataType: 'json',
+                                    contentType: 'application/json; charset=utf-8',
+                                    data: items,
+                                    success: function (response) {
+                                        $('#ViewEditModal').modal('hide');
+                                        $("body").removeClass("loading");
+                                        swal({
+                                            title: response.title,
+                                            text: response.text,
+                                            type: response.type,
+                                            showCancelButton: false,
+                                            showConfirmButton: true
+                                        }, function () {
+                                            //SendNotif(null);
+                                            $("#example1").DataTable().ajax.reload();
+                                        });
+                                    },
+                                    error: function (response) {
+                                        swal("Oops", "We couldn't connect to the server!", "error");
+                                    }
+                                });
+                            } else if (result == "") {
+                                swal({
+                                    title: "Failed!",
+                                    text: "Please choose receiver!",
+                                    type: "warning",
+                                    showCancelButton: false,
+                                    showConfirmButton: false,
+                                    timer: 1000,
+                                });
+                            }
+                        }
+                    });
+                }
+            });
+        }
+
+        function InfoModal(Id) {
+            $.ajax({
+                url: "@Url.Action("GetLastKeteranganById", "Histories")",
+                type: "GET",
+                data: { 'Id': Id },
+                dataType: "json",
+                success: function (result) {
+                    ClearScreen();
+                    $("#InfoKeterangan").val(result.Keterangan);
+
+                    $('#InfoModalLabel').html('Info Keterangan - ' + result.Status.Nama);
+                    $("#InfoModalBG").addClass("bg-" + result.Status.Warna2);
+                    $('#InfoModal').modal('show');
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            })
+        }
+
+        function ClearScreen() {
+            $('input[type=text]').val('');
+            $('input[type=hidden]').val(0);
+            $('select, textarea').val('');
+        }
+    </script>
+}
+
+

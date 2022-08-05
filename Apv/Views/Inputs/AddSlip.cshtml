@@ -1,0 +1,825 @@
+﻿
+@{
+    ViewBag.Title = "Input Payment - Add Slip";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<section class="content-header">
+    <h1>
+        Input Payment <small>Add Slips</small>
+    </h1>
+</section>
+
+<section class="content">
+    <input type="hidden" id="TransId" value="@Model.Id" />
+    <div class="nav-tabs-custom">
+        <ul class="nav nav-tabs">
+            @{var a = 0; }
+            @foreach (var item in Model.SettingSlips)
+            {
+                var active = "";
+                if (a == 0)
+                {
+                    active = "active";
+                }
+                a++;
+                <li class="@active"><a href="#@item.Id" data-toggle="tab">@item.JenisSlip.Singkatan</a></li>
+            }
+        </ul>
+        <div class="tab-content">
+            @{a = 0; }
+            @foreach (var item in Model.SettingSlips)
+            {
+                var active = ""; var pengirim = ""; var penerima = "";
+                if (a == 0)
+                {
+                    active = "active";
+                }
+                a++;
+                if (item.JenisSlipId == 5)
+                {
+                    penerima = "readonly disabled";
+                }
+                if (item.JenisSlipId == 6)
+                {
+                    pengirim = "readonly disabled";
+                }
+                <div class="tab-pane @active" id="@item.Id">
+                    <div class="row">
+                        <div class="col-md-6" style="border-right: 3px solid #000">
+                            <h2 class="page-header">
+                                <b>Pengirim <small>Debit</small></b>
+                            </h2>
+                            <div class="row">
+                                <input type="hidden" id="@(item.Id)JenisSlipId" value="@item.JenisSlipId" />
+                                @if (item.NoRekDebit)
+                                {
+                                    <div class="form-group col-md-12">
+                                        <label class="col-sm-3 control-label text-right" id="label@(item.Id)NoRekDebit">No Rekening</label>
+                                        <div class="col-sm-9" id="div@(item.Id)NoRekDebit">
+                                            @if (item.NoRekDebitText)
+                                            {
+                                                <input type="text" class="form-control NoRekDebit" SetId="@(item.Id)" JenisId="@(item.JenisSlipId)" @pengirim id="@(item.Id)NoRekDebit" oninput="this.value = this.value.replace(/[^A-Za-z0-9]/g, '')" placeholder="No Rekening">
+                                            }
+                                            else
+                                            {
+                                                <input type="text" class="form-control NoRekDebit" SetId="@(item.Id)" JenisId="@(item.JenisSlipId)" @pengirim id="@(item.Id)NoRekDebit" oninput="this.value = this.value.replace(/[^0-9]/g, '')" placeholder="No Rekening">
+                                            }
+
+                                        </div>
+                                    </div>
+                                }
+                                @if (item.NoRekDebit2)
+                                {
+                                    <div class="form-group col-md-12">
+                                        <div class="col-sm-9 col-sm-offset-3">
+                                            <div class="checkbox">
+                                                <label>
+                                                    <input type="checkbox" id="@(item.Id)NoRekDebitVA" onchange="UseVA(@(item.Id), 'Debit')"> Menggunakan rekening virtual account
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-md-12 hide" id="div@(item.Id)NoRekDebitVA">
+                                        <label class="col-sm-3 control-label text-right">No Rekening Asli</label>
+                                        <div class="col-sm-9" id="div@(item.Id)NoRekDebit2">
+                                            @if (item.NoRekDebitText)
+                                            {
+                                                <input type="text" class="form-control" SetId="@(item.Id)" JenisId="@(item.JenisSlipId)" @pengirim id="@(item.Id)NoRekDebit2" oninput="this.value = this.value.replace(/[^A-Za-z0-9]/g, '')" placeholder="No Rekening">
+                                            }
+                                            else
+                                            {
+                                                <input type="text" class="form-control" SetId="@(item.Id)" JenisId="@(item.JenisSlipId)" @pengirim id="@(item.Id)NoRekDebit2" oninput="this.value = this.value.replace(/[^0-9]/g, '')" placeholder="No Rekening">
+                                            }
+
+                                        </div>
+                                    </div>
+                                }
+                                @if (item.NamaRekDebit)
+                                {
+                                    <div class="form-group col-md-12">
+                                        <label class="col-sm-3 control-label text-right">Nama Rekening</label>
+                                        <div class="col-sm-9" id="div@(item.Id)NamaRekDebit">
+                                            <input type="text" class="form-control" @pengirim id="@(item.Id)NamaRekDebit" placeholder="Nama Rekening">
+                                        </div>
+                                    </div>
+                                }
+                                @if (item.NamaRekDebit2)
+                                {
+                                    <div class="form-group col-md-12">
+                                        <label class="col-sm-3 control-label text-right">Nama Rekening</label>
+                                        <div class="col-sm-9" id="div@(item.Id)NamaRekDebit">
+                                            <input type="text" class="form-control" @pengirim id="@(item.Id)NamaRekDebit2" placeholder="Nama Rekening">
+                                        </div>
+                                    </div>
+                                }
+                                @if (item.NamaCabangDebit)
+                                {
+                                    <div class="form-group col-md-12">
+                                        <label class="col-sm-3 control-label text-right">Nama Cabang</label>
+                                        <div class="col-sm-9" id="div@(item.Id)NamaCabangDebit">
+                                            <input type="text" class="form-control" @pengirim id="@(item.Id)NamaCabangDebit" placeholder="Nama Cabang">
+                                        </div>
+                                    </div>
+                                }
+                                @if (item.JenisRekeningDebit)
+                                {
+                                    <div class="form-group col-md-12">
+                                        <label class="col-sm-3 control-label text-right">Jenis Rekening</label>
+                                        <div class="col-sm-9" id="div@(item.Id)JenisRekeningDebitId">
+                                            <select required="required" class="form-control select2" @pengirim id="@(item.Id)JenisRekeningDebitId" style="width: 100%;">
+                                                <option selected="selected" value="4">-- Pilih Jenis Rekening --</option>
+                                                @foreach (var data in Model.JenisRekening)
+                                                {
+                                                    <option value="@data.Id">@data.Nama</option>
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+                                }
+                                @if (item.NominalDebit && item.NominalKredit)
+                                {
+                                    <div class="form-group col-md-12">
+                                        <label class="col-sm-3 control-label text-right">Nominal</label>
+                                        @if (item.CurrencyDebit)
+                                        {
+                                            <div class="col-sm-3" id="div@(item.Id)CurrencyDebitId">
+                                                <select required="required" class="form-control select2 CurrencyDebitId" @pengirim id="@(item.Id)CurrencyDebitId" onchange="Kurs(@(item.Id))" style="width: 100%;">
+                                                    @foreach (var data in Model.Currency)
+                                                    {
+                                                        <option value="@data.Id">@data.Nama</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                            <div class="col-sm-6" id="div@(item.Id)NominalDebit">
+                                                <input type="text" class="form-control text-right" id="@(item.Id)NominalDebit" @pengirim oninput="this.value = decimal(this.value.replace(/[^0-9.]/g, '').replace(/\.(?=.*\.)/g, ''));" autocomplete="off" placeholder="Nominal">
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="col-sm-9" id="div@(item.Id)NominalDebit">
+                                                <input type="text" class="form-control text-right" id="@(item.Id)NominalDebit" @pengirim oninput="this.value = decimal(this.value.replace(/[^0-9.]/g, '').replace(/\.(?=.*\.)/g, ''));" autocomplete="off" placeholder="Nominal">
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                                @if (item.PesanDebit)
+                                {
+                                    <div class="form-group col-md-12">
+                                        <label class="col-sm-3 control-label text-right">Pesan</label>
+                                        <div class="col-sm-9" id="div@(item.Id)PesanDebit">
+                                            <textarea class="form-control" @pengirim id="@(item.Id)PesanDebit" placeholder="Pesan"></textarea>
+                                        </div>
+                                    </div>
+                                }
+                                @if (item.PesanDebit2)
+                                {
+                                    <div class="form-group col-md-12">
+                                        <label class="col-sm-3 control-label text-right">Pesan</label>
+                                        <div class="col-sm-9" id="div@(item.Id)PesanDebit">
+                                            <textarea class="form-control" @pengirim id="@(item.Id)PesanDebit2" placeholder="Pesan"></textarea>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h2 class="page-header">
+                                <b>Penerima <small>Kredit</small></b>
+                            </h2>
+                            <div class="row">
+                                @if (item.NoRekKredit)
+                                {
+                                    <div class="form-group col-md-12">
+                                        <label class="col-sm-3 control-label text-right" id="label@(item.Id)NoRekKredit">No Rekening</label>
+                                        <div class="col-sm-9" id="div@(item.Id)NoRekKredit">
+                                            @if (item.NoRekKreditText)
+                                            {
+                                                <input type="text" class="form-control NoRekKredit" SetId="@(item.Id)" JenisId="@(item.JenisSlipId)" @penerima id="@(item.Id)NoRekKredit" oninput="this.value = this.value.replace(/[^A-Za-z0-9]/g, '')" placeholder="No Rekening">
+                                            }
+                                            else
+                                            {
+                                                <input type="text" class="form-control NoRekKredit" SetId="@(item.Id)" JenisId="@(item.JenisSlipId)" @penerima id="@(item.Id)NoRekKredit" oninput="this.value = this.value.replace(/[^0-9]/g, '')" placeholder="No Rekening">
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                                @if (item.NoRekKredit2)
+                                {
+                                    <div class="form-group col-md-12">
+                                        <div class="col-sm-9 col-sm-offset-3">
+                                            <div class="checkbox">
+                                                <label>
+                                                    <input type="checkbox" id="@(item.Id)NoRekKreditVA" onchange="UseVA(@(item.Id), 'Kredit')"> Menggunakan rekening virtual account
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-md-12 hide" id="div@(item.Id)NoRekKreditVA">
+                                        <label class="col-sm-3 control-label text-right">No Rekening Asli</label>
+                                        <div class="col-sm-9" id="div@(item.Id)NoRekKredit2">
+                                            @if (item.NoRekKreditText)
+                                            {
+                                                <input type="text" class="form-control" SetId="@(item.Id)" JenisId="@(item.JenisSlipId)" @penerima id="@(item.Id)NoRekKredit2" oninput="this.value = this.value.replace(/[^A-Za-z0-9]/g, '')" placeholder="No Rekening">
+                                            }
+                                            else
+                                            {
+                                                <input type="text" class="form-control" SetId="@(item.Id)" JenisId="@(item.JenisSlipId)" @penerima id="@(item.Id)NoRekKredit2" oninput="this.value = this.value.replace(/[^0-9]/g, '')" placeholder="No Rekening">
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                                @if (item.NamaRekKredit)
+                                {
+                                    <div class="form-group col-md-12">
+                                        <label class="col-sm-3 control-label text-right">Nama Rekening</label>
+                                        <div class="col-sm-9" id="div@(item.Id)NamaRekKredit">
+                                            <input type="text" class="form-control" @penerima id="@(item.Id)NamaRekKredit" placeholder="Nama Rekening">
+                                        </div>
+                                    </div>
+                                }
+                                @if (item.NamaCabangKredit)
+                                {
+                                    <div class="form-group col-md-12">
+                                        <label class="col-sm-3 control-label text-right">Nama Cabang</label>
+                                        <div class="col-sm-9" id="div@(item.Id)NamaCabangKredit">
+                                            <input type="text" class="form-control" @penerima id="@(item.Id)NamaCabangKredit" placeholder="Nama Cabang">
+                                        </div>
+                                    </div>
+                                }
+                                @if (item.JenisRekeningKredit)
+                                {
+                                    <div class="form-group col-md-12">
+                                        <label class="col-sm-3 control-label text-right">Jenis Rekening</label>
+                                        <div class="col-sm-9" id="div@(item.Id)JenisRekeningKreditId">
+                                            <select required="required" class="form-control select2" @penerima id="@(item.Id)JenisRekeningKreditId" style="width: 100%;">
+                                                <option selected="selected" value="4">-- Pilih Jenis Rekening --</option>
+                                                @foreach (var data in Model.JenisRekening)
+                                                {
+                                                    <option value="@data.Id">@data.Nama</option>
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+                                }
+                                @if (item.BankKredit)
+                                {
+                                    <div class="form-group col-md-12">
+                                        <label class="col-sm-3 control-label text-right">Bank</label>
+                                        <div class="col-sm-9" id="div@(item.Id)BankKreditId">
+                                            <select required="required" class="form-control select2" @penerima id="@(item.Id)BankKreditId" style="width: 100%;">
+                                                <option selected="selected" value="">-- Pilih Bank --</option>
+                                                @foreach (var data in Model.Bank)
+                                                {
+                                                    <option value="@data.Id">@data.Nama - @data.KodeBIC</option>
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+                                }
+                                @if (item.NominalDebit && item.NominalKredit)
+                                {
+                                    <div class="form-group col-md-12">
+                                        <label class="col-sm-3 control-label text-right">Nominal</label>
+                                        @if (item.CurrencyKredit)
+                                        {
+                                            <div class="col-sm-3" id="div@(item.Id)CurrencyKreditId">
+                                                <select required="required" class="form-control select2 CurrencyKreditId" @penerima id="@(item.Id)CurrencyKreditId" onchange="Kurs(@(item.Id))" style="width: 100%;">
+                                                    @foreach (var data in Model.Currency)
+                                                    {
+                                                        <option value="@data.Id">@data.Nama</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                            <div class="col-sm-6" id="div@(item.Id)NominalKredit">
+                                                <input type="text" class="form-control text-right" id="@(item.Id)NominalKredit" @penerima oninput="this.value = decimal(this.value.replace(/[^0-9.]/g, '').replace(/\.(?=.*\.)/g, ''));" autocomplete="off" placeholder="Nominal">
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="col-sm-9" id="div@(item.Id)NominalKredit">
+                                                <input type="text" class="form-control text-right" id="@(item.Id)NominalKredit" @penerima oninput="this.value = decimal(this.value.replace(/[^0-9.]/g, '').replace(/\.(?=.*\.)/g, ''));" autocomplete="off" placeholder="Nominal">
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                                @if (item.AddKredit)
+                                {
+                                    <div class="form-group col-md-12">
+                                        <label class="col-sm-3 control-label text-right">Add</label>
+                                        <div class="col-sm-9" id="div@(item.Id)AddKredit">
+                                            <input type="text" class="form-control" @penerima id="@(item.Id)AddKredit" placeholder="Add">
+                                        </div>
+                                    </div>
+                                }
+                                @if (item.AddKredit2)
+                                {
+                                    <div class="form-group col-md-12">
+                                        <label class="col-sm-3 control-label text-right">Add 2</label>
+                                        <div class="col-sm-9" id="div@(item.Id)AddKredit2">
+                                            <input type="text" class="form-control" @penerima id="@(item.Id)AddKredit2" placeholder="Add">
+                                        </div>
+                                    </div>
+                                }
+                                @if (item.PhoneKredit)
+                                {
+                                    <div class="form-group col-md-12">
+                                        <label class="col-sm-3 control-label text-right">Phone</label>
+                                        <div class="col-sm-9" id="div@(item.Id)PhoneKredit">
+                                            <input type="text" class="form-control" @penerima id="@(item.Id)PhoneKredit" placeholder="Phone">
+                                        </div>
+                                    </div>
+                                }
+                                @if (item.CityCodeKredit)
+                                {
+                                    <div class="form-group col-md-12">
+                                        <label class="col-sm-3 control-label text-right">City Code</label>
+                                        <div class="col-sm-9" id="div@(item.Id)CityCodeKredit">
+                                            <input type="text" class="form-control" @penerima id="@(item.Id)CityCodeKredit" placeholder="City Code">
+                                        </div>
+                                    </div>
+                                }
+                                @if (item.IdKredit)
+                                {
+                                    <div class="form-group col-md-12">
+                                        <label class="col-sm-3 control-label text-right">Id</label>
+                                        <div class="col-sm-9" id="div@(item.Id)IdKredit">
+                                            <input type="text" class="form-control" @penerima id="@(item.Id)IdKredit" placeholder="Id">
+                                        </div>
+                                    </div>
+                                }
+                                @if (item.IdTypeKredit)
+                                {
+                                    <div class="form-group col-md-12">
+                                        <label class="col-sm-3 control-label text-right">Id Type</label>
+                                        <div class="col-sm-9" id="div@(item.Id)IdTypeKredit">
+                                            <input type="text" class="form-control" @penerima id="@(item.Id)IdTypeKredit" placeholder="Id Type">
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="page-header">
+                                <b>Informasi Detail</b>
+                            </h2>
+                        </div>
+                        @if (item.Tanggal)
+                        {
+                            <div class="form-group col-md-12">
+                                <label class="col-sm-2 control-label text-right">Tanggal</label>
+                                <div class="col-sm-4">
+                                    <div class="input-group">
+                                        <div class="input-group-addon">
+                                            <i class="fa fa-calendar"></i>
+                                        </div>
+                                        <input type="text" class="form-control Tanggal" id="@(item.Id)Tanggal" readonly autocomplete="off">
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        @if (item.NoReferensi)
+                        {
+                            <div class="form-group col-md-12">
+                                <label class="col-sm-2 control-label text-right">No Referensi</label>
+                                <div class="col-sm-4" id="div@(item.Id)NoReferensi">
+                                    <input type="text" class="form-control" id="@(item.Id)NoReferensi" placeholder="No Referensi">
+                                </div>
+                            </div>
+                        }
+                        @if (!item.NominalDebit || !item.NominalKredit)
+                        {
+                            <div class="form-group col-md-12">
+                                <label class="col-sm-2 control-label text-right">Nominal</label>
+                                @if (item.NominalDebit)
+                                {
+                                    if (item.CurrencyDebit)
+                                    {
+                                        <div class="col-sm-1" id="div@(item.Id)CurrencyDebitId">
+                                            <select required="required" class="form-control select2 CurrencyDebitId" @pengirim id="@(item.Id)CurrencyDebitId" onchange="Kurs(@(item.Id))" style="width: 100%;">
+                                                @foreach (var data in Model.Currency)
+                                                {
+                                                    <option value="@data.Id">@data.Nama</option>
+                                                }
+                                            </select>
+                                        </div>
+                                        <div class="col-sm-3" id="div@(item.Id)NominalDebit">
+                                            <input type="text" class="form-control text-right" id="@(item.Id)NominalDebit" @pengirim oninput="this.value = decimal(this.value.replace(/[^0-9.]/g, '').replace(/\.(?=.*\.)/g, ''));" autocomplete="off" placeholder="Nominal">
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="col-sm-4" id="div@(item.Id)NominalDebit">
+                                            <input type="text" class="form-control text-right" id="@(item.Id)NominalDebit" @pengirim oninput="this.value = decimal(this.value.replace(/[^0-9.]/g, '').replace(/\.(?=.*\.)/g, ''));" autocomplete="off" placeholder="Nominal">
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    if (item.CurrencyKredit)
+                                    {
+                                        <div class="col-sm-1" id="div@(item.Id)CurrencyKreditId">
+                                            <select required="required" class="form-control select2 CurrencyKreditId" @penerima id="@(item.Id)CurrencyKreditId" onchange="Kurs(@(item.Id))" style="width: 100%;">
+                                                @foreach (var data in Model.Currency)
+                                                {
+                                                    <option value="@data.Id">@data.Nama</option>
+                                                }
+                                            </select>
+                                        </div>
+                                        <div class="col-sm-3" id="div@(item.Id)NominalKredit">
+                                            <input type="text" class="form-control text-right" id="@(item.Id)NominalKredit" @penerima oninput="this.value = decimal(this.value.replace(/[^0-9.]/g, '').replace(/\.(?=.*\.)/g, ''));" autocomplete="off" placeholder="Nominal">
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="col-sm-4" id="div@(item.Id)NominalKredit">
+                                            <input type="text" class="form-control text-right" id="@(item.Id)NominalKredit" @penerima oninput="this.value = decimal(this.value.replace(/[^0-9.]/g, '').replace(/\.(?=.*\.)/g, ''));" autocomplete="off" placeholder="Nominal">
+                                        </div>
+                                    }
+                                }
+                            </div>
+                        }
+                        @if (item.Kurs)
+                        {
+                            <div class="form-group col-md-12">
+                                <label class="col-sm-2 control-label text-right">Kurs</label>
+                                <div class="col-sm-4" id="div@(item.Id)Kurs">
+                                    <input type="text" class="form-control text-right" id="@(item.Id)Kurs" readonly oninput="this.value = decimal(this.value.replace(/[^0-9.]/g, '').replace(/\.(?=.*\.)/g, ''));" autocomplete="off" placeholder="Nominal Kurs">
+                                </div>
+                            </div>
+                        }
+                        @if (item.Biaya)
+                        {
+                            <div class="form-group col-md-12">
+                                <label class="col-sm-2 control-label text-right">Biaya</label>
+                                <div class="col-sm-4" id="div@(item.Id)Biaya">
+                                    <input type="text" class="form-control text-right" id="@(item.Id)Biaya" oninput="this.value = decimal(this.value.replace(/[^0-9.]/g, '').replace(/\.(?=.*\.)/g, ''));" autocomplete="off" placeholder="Nominal Biaya">
+                                </div>
+                            </div>
+                        }
+                        @if (item.SandiTXN)
+                        {
+                            <div class="form-group col-md-12">
+                                <label class="col-sm-2 control-label text-right">Sandi TXN</label>
+                                <div class="col-sm-4" id="div@(item.Id)SandiTXN">
+                                    <input type="text" class="form-control" id="@(item.Id)SandiTXN" placeholder="Sandi TXN">
+                                </div>
+                            </div>
+                        }
+                        @if (item.Keterangan1)
+                        {
+
+                            <div class="form-group col-md-12">
+                                <label class="col-sm-2 control-label text-right">Narasi</label>
+                                <div class="col-sm-10" id="div@(item.Id)Keterangan1">
+                                    <input type="text" class="form-control" id="@(item.Id)Keterangan1" placeholder="Narasi">
+                                </div>
+                            </div>
+                        }
+                        @if (item.Keterangan2)
+                        {
+
+                            <div class="form-group col-md-12">
+                                <label class="col-sm-2 control-label text-right">Narasi Tambahan</label>
+                                <div class="col-sm-10" id="div@(item.Id)Keterangan2">
+                                    <input type="text" class="form-control" id="@(item.Id)Keterangan2" placeholder="Narasi Tambahan">
+                                </div>
+                            </div>
+                        }
+                        @if (item.Keterangan3)
+                        {
+
+                            <div class="form-group col-md-12">
+                                <label class="col-sm-2 control-label text-right">Narasi Tambahan 2</label>
+                                <div class="col-sm-10" id="div@(item.Id)Keterangan3">
+                                    <input type="text" class="form-control" id="@(item.Id)Keterangan3" placeholder="Narasi Tambahan 2">
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="pull-right">
+                                <a href="@Url.Action("Add3", "Inputs", new { Id = Model.Id})" class="btn btn-default">Cancel</a>
+                                <button type="submit" name="submit" class="btn btn-primary" onclick="Submit(@(item.Id))">Submit</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+        </div>
+    </div>
+</section>
+
+@section mainscripts{
+    <script src="@Url.Content("~/Scripts/jquery-ui.min.js")"></script>
+}
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            $('.select2').select2();
+            SetDefault();
+            $('.Tanggal').datepicker("setDate", new Date());
+            AutoComplete();
+        });
+
+        function SetDefault() {
+            $('.CurrencyDebitId').val(1).change();
+            $('.CurrencyKreditId').val(1).change();
+        }
+
+        function Kurs(Id) {
+            var CurrencyDebitId = 1;
+            var CurrencyKreditId = 1;
+
+            if ($("#" + Id + "CurrencyDebitId").length) { CurrencyDebitId = $("#" + Id + "CurrencyDebitId").val(); }
+            if ($("#" + Id + "CurrencyKreditId").length) { CurrencyKreditId = $("#" + Id + "CurrencyKreditId").val(); }
+
+            if (CurrencyDebitId != 1 || CurrencyKreditId != 1) {
+                if ($("#" + Id + "Kurs").length) { $("#" + Id + "Kurs").prop('readonly', false); }
+            } else {
+                if ($("#" + Id + "Kurs").length) { $("#" + Id + "Kurs").prop('readonly', true); }
+            }
+        }
+
+        function AutoComplete() {
+            @*$('.NoRekDebit').autocomplete({
+                source: function (request, response) {
+                    var JenisId = $(this.element).attr("JenisId");
+                    var SetId = $(this.element).attr("SetId");
+                    $.ajax({
+                        type: "POST",
+                        url: '@Url.Action("AutoDebit", "Slips")',
+                        data: { Key: $(this.element).val(), JenisId: JenisId },
+                        dataType: "json",
+                        success: function (data) {
+                            response($.map(data, function (item) {
+                                return {
+                                    value: item,
+                                    description: item,
+                                    jenis: JenisId,
+                                    set: SetId
+                                }
+                            }))
+                        },
+                        error: function (error) {
+                            console.log(error);
+                        }
+                    });
+                },
+                minLength: 1,
+                select: function (event, ui) {
+                    var selected_val = ui.item.value;
+                    var JenisId = ui.item.jenis;
+                    var SetId = ui.item.set;
+                    $.ajax({
+                        type: "POST",
+                        url: '@Url.Action("AutoDebitSelected", "Slips")',
+                        data: { Key: selected_val, JenisId: JenisId },
+                        dataType: "json",
+                        success: function (data) {
+                            if (data.IsNoRekDebitVA) {
+                                if ($("#" + SetId + "NoRekDebitVA").length) {
+                                    $("#" + SetId + "NoRekDebitVA").prop('checked', true);
+                                    UseVA(SetId, 'Debit');
+                                    if ($("#" + SetId + "NoRekDebit2").length) { $("#" + SetId + "NoRekDebit2").val(data.NoRekDebit2); }
+                                }
+                            } else {
+                                if ($("#" + SetId + "NoRekDebitVA").length) { $("#" + SetId + "NoRekDebitVA").prop('checked', false); UseVA(SetId, 'Debit'); }
+                            }
+                            if ($("#" + SetId + "NamaRekDebit").length) { $("#" + SetId + "NamaRekDebit").val(data.NamaRekDebit); }
+                            if ($("#" + SetId + "NamaRekDebit2").length) { $("#" + SetId + "NamaRekDebit2").val(data.NamaRekDebit2); }
+                            if ($("#" + SetId + "NamaCabangDebit").length) { $("#" + SetId + "NamaCabangDebit").val(data.NamaCabangDebit); }
+                            if ($("#" + SetId + "JenisRekeningDebitId").length) { $("#" + SetId + "JenisRekeningDebitId").val(data.JenisRekeningDebitId).change(); }
+                        },
+                        error: function (error) {
+                            console.log(error);
+                        }
+                    });
+                }
+            });
+
+            $('.NoRekKredit').autocomplete({
+                source: function (request, response) {
+                    var JenisId = $(this.element).attr("JenisId");
+                    var SetId = $(this.element).attr("SetId");
+                    $.ajax({
+                        type: "POST",
+                        url: '@Url.Action("AutoKredit", "Slips")',
+                        data: { Key: $(this.element).val(), JenisId: JenisId },
+                        dataType: "json",
+                        success: function (data) {
+                            response($.map(data, function (item) {
+                                return {
+                                    value: item,
+                                    description: item,
+                                    jenis: JenisId,
+                                    set: SetId
+                                }
+                            }))
+                        },
+                        error: function (error) {
+                            console.log(error);
+                        }
+                    });
+                },
+                minLength: 1,
+                select: function (event, ui) {
+                    var selected_val = ui.item.value;
+                    var JenisId = ui.item.jenis;
+                    var SetId = ui.item.set;
+                    $.ajax({
+                        type: "POST",
+                        url: '@Url.Action("AutoKreditSelected", "Slips")',
+                        data: { Key: selected_val, JenisId: JenisId },
+                        dataType: "json",
+                        success: function (data) {
+                            if (data.IsNoRekKreditVA) {
+                                if ($("#" + SetId + "NoRekKreditVA").length) {
+                                    $("#" + SetId + "NoRekKreditVA").prop('checked', true);
+                                    UseVA(SetId, 'Kredit');
+                                    if ($("#" + SetId + "NoRekKredit2").length) { $("#" + SetId + "NoRekKredit2").val(data.NoRekKredit2); }
+                                }
+                            } else {
+                                if ($("#" + SetId + "NoRekKreditVA").length) { $("#" + SetId + "NoRekKreditVA").prop('checked', false); UseVA(SetId, 'Kredit'); }
+                            }
+                            if ($("#" + SetId + "NamaRekKredit").length) { $("#" + SetId + "NamaRekKredit").val(data.NamaRekKredit); }
+                            if ($("#" + SetId + "NamaCabangKredit").length) { $("#" + SetId + "NamaCabangKredit").val(data.NamaCabangKredit); }
+                            if ($("#" + SetId + "JenisRekeningKreditId").length) { $("#" + SetId + "JenisRekeningKreditId").val(data.JenisRekeningKreditId).change(); }
+                            if ($("#" + SetId + "BankKreditId").length) { $("#" + SetId + "BankKreditId").val(data.BankKreditId).change(); }
+                        },
+                        error: function (error) {
+                            console.log(error);
+                        }
+                    });
+                }
+            });*@
+        }
+
+        function UseVA(Id, Jenis) {
+            if ($("#" + Id + "NoRek" + Jenis + "VA").is(':checked')) {
+                $("#div" + Id + "NoRek" + Jenis + "VA").removeClass("hide");
+                $("#label" + Id + "NoRek" + Jenis).html("No Rekening VA");
+            } else {
+                $("#div" + Id + "NoRek" + Jenis + "VA").addClass("hide");
+                $("#label" + Id + "NoRek" + Jenis).html("No Rekening");
+
+            }
+        }
+
+        function decimal(num) {
+            var parts = num.toString().split(".");
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            return parts.join(".");
+        }
+
+        function minkoma(angka) {
+            var bil = angka;
+            var loop = Math.floor(angka.length / 3);
+            for (var i = 0; i < loop; i++) {
+                bil = bil.replace(',', '');
+            }
+            return bil;
+        }
+
+        function formatDate(dates) {
+            date = new Date(dates);
+            var year = date.getFullYear();
+            var month = (1 + date.getMonth()).toString();
+            month = month.length > 1 ? month : '0' + month;
+            var day = date.getDate().toString();
+            day = day.length > 1 ? day : '0' + day;
+            return year + '-' + month + '-' + day;
+        }
+
+        function ClearError() {
+            $(".has-error").removeClass("has-error");
+        }
+
+        function Submit(Id) {
+            ClearError();
+            var eror = false;
+            if ($("#" + Id + "NoRekKredit").length) { if ($.trim($("#" + Id + "NoRekKredit").val()) == "") { $("#div" + Id + "NoRekKredit").addClass("has-error"); eror = true; } }
+            if ($("#" + Id + "BankKreditId").length) { if ($.trim($("#" + Id + "BankKreditId").val()) == "") { $("#div" + Id + "BankKreditId").addClass("has-error"); eror = true; } }
+            if ($("#" + Id + "JenisRekeningKreditId").length) { if ($.trim($("#" + Id + "JenisRekeningKreditId").val()) == "" || $.trim($("#" + Id + "JenisRekeningKreditId").val()) == 4) { $("#div" + Id + "JenisRekeningKreditId").addClass("has-error"); eror = true; } }
+
+            if ($("#" + Id + "NoRekDebit").length) { if ($.trim($("#" + Id + "NoRekDebit").val()) == "") { $("#div" + Id + "NoRekDebit").addClass("has-error"); eror = true; } }
+            if ($("#" + Id + "JenisRekeningDebitId").length) { if ($.trim($("#" + Id + "JenisRekeningDebitId").val()) == "" || $.trim($("#" + Id + "JenisRekeningDebitId").val()) == 4) { $("#div" + Id + "JenisRekeningDebitId").addClass("has-error"); eror = true; } }
+
+
+            if ($("#" + Id + "NominalKredit").length) { if ($.trim($("#" + Id + "NominalKredit").val()) == "" || minkoma($("#" + Id + "NominalKredit").val()) == 0) { $("#div" + Id + "NominalKredit").addClass("has-error"); eror = true; } }
+            if ($("#" + Id + "NominalDebit").length) { if ($.trim($("#" + Id + "NominalDebit").val()) == "" || minkoma($("#" + Id + "NominalDebit").val()) == 0) { $("#div" + Id + "NominalDebit").addClass("has-error"); eror = true; } }
+
+            if ($("#" + Id + "Kurs").length) { if ($.trim($("#" + Id + "Kurs").val()) == "" && !$("#" + Id + "Kurs").is('[readonly]')) { $("#div" + Id + "Kurs").addClass("has-error"); eror = true; } }
+
+            if (!eror) {
+                var TransId = $("#TransId").val();
+
+                var Slip = new Object();
+                if ($("#" + Id + "NoRekDebit").length) { Slip.NoRekDebit = $("#" + Id + "NoRekDebit").val(); }
+                if ($("#" + Id + "NoRekDebitVA").length) {
+                    if ($("#" + Id + "NoRekDebitVA").is(':checked')) {
+                        Slip.IsNoRekDebitVA = true;
+                        //if ($("#" + Id + "NoRekDebit2").length) { Slip.NoRekDebit2 = $("#" + Id + "NoRekDebit2").val(); }
+                    }
+                }
+                if ($("#" + Id + "NamaRekDebit").length) { Slip.NamaRekDebit = $("#" + Id + "NamaRekDebit").val(); }
+                if ($("#" + Id + "NamaRekDebit2").length) { Slip.NamaRekDebit2 = $("#" + Id + "NamaRekDebit2").val(); }
+                if ($("#" + Id + "NamaCabangDebit").length) { Slip.NamaCabangDebit = $("#" + Id + "NamaCabangDebit").val(); }
+                if ($("#" + Id + "JenisRekeningDebitId").length) { Slip.JenisRekeningDebitId = $("#" + Id + "JenisRekeningDebitId").val(); }
+                if ($("#" + Id + "PesanDebit").length) { Slip.PesanDebit = $("#" + Id + "PesanDebit").val(); }
+                if ($("#" + Id + "PesanDebit2").length) { Slip.PesanDebit2 = $("#" + Id + "PesanDebit2").val(); }
+                if ($("#" + Id + "CurrencyDebitId").length) { Slip.CurrencyDebitId = $("#" + Id + "CurrencyDebitId").val(); }
+                if ($("#" + Id + "NominalDebit").length) { Slip.NominalDebit = minkoma($("#" + Id + "NominalDebit").val()); }
+
+                if ($("#" + Id + "NoRekKredit").length) { Slip.NoRekKredit = $("#" + Id + "NoRekKredit").val(); }
+                if ($("#" + Id + "NoRekKreditVA").length) {
+                    if ($("#" + Id + "NoRekKreditVA").is(':checked')) {
+                        Slip.IsNoRekKreditVA = true;
+                        //if ($("#" + Id + "NoRekKredit2").length) { Slip.NoRekKredit2 = $("#" + Id + "NoRekKredit2").val(); }
+                    }
+                }
+                if ($("#" + Id + "NamaRekKredit").length) { Slip.NamaRekKredit = $("#" + Id + "NamaRekKredit").val(); }
+                if ($("#" + Id + "NamaCabangKredit").length) { Slip.NamaCabangKredit = $("#" + Id + "NamaCabangKredit").val(); }
+                if ($("#" + Id + "JenisRekeningKreditId").length) { Slip.JenisRekeningKreditId = $("#" + Id + "JenisRekeningKreditId").val(); }
+                if ($("#" + Id + "BankKreditId").length) { Slip.BankKreditId = $("#" + Id + "BankKreditId").val(); }
+                if ($("#" + Id + "CurrencyKreditId").length) { Slip.CurrencyKreditId = $("#" + Id + "CurrencyKreditId").val(); }
+                if ($("#" + Id + "NominalKredit").length) { Slip.NominalKredit = minkoma($("#" + Id + "NominalKredit").val()); }
+                if ($("#" + Id + "AddKredit").length) { Slip.AddKredit = $("#" + Id + "AddKredit").val(); }
+                if ($("#" + Id + "AddKredit2").length) { Slip.AddKredit2 = $("#" + Id + "AddKredit2").val(); }
+                if ($("#" + Id + "PhoneKredit").length) { Slip.PhoneKredit = $("#" + Id + "PhoneKredit").val(); }
+                if ($("#" + Id + "CityCodeKredit").length) { Slip.CityCodeKredit = $("#" + Id + "CityCodeKredit").val(); }
+                if ($("#" + Id + "IdKredit").length) { Slip.IdKredit = $("#" + Id + "IdKredit").val(); }
+                if ($("#" + Id + "IdTypeKredit").length) { Slip.IdTypeKredit = $("#" + Id + "IdTypeKredit").val(); }
+                if ($("#" + Id + "SandiTXN").length) { Slip.SandiTXN = $("#" + Id + "SandiTXN").val(); }
+
+                if ($("#" + Id + "Keterangan1").length) { Slip.Keterangan1 = $("#" + Id + "Keterangan1").val(); }
+                if ($("#" + Id + "Keterangan2").length) { Slip.Keterangan2 = $("#" + Id + "Keterangan2").val(); }
+                if ($("#" + Id + "Keterangan3").length) { Slip.Keterangan3 = $("#" + Id + "Keterangan3").val(); }
+                if ($("#" + Id + "Biaya").length) { Slip.Biaya = minkoma($("#" + Id + "Biaya").val()); }
+                if ($("#" + Id + "Kurs").length) { Slip.Kurs = minkoma($("#" + Id + "Kurs").val()); }
+                if ($("#" + Id + "Tanggal").length) { Slip.Tanggal = formatDate($("#" + Id + "Tanggal").val()); } else { Slip.Tanggal = formatDate(new Date()); }
+                if ($("#" + Id + "NoReferensi").length) { Slip.NoReferensi = $("#" + Id + "NoReferensi").val(); }
+                if ($("#" + Id + "JenisSlipId").length) { Slip.JenisSlipId = $("#" + Id + "JenisSlipId").val(); }
+
+                if (!$("#" + Id + "CurrencyDebitId").length && !$("#" + Id + "CurrencyKreditId").length) {
+                    if (Id == 6) {
+                        Slip.CurrencyKreditId = 1;
+                    } else {
+                        Slip.CurrencyDebitId = 1;
+                    }
+                }
+                Slip.TransId = TransId;
+
+                $.ajax({
+                    url: "@Url.Action("SaveSlip", "Inputs")",
+                    type: 'POST',
+                    data: { 'Slip': Slip, 'TransId' : TransId },
+                    dataType: 'json',
+                    success: function (result) {
+                        swal({
+                            title: "Success!",
+                            text: "The data has been saved!",
+                            type: "success",
+                            showCancelButton: false,
+                            showConfirmButton: true
+                        },
+                        function () {
+                            swal("success!!", "Input Berhasil", "success");
+                            //SendNotif(null);
+                            ClearForm(Id);
+                            window.location.href = '@Url.Action("Add3", "Inputs")/' + TransId;
+                        });
+                    },
+                    error: function (response) {
+                        swal("Oops", "We couldn't connect to the server!", "error");
+                    }
+                });
+            } else {
+                swal({
+                    title: "Failed!",
+                    text: "Data not completed!",
+                    type: "warning",
+                    showCancelButton: false,
+                    showConfirmButton: false,
+                    timer: 1000,
+                });
+            }
+        }
+
+        function ClearForm(Id) {
+            var get = $("#" + Id + "JenisSlipId").val();
+            $(':input').val('');
+            $("#" + Id + "JenisSlipId").val(get);
+            $("#" + Id + "JenisRekeningDebitId").prop('selectedIndex', 0);
+            $("#" + Id + "JenisRekeningKreditId").prop('selectedIndex', 0);
+        }
+    </script>
+}
+
+
+
+

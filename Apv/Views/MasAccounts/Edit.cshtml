@@ -1,0 +1,348 @@
+﻿@model Apv.ViewModels.UserRoleVM
+@{
+    ViewBag.Title = "Edit User Account";
+    Layout = "~/Views/Shared/_LayoutConfigs.cshtml";
+}
+
+<section class="content-header">
+    <h1>
+        Edit User Account
+    </h1>
+</section>
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box">
+                <div class="box-header with-border">
+                    <div class="col-md-12">
+                        <div class="pull-right">
+                            <a href="@Url.Action("Index", "MasAccounts")" class="btn btn-sm btn-default">Back</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="form-group col-md-12">
+                            <input type="hidden" value="@Model.User.Id" id="IdUser" />
+                            <label class="col-sm-2 control-label">NPP</label>
+                            <div class="col-sm-4" id="divNPP">
+                                <input type="text" class="form-control" id="NPP" placeholder="NPP" value="@Model.User.NPP" disabled readonly />
+                            </div>
+                            <label class="col-sm-2 control-label">Nama</label>
+                            <div class="col-sm-4" id="divNama">
+                                <input type="text" class="form-control" id="Nama" placeholder="Nama" value="@Model.User.Nama" disabled readonly />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="box">
+                <div class="box-header with-border">
+                    <button type="button" class="btn btn-success pull-right" data-toggle="modal" data-target="#myModal" onclick="AddModal('@Model.User.Nama')"><i class="fa fa-plus-circle"></i> Tambah Data</button>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <table id="example1" class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Tanggal Mulai</th>
+                                        <th>Tanggal Selesai</th>
+                                        <th>Jabatan</th>
+                                        <th>Kelompok</th>
+                                        <th>Unit</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{var no = 0; }
+                                    @foreach (var item in Model.SettingRole)
+                                    {
+                                        {
+                                            no++;
+                                        }
+                                        <tr>
+                                            <td>@no</td>
+                                            <td>@item.StartDate.ToString("dd-MM-yyyy HH:mm")</td>
+                                            <td>@item.EndDate.ToString("dd-MM-yyyy HH:mm")</td>
+                                            <td>@item.MappingRole.Jabatan.Nama</td>
+                                            <td>@item.MappingRole.Unit.Kelompok.Nama</td>
+                                            <td>@item.MappingRole.Unit.Nama</td>
+                                            @if (item.IsDefault)
+                                            {
+                                                <td>DEFINITIF</td>
+                                            }
+                                            else
+                                            {
+                                                <td>PGS</td>
+                                            }
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="example-modal">
+    <div id="myModal" class="modal fade" role="dialog" style="display:none;">
+        <div class="modal-dialog" style="width:50%;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel"></h4>
+                </div>
+                <div class="modal-body">
+                    <form class="form-horizontal">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Jabatan</label>
+                            <div class="col-sm-9" id="divJabatan">
+                                <select required="required" class="form-control select2" id="Jabatan" onchange="LoadKelompok();" style="width: 100%;"></select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Kelompok</label>
+                            <div class="col-sm-9" id="divKelompok">
+                                <select required="required" class="form-control select2" id="Kelompok" onchange="LoadUnit();" style="width: 100%;"></select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Unit</label>
+                            <div class="col-sm-9" id="divUnit">
+                                <select required="required" class="form-control select2" id="Unit" style="width: 100%;"></select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Status</label>
+                            <div class="col-sm-9" id="divStatus">
+                                <select required="required" class="form-control select2" id="Status" style="width: 100%;"></select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Tanggal</label>
+                            <div class="col-sm-9" id="divDate">
+                                <div class="input-group">
+                                    <div class="input-group-addon">
+                                        <i class="fa fa-calendar-o"></i>
+                                    </div>
+                                    <input type="text" class="form-control pull-right" id="Date">
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <div class="pull-right">
+                        <button type="button" class="btn btn-default" data-dismiss="modal" onclick="ClearScreen()" ;>Close</button>
+                        <button type="button" class="btn btn-success" id="Add" onclick="Save();">Save</button>
+                        <button type="button" class="btn btn-primary" id="Edit" style="display:none;" onclick="Save();">Update</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            $('#example1').DataTable({
+                "pageLength": -1,
+                "dom": "<'row'<'col-sm-12'tr>>"
+            });
+        });
+
+        $(function () {
+            $('#Date').daterangepicker({
+                timePicker: true,
+                startDate: moment().startOf('hour'),
+                endDate: moment().startOf('hour').add(32, 'hour'),
+                locale: {
+                    //format: 'DD/MM/YYYY HH:mm'
+                    format: 'YYYY/MM/DD HH:mm'
+                }
+            });
+
+        })
+
+        function AddModal(User) {
+            ClearError();
+            ClearScreen();
+            LoadJabatan();
+            LoadStatus();
+            $('#myModalLabel').html('Tambah Data Kewenangan ' + User);
+            $('#Edit').hide();
+            $('#Add').show();
+        }
+
+        function LoadJabatan() {
+            $.ajax({
+                url: "@Url.Action("GetJabatan", "MasAccounts")",
+                type: 'GET',
+                dataType: 'json',
+                success: function (result) {
+                    var Jabatan = $("#Jabatan");
+                    Jabatan.html('');
+                    $.each(result, function (i, value) {
+                        $("<option></option>").val(value.Id).text(value.Nama).appendTo(Jabatan);
+                    });
+
+                    $("#Jabatan").val(result[0].Id).trigger('change');
+                }
+            });
+        }
+
+        function LoadKelompok() {
+            var JabId = $('#Jabatan').val();
+            $.ajax({
+                url: "@Url.Action("GetKelompok", "MasAccounts")",
+                type: 'GET',
+                data: { 'JabId': JabId },
+                dataType: 'json',
+                success: function (result) {
+                    var Kelompok = $("#Kelompok");
+                    Kelompok.html('');
+                    $.each(result, function (i, value) {
+                        $("<option></option>").val(value.Id).text(value.Nama).appendTo(Kelompok);
+                    });
+                    $("#Kelompok").val(result[0].Id).trigger('change');
+                }
+            });
+        }
+
+
+        function LoadUnit() {
+            var KelId = $('#Kelompok').val();
+            var JabId = $('#Jabatan').val();
+            $.ajax({
+                url: "@Url.Action("GetUnit", "MasAccounts")",
+                type: 'GET',
+                data: { 'KelId': KelId, 'JabId': JabId },
+                dataType: 'json',
+                success: function (result) {
+                    var Unit = $("#Unit");
+                    Unit.html('');
+                    $.each(result, function (i, value) {
+                        $("<option></option>").val(value.Id).text(value.Nama).appendTo(Unit);
+                    });
+                    $("#Unit").val(result[0].Id).trigger('change');
+                }
+            });
+        }
+
+        function LoadStatus() {
+            $.ajax({
+                url: "@Url.Action("GetStatus", "Account")",
+                type: 'GET',
+                dataType: 'json',
+                success: function (result) {
+                    var Status = $("#Status");
+                    Status.html('');
+                    for (var i = 0; i < 2; i++) {
+                        $("<option></option>").val(result[i].Id).text(result[i].Nama).appendTo(Status);
+                    }
+                    $("#Status").val(1).trigger('change');
+                }
+            });
+        }
+
+        function ClearError() {
+            $(".has-error").removeClass("has-error");
+        }
+
+        function formatDateTime(dates) {
+            date = new Date(dates);
+            var year = date.getFullYear();
+            var month = (1 + date.getMonth()).toString();
+            month = month.length > 1 ? month : '0' + month;
+            var day = date.getDate().toString();
+            day = day.length > 1 ? day : '0' + day;
+            var hour = date.getHours().toString();
+            hour = hour.length > 1 ? hour : '0' + hour;
+            var minutes = date.getMinutes().toString();
+            minutes = minutes.length > 1 ? minutes : '0' + minutes;
+            var second = date.getSeconds().toString();
+            second = second.length > 1 ? second : '0' + second;
+            return year + '-' + month + '-' + day + ' ' + hour + ':' + minutes + ':' + second;
+        }
+
+        function Save() {
+            ClearError();
+            if ($.trim($("#Jabatan").val()) == "") { $("#divJabatan").addClass("has-error"); return; }
+            if ($.trim($("#Unit").val()) == "") { $("#divUnit").addClass("has-error"); return; }
+            if ($.trim($("#Status").val()) == "") { $("#divStatus").addClass("has-error"); return; }
+
+            var Mapping = new Object();
+            Mapping.JabatanId = $('#Jabatan').val();
+            Mapping.UnitId = $("#Unit").val();
+
+
+            var Setting = new Object();
+            Setting.UserId = $("#IdUser").val();
+            if ($("#Status").val() == 2) {
+                Setting.IsDefault = true;
+            } else {
+                Setting.IsDefault = false;
+            }
+            var daterange = $("#Date").val();
+
+            Setting.StartDate = formatDateTime(daterange.substring(0, 16));
+            Setting.EndDate = formatDateTime(daterange.substring(19, 35));
+
+            console.log(Setting)
+
+            $.ajax({
+                url: "@Url.Action("Save", "MasAccounts")",
+                type: 'POST',
+                data: { 'Setting': Setting, 'Mapping': Mapping },
+                dataType: 'json',
+                success: function (result) {
+                    ClearScreen();
+                    $('#myModal').modal('hide');
+                    swal({
+                        title: "Success!",
+                        text: "The data has been saved!",
+                        type: "success",
+                        showCancelButton: false,
+                        showConfirmButton: false,
+                        timer: 1000,
+                    },
+                    function () {
+                        location.reload();
+                    });
+                },
+                error: function (response) {
+                    swal("Oops", "We couldn't connect to the server!", "error");
+                }
+            });
+        }
+
+        function ClearScreen() {
+            $('#Update').hide();
+            $('#Save').show();
+            $('#Id').val('');
+            $('#Jabatan').val('');
+            $('#Jabatan').html('');
+            $('#Kelompok').val('');
+            $('#Kelompok').html('');
+            $('#Unit').val('');
+            $('#Unit').html('');
+            $('#Status').val('');
+            $('#Status').html('');
+            $('#JabatanHidden').val(0);
+            $('#KelompokHidden').val(0);
+            $('#StatusHidden').val(0);
+            $('#Roles').html('');
+            $('input:checkbox').prop('checked', false);
+            $('input[type=text],input[type=email],select,input:checkbox').prop("readonly", false);
+            $('input[type=text],input[type=email],select,input:checkbox').prop("disabled", false);
+        }
+    </script>
+}
+

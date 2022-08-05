@@ -1,0 +1,249 @@
+﻿
+@{
+    ViewBag.Title = "List Tax Payment";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<section class="content-header">
+    <h1>
+        List Tax Payment
+    </h1>
+</section>
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box">
+                <div class="box-body">
+                    <table id="example1" class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Tanggal</th>
+                                <th>Nomor</th>
+                                <th>Vendor</th>
+                                <th>Pajak</th>
+                                <th>Total</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody class="tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            $('.select2').select2();
+            $('.tanggalrange').daterangepicker()
+            var t = $("#example1").DataTable({
+                "orderCellsTop": true,
+                "ajax": {
+                    "url": "@Url.Action("GetList", "Taxes")",
+                    "type": "POST",
+                    "datatype": "json"
+                },
+                "columns": [
+                    { "data": null },
+                    {
+                        "render": function (data, type, val) {
+                            return formatDates(val.DocDate);
+                        }
+                    },
+                    {
+                        "render": function (data, type, val) {
+                            return val.KodeSurat.Nama + '' + val.Nomor;
+                        }
+                    },
+                    { "data": "Vendor.Nama" },
+                    { "data": "SubJenisPotongan.Nama" },
+                    {
+                        "render": function (data, type, val) {
+                            return plustitik(val.TotalNominal);
+                        }
+                    },
+                    {
+                        "render": function (data, type, val) {
+                            html = '<button class="btn btn-sm btn-success" onclick="Finish(' + val.Id + ',\'' + val.Nomor + '\',\'' + val.Vendor.Nama + '\',\'' + val.SubJenisPotongan.Nama + '\')" data-placement="bottom" title="Finish"><i class="fa fa-check"></i></button>';
+                            return html;
+                        }
+                    }
+                ],
+                "pageLength": 25,
+                //"rowReorder": true,
+                //"scrollX": true,
+                "scrollCollapse": true,
+                "dom": "<'row'<'col-sm-4'B><'col-sm-2'l><'col-sm-6'p>>" + "<'row'<'col-sm-12'tr>>" + "<'row'<'col-sm-5'i><'col-sm-7'p>>",
+                "columnDefs": [
+                    {
+                        "searchPanes": {
+                            "show": true,
+                        },
+                        "targets": [1, 2, 3, 4, 5],
+                    }, {
+                        "searchPanes": {
+                            "show": false,
+                        },
+                        "targets": [0, 6],
+                    }, {
+                        "sortable": false,
+                        "class": "index",
+                        "targets": [0, 6]
+                    }, {
+                        "className": 'text-right',
+                        "targets": 5
+                    }],
+                "searchPanes": {
+                    "layout": 'columns-6'
+                },
+                "buttons": {
+                    "buttons": [
+                        {
+                            "extend": 'searchPanes',
+                            "config": {
+                                "cascadePanes": true
+                            },
+                            "className": 'btn-info'
+                        }
+                    ],
+                    "dom": {
+                        "button": {
+                            "className": 'btn btn-sm'
+                        },
+                        "buttonLiner": {
+                            "tag": null
+                        }
+                    }
+                },
+                "language": {
+                    "searchPanes": {
+                        "clearMessage": 'Clear',
+                        "collapse": { 0: '<i class="fa fa-search"></i> Search', _: '<i class="fa fa-search"></i> Search (%d)' }
+                    }
+                }
+            });
+
+            t.on('order.dt search.dt', function () {
+                t.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+                    cell.innerHTML = i + 1;
+                });
+            }).draw();
+        });
+
+        function plustitik(angka) {
+            var rupiah = '';
+            var angkarev = angka.toString().split('').reverse().join('');
+            for (var i = 0; i < angkarev.length; i++) if (i % 3 == 0) rupiah += angkarev.substr(i, 3) + ',';
+            return rupiah.split('', rupiah.length - 1).reverse().join('');
+        }
+
+        function decimal(num) {
+            var parts = num.toString().split(".");
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            return parts.join(".");
+        }
+
+        function minkoma(angka) {
+            var bil = angka;
+            var loop = Math.floor(angka.length / 3);
+            for (var i = 0; i < loop; i++) {
+                bil = bil.replace(',', '');
+            }
+            return bil;
+        }
+
+        function formatDateTime(dates) {
+            date = new Date(parseInt(dates.substr(6)));
+            var year = date.getFullYear();
+            var month = (1 + date.getMonth()).toString();
+            month = month.length > 1 ? month : '0' + month;
+            var day = date.getDate().toString();
+            day = day.length > 1 ? day : '0' + day;
+            var hour = date.getHours().toString();
+            hour = hour.length > 1 ? hour : '0' + hour;
+            var minutes = date.getMinutes().toString();
+            minutes = minutes.length > 1 ? minutes : '0' + minutes;
+            var second = date.getSeconds().toString();
+            second = second.length > 1 ? second : '0' + second;
+            return day + '/' + month + '/' + year + ' ' + hour + ':' + minutes + ':' + second;
+        }
+
+        function formatDates(dates) {
+            date = new Date(parseInt(dates.substr(6)));
+            var year = date.getFullYear();
+            var month = (1 + date.getMonth()).toString();
+            month = month.length > 1 ? month : '0' + month;
+            var day = date.getDate().toString();
+            day = day.length > 1 ? day : '0' + day;
+            return day + '/' + month + '/' + year;
+        }
+
+        function formatDatesRange(dates) {
+            date = new Date(parseInt(dates.substr(6)));
+            var year = date.getFullYear();
+            var month = (1 + date.getMonth()).toString();
+            month = month.length > 1 ? month : '0' + month;
+            var day = date.getDate().toString();
+            day = day.length > 1 ? day : '0' + day;
+            return month + '-' + day + '-' + year;
+        }
+
+        function formatDate(dates) {
+            date = new Date(dates);
+            var year = date.getFullYear();
+            var month = (1 + date.getMonth()).toString();
+            month = month.length > 1 ? month : '0' + month;
+            var day = date.getDate().toString();
+            day = day.length > 1 ? day : '0' + day;
+            return year + '-' + month + '-' + day;
+        }
+
+        function ClearError() {
+            $(".has-error").removeClass("has-error");
+        }
+
+        function Finish(Id, Nomor, Nama, Pajak) {
+            swal({
+                title: "Are you sure to finish this?",
+                text: Pajak + " from " + Nama + " - " + Nomor,
+                type: "success",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                closeOnConfirm: false
+            }, function () {
+                $.ajax({
+                    url: "@Url.Action("Finish", "Taxes")",
+                    type: 'POST',
+                    data: { 'Id': Id },
+                    dataType: 'json',
+                    success: function (result) {
+                        if (result) {
+                            swal({
+                                title: "Success!",
+                                text: "The data has been saved!",
+                                type: "success",
+                                showCancelButton: false,
+                                showConfirmButton: true
+                            },
+                            function () {
+                                //SendNotif(null);
+                                $("#example1").DataTable().ajax.reload();
+                            });
+                        } else {
+                            swal("Oops", "Data failed to save!", "error");
+                        }
+                    },
+                    error: function (response) {
+                        swal("Oops", "We couldn't connect to the server!", "error");
+                    }
+                });
+            });
+        }
+    </script>
+}
+
+

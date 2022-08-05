@@ -1,0 +1,598 @@
+﻿@model Apv.ViewModels.TransVM
+@{
+    ViewBag.Title = "Input Payment";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<section class="content-header">
+    <h1>
+        Input Payment <small>Attachment</small>
+    </h1>
+</section>
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box box-solid">
+                <div class="box-header">
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="form-group col-md-12">
+                            <input type="hidden" id="TransId" value="@Model.Trans.Id" />
+                            <label class="col-sm-2 control-label text-right">Nomor Reg</label>
+                            <div class="col-sm-4" id="divNomorReg">
+                                <div class="input-group">
+                                    <span class="input-group-addon">
+                                        PYN / 760 / @Model.Trans.DocDate.ToString("MMyyyy") /
+                                    </span>
+                                    <input type="text" class="form-control" id="NomorReg" value="@Model.Trans.NomorReg" autocomplete="off">
+                                </div>
+                            </div>
+                            <label class="col-sm-2 control-label text-right">Nomor CN</label>
+                            <div class="col-sm-4" id="divNomorCN">
+                                <div class="input-group">
+                                    <span class="input-group-addon">
+                                        @Model.Trans.DocDate.ToString("yyyy") / OPR / 4.6 /
+                                    </span>
+                                    <input type="text" class="form-control" id="NomorCN" value="@Model.Trans.NomorCN" autocomplete="off">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label class="col-sm-2 control-label text-right">Nomor CN PPN</label>
+                            <div class="col-sm-4" id="divNomorCNPPN">
+                                <div class="input-group">
+                                    <span class="input-group-addon">
+                                        @Model.Trans.DocDate.ToString("yyyy") / OPR / 4.6 /
+                                    </span>
+                                    <input type="text" class="form-control" id="NomorCNPPN" value="@Model.Trans.NomorCNPPN" autocomplete="off">
+                                </div>
+                            </div>
+                            <label class="col-sm-2 control-label text-right">Nomor PP</label>
+                            <div class="col-sm-4" id="divNomorPP">
+                                <div class="input-group">
+                                    <span class="input-group-addon">
+                                        @Model.Trans.DocDate.ToString("yyyy") / OPR / 4.6 /
+                                    </span>
+                                    <input type="text" class="form-control" id="NomorPP" value="@Model.Trans.NomorPP" autocomplete="off">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-12">
+            <div class="box box-solid">
+                <div class="box-header">
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="form-group col-md-12">
+                            <label class="col-sm-2 control-label text-right">Nomor Memo</label>
+                            <div class="col-sm-4" id="divNomorMemo">
+                                <input type="text" class="form-control" id="NomorMemo" readonly disabled value="@Model.Trans.KodeSurat.Nama@Model.Trans.Nomor" placeholder="Nomor Memo">
+                            </div>
+                            <label class="col-sm-2 control-label text-right">Tanggal</label>
+                            <div class="col-sm-4" id="divDocDate">
+                                <div class="input-group">
+                                    <div class="input-group-addon">
+                                        <i class="fa fa-calendar"></i>
+                                    </div>
+                                    <input type="text" class="form-control" id="DocDate" readonly disabled value="@Model.Trans.DocDate.ToString("dd MMMM yyyy")" autocomplete="off">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label class="col-sm-2 control-label text-right">Nama Rekanan</label>
+                            <div class="col-sm-4" id="divMainDetailId">
+                                <input type="text" class="form-control" id="MainDetailId" readonly disabled value="@Model.TransMainDetail.FirstOrDefault().MainDetail.Main.Vendor.Nama" />
+                            </div>
+                        </div>
+                        @if (Model.TransMainDetail.ToList().Count > 0)
+                        {
+                            foreach (var item in Model.TransMainDetail)
+                            {
+                                <div class="form-group col-md-12 GKontrak">
+                                    <label class="col-sm-offset-1 col-sm-1 control-label text-right"><i class="fa fa-square"></i></label>
+                                    <div class="col-sm-2">
+                                        @if (item.MainDetail.JenisDokumenId != 3)
+                                        {
+                                            <input type="text" class="form-control input-sm" readonly disabled value="@item.MainDetail.JenisDokumen.Nama">
+                                        }
+                                        else
+                                        {
+                                            <input type="text" class="form-control input-sm" readonly disabled value="@item.MainDetail.JenisDokumen.Nama - @item.MainDetail.Index">
+                                        }
+
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <input type="text" class="form-control input-sm" readonly disabled value="@item.MainDetail.Nomor">
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <div class="input-group input-group-sm">
+                                            <div class="input-group-addon">
+                                                <i class="fa fa-calendar"></i>
+                                            </div>
+                                            <input type="text" class="form-control input-sm" readonly disabled value="@item.MainDetail.DocDate.ToString("dd MMMM yyyy")">
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        <div class="form-group col-md-12">
+                            <label class="col-sm-2 control-label text-right">Uraian</label>
+                            <div class="col-sm-10" id="divUraian">
+                                <textarea class="form-control" rows="2" id="Uraian" readonly disabled placeholder="Uraian">@Model.Trans.Uraian</textarea>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label class="col-sm-12 control-label text-center">Lampiran</label>
+                        </div>
+                        @if (Model.TransAttachment.Count > 0)
+                        {
+                            var no = 0; var allcount = Model.TransAttachment.Count - 1;
+                            foreach (var item in Model.TransAttachment)
+                            {
+                                <div class="GLampiran" id="GLampiran@(no)" count="@allcount">
+                                    <div class="form-group col-md-12">
+                                        <input type="hidden" id="Id@(no)" value="@item.Id" />
+                                        <label class="col-sm-1 control-label text-right"><i class="fa fa-square"></i></label>
+                                        <div class="col-sm-10">
+                                            <label class="col-sm-1 control-label text-right">Jenis</label>
+                                            <div class="col-sm-11" id="divSubJenisAttch@(no)">
+                                                @*<input type="text" class="form-control" id="Nama@(no)" value="@item.Nama" placeholder="Nama Lampiran">s*@
+                                                <select required="required" class="form-control select2" id="SubJenisAttch@(no)" style="width: 100%;">
+                                                    @foreach (var data in Model.SubJenisAttch)
+                                                    {
+                                                        if (data.Id == item.SubJenisAttchId)
+                                                        {
+                                                            <option value="@data.Id" selected>@data.Nama</option>
+                                                        }
+                                                        else
+                                                        {
+                                                            <option value="@data.Id">@data.Nama</option>
+                                                        }
+                                                    }
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-1">
+                                            @if (no == 0)
+                                            {
+                                                <button class="btn btn-default btn-sm" onclick="AddLampiran()"><i class="fa fa-plus-circle"></i></button>
+                                            }
+                                            else
+                                            {
+                                                <button class="btn btn-danger btn-sm" onclick="Remove('GLampiran@(no)')"><i class="fa fa-trash"></i></button>
+                                            }
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-md-12">
+                                        <div class="col-sm-offset-1 col-sm-10">
+                                            <label class="col-sm-1 control-label text-right">Tanggal</label>
+                                            <div class="col-sm-3" id="divTanggal@(no)">
+                                                <div class="input-group">
+                                                    <div class="input-group-addon">
+                                                        <i class="fa fa-calendar"></i>
+                                                    </div>
+                                                    <input type="text" class="form-control Tanggal" id="Tanggal@(no)" value="@item.DocDate.ToString("dd MMMM yyyy")" autocomplete="off">
+                                                    @*<span class="input-group-addon">
+                                                        <input type="checkbox" id="AddKJangkaWaktuCheck" onchange="JangkaWaktu()">
+                                                    </span>*@
+                                                </div>
+                                            </div>
+                                            <label class="col-sm-1 control-label text-right">Jumlah</label>
+                                            <div class="col-sm-3" id="divJumlah@(no)">
+                                                <input type="text" class="form-control text-right" value="@item.Jumlah.ToString("n0")" oninput="this.value = decimal(this.value.replace(/[^0-9.]/g, '').replace(/\.(?=.*\.)/g, ''));" id="Jumlah@(no)" placeholder="Jumlah Lembar">
+                                            </div>
+                                            <label class="col-sm-1 control-label text-right">Nomor</label>
+                                            <div class="col-sm-3" id="divNomor@(no)">
+                                                <input type="text" class="form-control" id="Nomor@(no)" value="@item.Nomor" placeholder="Nomor Lampiran">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-md-12">
+                                        <div class="col-sm-offset-1 col-sm-10">
+                                            <label class="col-sm-1 control-label text-right">Output</label>
+                                            <div class="col-sm-3" id="divOutputAttch@(no)">
+                                                <select required="required" class="form-control select2" id="OutputAttch@(no)" onchange="OutputAttch(@(no))" style="width: 100%;">
+                                                    @foreach (var data in Model.OutputAttch)
+                                                    {
+                                                        if (data.Id == item.OutputAttchId)
+                                                        {
+                                                            <option value="@data.Id" selected>@data.Nama</option>
+                                                        }
+                                                        else
+                                                        {
+                                                            <option value="@data.Id">@data.Nama</option>
+                                                        }
+                                                    }
+                                                </select>
+                                            </div>
+                                            <label class="col-sm-1 control-label text-right">File</label>
+                                            <div class="col-sm-3" id="divFile@(no)">
+                                                @if (item.OutputAttchId == 2 || item.OutputAttchId == 4)
+                                                {
+                                                    <div class="input-group">
+                                                        <input type="text" class="form-control" id="FileOld@(no)" value="@item.Path" disabled readonly>
+                                                        <span class="input-group-btn">
+                                                            <a href="@Url.Content("~/Files/Attachment/")@item.Path" class="btn btn-info btn-flat" target="_blank"><i class="fa fa-download"></i></a>
+                                                            <button class="btn btn-danger btn-flat" onclick="DeleteAttch(@no, '@item.Path')"><i class="fa fa-remove"></i></button>
+                                                        </span>
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <input type="file" class="form-control" id="File@(no)" path="@item.Path" placeholder="File Lampiran">
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                { no++; }
+                            }
+                        }
+                        else
+                        {
+                            <div class="GLampiran" id="GLampiran0" count="0">
+                                <div class="form-group col-md-12">
+                                    <label class="col-sm-1 control-label text-right"><i class="fa fa-square"></i></label>
+                                    <div class="col-sm-10">
+                                        <label class="col-sm-1 control-label text-right">Jenis</label>
+                                        <div class="col-sm-11" id="divSubJenisAttch0">
+                                            @*<input type="text" class="form-control" id="Nama0" placeholder="Nama Lampiran">*@
+                                            <select required="required" class="form-control select2" id="SubJenisAttch0" style="width: 100%;">
+                                                @foreach (var data in Model.SubJenisAttch)
+                                                {
+                                                    <option value="@data.Id">@data.Nama</option>
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-1">
+                                        <button class="btn btn-default btn-sm" onclick="AddLampiran()"><i class="fa fa-plus-circle"></i></button>
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-12">
+                                    <div class="col-sm-offset-1 col-sm-10">
+                                        <label class="col-sm-1 control-label text-right">Tanggal</label>
+                                        <div class="col-sm-3" id="divTanggal0">
+                                            <div class="input-group">
+                                                <div class="input-group-addon">
+                                                    <i class="fa fa-calendar"></i>
+                                                </div>
+                                                <input type="text" class="form-control Tanggal" id="Tanggal0" autocomplete="off">
+                                            </div>
+                                        </div>
+                                        <label class="col-sm-1 control-label text-right">Jumlah</label>
+                                        <div class="col-sm-3" id="divJumlah0">
+                                            <input type="text" class="form-control text-right" oninput="this.value = decimal(this.value.replace(/[^0-9.]/g, '').replace(/\.(?=.*\.)/g, ''));" id="Jumlah0" placeholder="Jumlah Lembar">
+                                        </div>
+                                        <label class="col-sm-1 control-label text-right">Nomor</label>
+                                        <div class="col-sm-3" id="divNomor0">
+                                            <input type="text" class="form-control" id="Nomor0" placeholder="Nomor Lampiran">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-12">
+                                    <div class="col-sm-offset-1 col-sm-10">
+                                        <label class="col-sm-1 control-label text-right">Output</label>
+                                        <div class="col-sm-3" id="divOutputAttch0">
+                                            <select required="required" class="form-control select2" id="OutputAttch0" onchange="OutputAttch(0)" style="width: 100%;">
+                                                @foreach (var data in Model.OutputAttch)
+                                                {
+                                                    <option value="@data.Id">@data.Nama</option>
+                                                }
+                                            </select>
+                                        </div>
+                                        <label class="col-sm-1 control-label text-right">File</label>
+                                        <div class="col-sm-3" id="divFile0">
+                                            <input type="file" class="form-control" id="File0" path="" placeholder="File Lampiran">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="pull-right">
+                                <a href="@Url.Action("Index", "Inputs")" class="btn btn-default">Cancel</a>
+                                <button type="submit" name="submit" class="btn btn-primary" onclick="Submit()">Next</button>
+                                @*<button type="submit" name="submit" class="btn btn-primary" onclick="Submit()">Submit</button>*@
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            $('.select2').select2();
+            $('.Tanggal').datepicker();
+            //$('.Tanggal').datepicker("setDate", new Date());
+
+            var countawal = $('#GLampiran0').attr('count');
+            for (var i = 0; i <= countawal; i++) {
+                OutputAttch(i);
+            }
+        });
+
+        function plustitik(angka) {
+            var rupiah = '';
+            var angkarev = angka.toString().split('').reverse().join('');
+            for (var i = 0; i < angkarev.length; i++) if (i % 3 == 0) rupiah += angkarev.substr(i, 3) + ',';
+            return rupiah.split('', rupiah.length - 1).reverse().join('');
+        }
+
+        function decimal(num) {
+            var parts = num.toString().split(".");
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            return parts.join(".");
+        }
+
+        function minkoma(angka) {
+            var bil = angka;
+            var loop = Math.floor(angka.length / 3);
+            for (var i = 0; i < loop; i++) {
+                bil = bil.replace(',', '');
+            }
+            return bil;
+        }
+
+        function formatDateTime(dates) {
+            date = new Date(parseInt(dates.substr(6)));
+            var year = date.getFullYear();
+            var month = (1 + date.getMonth()).toString();
+            month = month.length > 1 ? month : '0' + month;
+            var day = date.getDate().toString();
+            day = day.length > 1 ? day : '0' + day;
+            var hour = date.getHours().toString();
+            hour = hour.length > 1 ? hour : '0' + hour;
+            var minutes = date.getMinutes().toString();
+            minutes = minutes.length > 1 ? minutes : '0' + minutes;
+            var second = date.getSeconds().toString();
+            second = second.length > 1 ? second : '0' + second;
+            return day + '/' + month + '/' + year + ' ' + hour + ':' + minutes + ':' + second;
+        }
+
+        function formatDates(dates) {
+            date = new Date(parseInt(dates.substr(6)));
+            var year = date.getFullYear();
+            var month = (1 + date.getMonth()).toString();
+            month = month.length > 1 ? month : '0' + month;
+            var day = date.getDate().toString();
+            day = day.length > 1 ? day : '0' + day;
+            return day + '/' + month + '/' + year;
+        }
+
+        function formatDatesRange(dates) {
+            date = new Date(parseInt(dates.substr(6)));
+            var year = date.getFullYear();
+            var month = (1 + date.getMonth()).toString();
+            month = month.length > 1 ? month : '0' + month;
+            var day = date.getDate().toString();
+            day = day.length > 1 ? day : '0' + day;
+            return month + '-' + day + '-' + year;
+        }
+
+        function formatDate(dates) {
+            date = new Date(dates);
+            var year = date.getFullYear();
+            var month = (1 + date.getMonth()).toString();
+            month = month.length > 1 ? month : '0' + month;
+            var day = date.getDate().toString();
+            day = day.length > 1 ? day : '0' + day;
+            return year + '-' + month + '-' + day;
+        }
+
+        function AddLampiran() {
+            var countawal = $('#GLampiran0').attr('count');
+            var count = parseInt(countawal) + 1;
+            var html = '';
+            html += '<div class="GLampiran" id="GLampiran' + count + '">';
+            html += '<div class="form-group col-md-12">';
+            html += '<label class="col-sm-1 control-label text-right"><i class="fa fa-square"></i></label>';
+            html += '<div class="col-sm-10">';
+            html += '<label class="col-sm-1 control-label text-right">Jenis</label>';
+            html += '<div class="col-sm-11" id="divSubJenisAttch' + count + '"><select required="required" class="form-control select2" id="SubJenisAttch' + count + '" style="width: 100%;"></select></div>';
+            html += '</div>';
+            html += '<div class="col-sm-1">';
+            html += '<button class="btn btn-danger btn-sm" onclick="Remove(\'GLampiran' + count + '\')"><i class="fa fa-trash"></i></button>';
+            html += '</div>';
+            html += '</div>';
+            html += '<div class="form-group col-md-12">';
+            html += '<div class="col-sm-offset-1 col-sm-10">';
+            html += '<label class="col-sm-1 control-label text-right">Tanggal</label>';
+            html += '<div class="col-sm-3" id="divTanggal' + count + '">';
+            html += '<div class="input-group">';
+            html += '<div class="input-group-addon"><i class="fa fa-calendar"></i></div>';
+            html += '<input type="text" class="form-control Tanggal" id="Tanggal' + count + '" autocomplete="off">';
+            html += '</div>';
+            html += '</div>';
+            html += '<label class="col-sm-1 control-label text-right">Lembar</label>';
+            html += '<div class="col-sm-3" id="divJumlah' + count + '"><input type="text" class="form-control text-right" id="Jumlah' + count + '" oninput="this.value = decimal(this.value.replace(/[^0-9.]/g, \'\').replace(/\\.(?=.*\\.)/g, \'\'));" placeholder="Jumlah Lembar"></div>';
+            html += '<label class="col-sm-1 control-label text-right">Nomor</label>';
+            html += '<div class="col-sm-3" id="divNomor' + count + '"><input type="text" class="form-control" id="Nomor' + count + '" placeholder="Nomor Lampiran"></div>';
+            html += '</div>';
+            html += '</div>';
+            html += '<div class="form-group col-md-12">';
+            html += '<div class="col-sm-offset-1 col-sm-10">';
+            html += '<label class="col-sm-1 control-label text-right">Output</label>';
+            html += '<div class="col-sm-3" id="divOutputAttch' + count + '">';
+            html += '<select required="required" class="form-control select2" id="OutputAttch' + count + '" onchange="OutputAttch(' + count + ')" style="width: 100%;"></select>';
+            html += '</div>';
+            html += '<label class="col-sm-1 control-label text-right">File</label>';
+            html += '<div class="col-sm-3" id="divFile' + count + '"><input type="file" class="form-control" id="File' + count + '" path="" placeholder="File Lampiran"></div>';
+            html += '</div>';
+            html += '</div>';
+            html += '</div>';
+
+            $('.GLampiran').last().after(html);
+            $('#GLampiran0').attr('count', count);
+
+            $('#SubJenisAttch0').find('option').clone().appendTo('#SubJenisAttch' + count);
+            $('#OutputAttch0').find('option').clone().appendTo('#OutputAttch' + count);
+
+            $('.select2').select2();
+            $('#Tanggal' + count).datepicker();
+            
+            OutputAttch(count);
+        }
+
+        function Remove(Name) {
+            $('#' + Name).remove();
+        }
+
+        function OutputAttch(count) {
+            var Jenis = $('#OutputAttch' + count).val();
+            if (Jenis == 1 || Jenis == 3) {
+                if ($('#FileOld' + count).length) {
+                    var Path = $('#FileOld' + count).val()
+                    var ele = $('#divFile' + count);
+                    ele.html('<input type="file" class="form-control" id="File' + count + '" path="' + Path + '" placeholder="File Lampiran">');
+                }
+                if ($('#File' + count).length) {
+                    $('#File' + count).prop('readonly', true);
+                    $('#File' + count).prop('disabled', true);
+                }
+            } else {
+                if ($('#File' + count).length) {
+                    $('#File' + count).prop('readonly', false);
+                    $('#File' + count).prop('disabled', false);
+                }
+            }
+        }
+
+        function DeleteAttch(Id, Path) {
+            var Nama = $('#SubJenisAttch' + Id + ' option:selected').text();
+            swal({
+                title: "Are you sure to delete this documents?",
+                text: "All documents about " + Nama + " will be lost",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                closeOnConfirm: true
+            }, function () {
+                var ele = $('#divFile' + Id);
+                ele.html('<input type="file" class="form-control" id="File' + Id + '" path="' + Path + '" placeholder="File Lampiran">');
+            });
+        }
+
+        
+
+        function Submit() {
+            ClearError();
+            
+            var eror = false;
+            var Lampiran = $('#GLampiran0').attr('count');
+
+            if ($("#NomorReg").length) { if ($.trim($("#NomorReg").val()) == "") { $("#divNomorReg").addClass("has-error"); eror = true; } }
+            if ($("#NomorCN").length) { if ($.trim($("#NomorCN").val()) == "") { $("#divNomorCN").addClass("has-error"); eror = true; } }
+            if ($("#NomorCNPPN").length) { if ($.trim($("#NomorCNPPN").val()) == "") { $("#divNomorCNPPN").addClass("has-error"); eror = true; } }
+            if ($("#NomorPP").length) { if ($.trim($("#NomorPP").val()) == "") { $("#divNomorPP").addClass("has-error"); eror = true; } }
+
+            for (var i = 0; i <= Lampiran; i++) {
+                //if ($("#Nama" + i).length) { if ($.trim($("#Nama" + i).val()) == "") { $("#divNama" + i).addClass("has-error"); eror = true; } }
+                if ($("#SubJenisAttch" + i).length) { if ($.trim($("#SubJenisAttch" + i).val()) == "") { $("#divSubJenisAttch" + i).addClass("has-error"); eror = true; } }
+
+                if ($("#tanggal" + i).length) { if ($.trim($("#tanggal" + i).val()) == "") { $("#divtanggal" + i).addclass("has-error"); eror = true; } }
+                //if ($("#AddKJangkaWaktuCheck").is(":checked")) { if ($.trim($("#tanggal").val()) == "") { $("#divtanggal").addClass("has-error"); eror = true; } }
+                //if ($("#tanggal" + i).length) { if ($.trim($("#tanggal" + i).val()) == "") { $("#divtanggal" + i).removeClass('has-error'); eror = true } else { $("#divtanggal" + i).addclass("has-error"); eror = true; } }
+
+                if ($("#Jumlah" + i).length) { if ($.trim($("#Jumlah" + i).val()) == "") { $("#divJumlah" + i).addClass("has-error"); eror = true; } }
+                if ($("#Nomor" + i).length) { if ($.trim($("#Nomor" + i).val()) == "") { $("#divNomor" + i).addClass("has-error"); eror = true; } }
+                if ($("#OutputAttch" + i).length) { if ($.trim($("#OutputAttch" + i).val()) == "") { $("#divOutputAttch" + i).addClass("has-error"); eror = true; } }
+                if ($("#File" + i).length) { if (!$("#File" + i).is('[readonly') && !$("#File" + i).is('[disabled')) { if ($.trim($("#File" + i).val()) == "") { $("#divFile" + i).addClass("has-error"); eror = true; } } }
+            }
+            if (!eror) {
+                var count = 0;
+                var formData = new FormData();
+                var TransId = $("#TransId").val();
+                formData.append('Trans.Id', TransId);
+                formData.append('Trans.NomorReg', $("#NomorReg").val());
+                formData.append('Trans.NomorCN', $("#NomorCN").val());
+                formData.append('Trans.NomorCNPPN', $("#NomorCNPPN").val());
+                formData.append('Trans.NomorPP', $("#NomorPP").val());
+                for (var i = 0; i <= Lampiran; i++) {
+                    if ($("#SubJenisAttch" + i).length) {
+                        var KeyFile = "file" + count;
+                        if ($("#Id" + i).length) {
+                            formData.append('TransAttchs[' + count + '].Id', $("#Id" + i).val());
+                        }
+                        //formData.append('TransAttchs[' + count + '].Nama', $("#Nama" + i).val());
+                        formData.append('TransAttchs[' + count + '].SubJenisAttchId', $("#SubJenisAttch" + i).val());
+                        formData.append('TransAttchs[' + count + '].DocDate', formatDate($("#Tanggal" + i).val()));
+                        formData.append('TransAttchs[' + count + '].Jumlah', minkoma($("#Jumlah" + i).val()));
+                        formData.append('TransAttchs[' + count + '].Nomor', $("#Nomor" + i).val());
+                        formData.append('TransAttchs[' + count + '].OutputAttchId', $("#OutputAttch" + i).val());
+                        if ($("#File" + i).length) {
+                            formData.append('TransAttchs[' + count + '].Path', $("#File" + i).attr('path'));
+                            formData.append(KeyFile, $("#File" + i).get(0).files[0]);
+                        } else {
+                            formData.append('TransAttchs[' + count + '].Path', $("#FileOld" + i).val());
+                        }
+                        formData.append('TransAttchs[' + count + '].KeyFile', KeyFile);
+                        count++;
+                    }
+                }
+                $.ajax({
+                    url: "@Url.Action("Submit2", "Inputs")",
+                    type: "POST",
+                    contentType: false,
+                    processData: false,
+                    data: formData,
+                    success: function (result) {
+                        if (result.result) {
+                            swal({
+                                title: "Success!",
+                                text: "The data has been saved!",
+                                type: "success",
+                                showCancelButton: false,
+                                showConfirmButton: true
+                            },
+                            function () {
+                                window.location.href = '@Url.Action("Add3", "Inputs")/' + TransId;
+                            });
+                        } else {
+                            swal("Oops", "Data failed to save!", "error");
+                        }
+                    },
+                    error: function (response) {
+                        swal("Oops", "We couldn't connect to the server!", "error");
+                        $('.savebtn').button('reset');
+                    }
+                });
+
+            } else {
+                swal({
+                    title: "Failed!",
+                    text: "Data not completed!",
+                    type: "warning",
+                    showCancelButton: false,
+                    showConfirmButton: false,
+                    timer: 1000,
+                });
+            }
+
+        }
+
+        function ClearError() {
+            $(".has-error").removeClass("has-error");
+        }
+
+        function ClearScreen() {
+            $('input[type=text]').val('');
+            $('input[type=file]').val('');
+            $('input[type=hidden]').val(0);
+            $('select, textarea').val('');
+            $("#IsUrgent").prop('checked', false);
+        }
+    </script>
+}

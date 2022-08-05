@@ -1,0 +1,101 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<section class="content-header">
+    <h1>
+        Download Report
+    </h1>
+</section>
+<section class="content">
+    <div class="box box-default">
+        <div class="box-body">
+            <div class="row">
+                <div class="form-group col-md-12">
+                    <label for="total" class="col-sm-3 control-label">Jenis Report</label>
+                    <div class="col-sm-5">
+                        <select required="required" class="form-control select2 section1" id="JenisReport" onchange="Jenis()" style="width: 100%;">
+                            <option selected="selected" value="">-- Pilih Jenis Report --</option>
+                            <option value="1">Rekap PPN</option>
+                            <option value="2">Rekap PPH</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group col-md-12">
+                    <label for="total" class="col-sm-3 control-label">Tanggal</label>
+                    <div class="col-sm-5">
+                        <input type="text" class="form-control pull-right tanggalrange" onchange="Tanggal()" id="tanggal">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="box-footer with-border">
+            <div class="pull-right">
+                <a id="Download" readonly disabled class="btn btn-primary">Download</a>
+            </div>
+        </div>
+    </div>
+</section>
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            $('.tanggalrange').daterangepicker();
+        })
+
+        function ClearError() {
+            $(".has-error").removeClass("has-error");
+        }
+
+        function formatDate(dates) {
+            date = new Date(dates);
+            var year = date.getFullYear();
+            var month = (1 + date.getMonth()).toString();
+            month = month.length > 1 ? month : '0' + month;
+            var day = date.getDate().toString();
+            day = day.length > 1 ? day : '0' + day;
+            return year + '-' + month + '-' + day;
+        }
+
+        function Jenis() {
+            var Jenis = $("#JenisReport").val();
+            var daterange = $("#tanggal").val();
+
+            var start = daterange.substring(0, 10);
+            var end = daterange.substring(13, 24);
+
+            if (daterange != "") {
+                console.log('daas')
+                SetHref(Jenis, formatDate(start), formatDate(end));
+            }
+        }
+
+        function Tanggal() {
+            var Jenis = $("#JenisReport").val();
+            var daterange = $("#tanggal").val();
+
+            var start = daterange.substring(0, 10);
+            var end = daterange.substring(13, 24);
+
+            console.log(Jenis)
+            if (Jenis != null) {
+                console.log('daas2')
+                SetHref(Jenis, formatDate(start), formatDate(end));
+            }
+        }
+
+        function SetHref(Jenis, StartDate, EndDate) {
+            if (Jenis == 1) {
+                $('#Download').attr('href', '@Url.Action("RekapPPN", "Reports")?StartDate=' + StartDate + '&&EndDate=' + EndDate);
+                $('#Download').removeAttr('disabled');
+                $('#Download').removeAttr('readonly');
+            } else if (Jenis == 2) {
+                $('#Download').attr('href', '@Url.Action("RekapPPH", "Reports")?StartDate=' + StartDate + '&&EndDate=' + EndDate);
+                $('#Download').removeAttr('disabled');
+                $('#Download').removeAttr('readonly');
+            } 
+        }
+    </script>
+}
+

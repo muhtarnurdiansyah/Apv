@@ -1,0 +1,222 @@
+﻿@model IEnumerable<Apv.Models.Master.Currency>
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_LayoutConfigs.cshtml";
+}
+
+<section class="content-header">
+    <h1>
+        Currency
+    </h1>
+</section>
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box">
+                <div class="box-header with-border">
+                    <button type="button" class="btn btn-success pull-right" data-toggle="modal" data-target="#myModal" onclick="AddModal()"><i class="fa fa-plus-circle"></i> Tambah Data</button>
+                </div>
+                <div class="box-body">
+                    <table id="example1" class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Tanggal Dibuat</th>
+                                <th>Nama Currency</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{var no = 0; }
+                            @foreach (var data in Model)
+                            {
+                                { no++; }
+                                <tr>
+                                    <td>@no</td>
+                                    <td>@data.CreateDate.ToString()</td>
+                                    <td>@data.Nama</td>
+                                    <td>
+                                        <a href="#" onclick="ViewModal(@data.Id)" class="btn btn-sm  btn-primary"><i class="fa fa-eye"></i> View</a>
+                                        <a href="#" onclick="EditModal(@data.Id)" class="btn btn-sm btn-info"><i class="fa fa-pencil"></i> Edit</a>
+                                        <a href="#" onclick="DeleteModal(@data.Id, '@data.Nama')" class="btn btn-sm btn-danger"><i class="fa fa-trash-o"></i> Delete</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="example-modal">
+    <div id="myModal" class="modal fade" role="dialog" style="display:none;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel"></h4>
+                </div>
+                <div class="modal-body">
+                    <form class="form-horizontal">
+                        <input type="hidden" class="form-control" id="Id" />
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Nama</label>
+                            <div class="col-sm-9" id="divNama">
+                                <input type="text" class="form-control" id="Nama" placeholder="Nama" required />
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <div class="pull-right">
+                        <button type="button" class="btn btn-default" data-dismiss="modal" onclick="ClearScreen()" ;>Close</button>
+                        <button type="button" class="btn btn-success" id="Add" onclick="Save();">Save</button>
+                        <button type="button" class="btn btn-primary" id="Edit" style="display:none;" onclick="Save();">Update</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            $('#example1').DataTable();
+        });
+
+        function AddModal() {
+            ClearError();
+            ClearScreen();
+            $('#myModalLabel').html('Tambah Data');
+            $('#Edit').hide();
+            $('#Add').show();
+        }
+
+        function ViewModal(Id) {
+            $.ajax({
+                url: "@Url.Action("GetById", "MasCurrencies")",
+                type: "GET",
+                data: { 'Id': Id },
+                dataType: "json",
+                success: function (result) {
+                    ClearError();
+                    ClearScreen();
+                    $('#Id').val(result.Id);
+                    $('#Nama').val(result.Nama);
+
+                    $('#myModalLabel').html('View Data');
+                    $('#myModal').modal('show');
+                    $('#Edit').hide();
+                    $('#Add').hide();
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            })
+        }
+
+        function EditModal(Id) {
+            $.ajax({
+                url: "@Url.Action("GetById", "MasCurrencies")",
+                type: "GET",
+                data: { 'Id': Id },
+                dataType: "json",
+                success: function (result) {
+                    ClearError();
+                    ClearScreen();
+                    $('#Id').val(result.Id);
+                    $('#Nama').val(result.Nama);
+
+                    $('#myModalLabel').html('Edit Data');
+                    $('#myModal').modal('show');
+                    $('#Edit').show();
+                    $('#Add').hide();
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            })
+        }
+
+        function ClearError() {
+            $(".has-error").removeClass("has-error");
+        }
+
+        function Save() {
+            ClearError();
+            if ($.trim($("#Nama").val()) == "") { $("#divNama").addClass("has-error"); return; }
+
+            var Currency = new Object();
+            if ($.trim($("#Id").val()) != "") { Currency.Id = $("#Id").val(); }
+            Currency.Nama = $('#Nama').val();
+
+            $.ajax({
+                url: "@Url.Action("Save", "MasCurrencies")",
+                type: 'POST',
+                data: { 'Currency': Currency },
+                dataType: 'json',
+                success: function (result) {
+                    ClearScreen();
+                    $('#myModal').modal('hide');
+                    swal({
+                        title: "Success!",
+                        text: "The data has been saved!",
+                        type: "success",
+                        showCancelButton: false,
+                        showConfirmButton: false,
+                        timer: 1000,
+                    },
+                    function () {
+                        window.location.href = '@Url.Action("Index", "MasCurrencies")';
+                    });
+                },
+                error: function (response) {
+                    swal("Oops", "We couldn't connect to the server!", "error");
+                }
+            });
+        }
+
+        function DeleteModal(Id, Nama) {
+            swal({
+                title: "Are you sure to delete this?",
+                text: "Currency : " + Nama,
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                closeOnConfirm: false
+            }, function () {
+                $.ajax({
+                    url: "@Url.Action("Delete", "MasCurrencies")",
+                    type: "POST",
+                    data: { 'Id': Id },
+                    success: function (response) {
+                        swal({
+                            title: "Deleted!",
+                            text: "That data has been delete!",
+                            type: "success"
+                        },
+                        function () {
+                            window.location.href = '@Url.Action("Index", "MasCurrencies")';
+                        });
+                    },
+                    error: function (response) {
+                        swal("Oops", "We couldn't connect to the server!", "error");
+                    }
+                });
+            });
+        }
+
+        function ClearScreen() {
+            $('#Update').hide();
+            $('#Save').show();
+            $('#Id').val('');
+            $('#CurrencyId').val('');
+            $('#Nama').val('');
+        }
+    </script>
+}

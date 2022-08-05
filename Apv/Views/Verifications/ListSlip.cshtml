@@ -1,0 +1,825 @@
+﻿@model Apv.ViewModels.TransSlipsVM
+@{
+    ViewBag.Title = "List Slip";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<section class="content-header">
+    <h1>
+        List Slip
+    </h1>
+</section>
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box">
+                <input type="hidden" id="TransId" value="@Model.Trans.Id" />
+                <div class="box-header with-border">
+                    <div class="col-md-12">
+                        <div class="pull-right">
+                            <a href="@Url.Action("Add", "Verifications", new { Id = Model.Trans.Id})" class="btn btn-sm btn-primary"><i class="fa fa-plus-circle"></i> Tambah Data Manual</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <table id="example1" class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Jenis Slip</th>
+                                @*<th>Output Slip</th>*@
+                                <th>Rek Debit</th>
+                                <th>Nama Debit</th>
+                                <th>Rek Kredit</th>
+                                @*<th>Nama Kredit</th>*@
+                                <th>Nominal</th>
+                                @*<th>Keterangan 1</th>*@
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody class="tbody"></tbody>
+                    </table>
+                </div>
+                <div class="box-footer">
+                    <div class="col-md-12">
+                        <div class="pull-right">
+                            <a href="@Url.Action("Index", "Verifications" )" class="btn btn-default">Close</a>
+                            <button class="btn btn-success" onclick="Send()">Send E-Voucher</button>
+                            @*<button class="btn btn-success" readonly disabled>Send E-Voucher</button>*@
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@foreach (var item in Model.SettingSlip)
+{
+    var set = item.JenisSlipId + "-" + item.OutputSlipId;
+    <div class="example-modal">
+        <div id="@(set)ViewModal" class="modal fade" role="dialog" style="display:none;">
+            <div class="modal-dialog" style="width:95%;">
+                <div class="modal-content">
+                    <div class="modal-header bg-aqua">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Lihat Data @item.JenisSlip.Nama</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6" style="border-right: 3px solid #000">
+                                <h2 class="page-header">
+                                    <b>Pengirim <small>Debit</small></b>
+                                </h2>
+                                <div class="row">
+                                    @if (item.NoRekDebit)
+                                    {
+                                    <div class="form-group col-md-12">
+                                        <label class="col-sm-3 control-label text-right" id="label@(set)NoRekDebit">No Rekening</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" readonly id="@(set)NoRekDebit" placeholder="No Rekening">
+                                        </div>
+                                    </div>
+                                    }
+                                    @if (item.NoRekDebit2)
+                                    {
+                                    <div class="form-group col-md-12 hide" id="div@(set)NoRekDebitVA">
+                                        <label class="col-sm-3 control-label text-right">No Rekening Asli</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" readonly id="@(set)NoRekDebit2" placeholder="No Rekening">
+                                        </div>
+                                    </div>
+                                    }
+                                    @if (item.NamaRekDebit)
+                                    {
+                                    <div class="form-group col-md-12">
+                                        <label class="col-sm-3 control-label text-right">Nama Rekening</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" readonly id="@(set)NamaRekDebit" placeholder="Nama Rekening">
+                                        </div>
+                                    </div>
+                                    }
+                                    @if (item.NamaRekDebit2)
+                                    {
+                                    <div class="form-group col-md-12">
+                                        <label class="col-sm-3 control-label text-right">Nama Rekening</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" readonly id="@(set)NamaRekDebit2" placeholder="Nama Rekening">
+                                        </div>
+                                    </div>
+                                    }
+                                    @if (item.NamaCabangDebit)
+                                    {
+                                    <div class="form-group col-md-12">
+                                        <label class="col-sm-3 control-label text-right">Nama Cabang</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" readonly id="@(set)NamaCabangDebit" placeholder="Nama Cabang">
+                                        </div>
+                                    </div>
+                                    }
+                                    @if (item.JenisRekeningDebit)
+                                    {
+                                    <div class="form-group col-md-12">
+                                        <label class="col-sm-3 control-label text-right">Jenis Rekening</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" readonly id="@(set)JenisRekeningDebit" placeholder="Jenis Rekening">
+                                        </div>
+                                    </div>
+                                    }
+                                    @if (item.NominalDebit && item.NominalKredit)
+                                    {
+                                    <div class="form-group col-md-12">
+                                        <label class="col-sm-3 control-label text-right">Nominal</label>
+                                        @if (item.CurrencyDebit)
+                                            {
+                                        <div class="col-sm-3">
+                                            <input type="text" class="form-control" readonly id="@(set)CurrencyDebit" placeholder="CCY">
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <input type="text" class="form-control text-right" readonly id="@(set)NominalDebit" placeholder="Nominal">
+                                        </div>
+                                            }
+                                            else
+                                            {
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control text-right" readonly id="@(set)NominalDebit" placeholder="Nominal">
+                                        </div>
+                                            }
+                                    </div>
+                                    }
+                                    @if (item.PesanDebit)
+                                    {
+                                    <div class="form-group col-md-12">
+                                        <label class="col-sm-3 control-label text-right">Pesan</label>
+                                        <div class="col-sm-9">
+                                            <textarea class="form-control" readonly id="@(set)PesanDebit" placeholder="Pesan"></textarea>
+                                        </div>
+                                    </div>
+                                    }
+                                    @if (item.PesanDebit2)
+                                    {
+                                    <div class="form-group col-md-12">
+                                        <label class="col-sm-3 control-label text-right">Pesan</label>
+                                        <div class="col-sm-9">
+                                            <textarea class="form-control" readonly id="@(set)PesanDebit2" placeholder="Pesan"></textarea>
+                                        </div>
+                                    </div>
+                                    }
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h2 class="page-header">
+                                    <b>Penerima <small>Kredit</small></b>
+                                </h2>
+                                <div class="row">
+                                    @if (item.NoRekKredit)
+                                    {
+                                    <div class="form-group col-md-12">
+                                        <label class="col-sm-3 control-label text-right" id="label@(set)NoRekKredit">No Rekening</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" readonly id="@(set)NoRekKredit" placeholder="No Rekening">
+                                        </div>
+                                    </div>
+                                    }
+                                    @if (item.NoRekKredit2)
+                                    {
+                                    <div class="form-group col-md-12 hide" id="div@(set)NoRekKreditVA">
+                                        <label class="col-sm-3 control-label text-right">No Rekening Asli</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" readonly id="@(set)NoRekKredit2" placeholder="No Rekening">
+                                        </div>
+                                    </div>
+                                    }
+                                    @if (item.NamaRekKredit)
+                                    {
+                                    <div class="form-group col-md-12">
+                                        <label class="col-sm-3 control-label text-right">Nama Rekening</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" readonly id="@(set)NamaRekKredit" placeholder="Nama Rekening">
+                                        </div>
+                                    </div>
+                                    }
+                                    @if (item.NamaCabangKredit)
+                                    {
+                                    <div class="form-group col-md-12">
+                                        <label class="col-sm-3 control-label text-right">Nama Cabang</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" readonly id="@(set)NamaCabangKredit" placeholder="Nama Cabang">
+                                        </div>
+                                    </div>
+                                    }
+                                    @if (item.JenisRekeningKredit)
+                                    {
+                                    <div class="form-group col-md-12">
+                                        <label class="col-sm-3 control-label text-right">Jenis Rekening</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" readonly id="@(set)JenisRekeningKredit" placeholder="Jenis Rekening">
+                                        </div>
+                                    </div>
+                                    }
+                                    @if (item.BankKredit)
+                                    {
+                                    <div class="form-group col-md-12">
+                                        <label class="col-sm-3 control-label text-right">Bank</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" readonly id="@(set)BankKredit" placeholder="Bank">
+                                        </div>
+                                    </div>
+                                    }
+                                    @if (item.NominalDebit && item.NominalKredit)
+                                    {
+                                    <div class="form-group col-md-12">
+                                        <label class="col-sm-3 control-label text-right">Nominal</label>
+                                        @if (item.CurrencyKredit)
+                                            {
+                                        <div class="col-sm-3">
+                                            <input type="text" class="form-control" readonly id="@(set)CurrencyKredit" placeholder="CCY">
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <input type="text" class="form-control text-right" readonly id="@(set)NominalKredit" placeholder="Nominal">
+                                        </div>
+                                            }
+                                            else
+                                            {
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control text-right" readonly id="@(set)NominalKredit" placeholder="Nominal">
+                                        </div>
+                                            }
+                                    </div>
+                                    }
+                                    @if (item.AddKredit)
+                                    {
+                                    <div class="form-group col-md-12">
+                                        <label class="col-sm-3 control-label text-right">Add</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" readonly id="@(set)AddKredit" placeholder="Add">
+                                        </div>
+                                    </div>
+                                    }
+                                    @if (item.AddKredit2)
+                                    {
+                                    <div class="form-group col-md-12">
+                                        <label class="col-sm-3 control-label text-right">Add 2</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" readonly id="@(set)AddKredit2" placeholder="Add">
+                                        </div>
+                                    </div>
+                                    }
+                                    @if (item.PhoneKredit)
+                                    {
+                                    <div class="form-group col-md-12">
+                                        <label class="col-sm-3 control-label text-right">Phone</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" readonly id="@(set)PhoneKredit" placeholder="Phone">
+                                        </div>
+                                    </div>
+                                    }
+                                    @if (item.CityCodeKredit)
+                                    {
+                                    <div class="form-group col-md-12">
+                                        <label class="col-sm-3 control-label text-right">City Code</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" readonly id="@(set)CityCodeKredit" placeholder="City Code">
+                                        </div>
+                                    </div>
+                                    }
+                                    @if (item.IdKredit)
+                                    {
+                                    <div class="form-group col-md-12">
+                                        <label class="col-sm-3 control-label text-right">Id</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" readonly id="@(set)IdKredit" placeholder="Id">
+                                        </div>
+                                    </div>
+                                    }
+                                    @if (item.IdTypeKredit)
+                                    {
+                                    <div class="form-group col-md-12">
+                                        <label class="col-sm-3 control-label text-right">Id Type</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" readonly id="@(set)IdTypeKredit" placeholder="Id Type">
+                                        </div>
+                                    </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h2 class="page-header">
+                                    <b>Informasi Detail</b>
+                                </h2>
+                            </div>
+                            @if (item.Tanggal)
+                            {
+                            <div class="form-group col-md-12">
+                                <label class="col-sm-2 control-label text-right">Tanggal</label>
+                                <div class="col-sm-4">
+                                    <div class="input-group">
+                                        <div class="input-group-addon">
+                                            <i class="fa fa-calendar"></i>
+                                        </div>
+                                        <input type="text" class="form-control Tanggal" id="@(set)Tanggal" readonly autocomplete="off">
+                                    </div>
+                                </div>
+                            </div>
+                            }
+                            @if (item.NoReferensi)
+                            {
+                            <div class="form-group col-md-12">
+                                <label class="col-sm-2 control-label text-right">No Referensi</label>
+                                <div class="col-sm-4">
+                                    <input type="text" class="form-control" id="@(set)NoReferensi" readonly placeholder="No Referensi">
+                                </div>
+                            </div>
+                            }
+                            @if (!item.NominalDebit || !item.NominalKredit)
+                            {
+                            <div class="form-group col-md-12">
+                                <label class="col-sm-2 control-label text-right">Nominal</label>
+                                @if (item.NominalDebit)
+                                    {
+                                        if (item.CurrencyDebit)
+                                        {
+                                <div class="col-sm-1">
+                                    <input type="text" class="form-control" id="@(set)CurrencyDebit" readonly placeholder="CCY">
+                                </div>
+                                <div class="col-sm-3">
+                                    <input type="text" class="form-control text-right" readonly id="@(set)NominalDebit" placeholder="Nominal">
+                                </div>
+                                        }
+                                        else
+                                        {
+                                <div class="col-sm-4">
+                                    <input type="text" class="form-control text-right" readonly id="@(set)NominalDebit" placeholder="Nominal">
+                                </div>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (item.CurrencyKredit)
+                                        {
+                                <div class="col-sm-1">
+                                    <input type="text" class="form-control" id="@(set)CurrencyKredit" readonly placeholder="CCY">
+                                </div>
+                                <div class="col-sm-3">
+                                    <input type="text" class="form-control text-right" readonly id="@(set)NominalKredit" placeholder="Nominal">
+                                </div>
+                                        }
+                                        else
+                                        {
+                                <div class="col-sm-4">
+                                    <input type="text" class="form-control text-right" readonly id="@(set)NominalKredit" placeholder="Nominal">
+                                </div>
+                                        }
+                                    }
+                            </div>
+                            }
+                            @if (item.Kurs)
+                            {
+                            <div class="form-group col-md-12">
+                                <label class="col-sm-2 control-label text-right">Kurs</label>
+                                <div class="col-sm-4">
+                                    <input type="text" class="form-control text-right" id="@(set)Kurs" readonly placeholder="Nominal Kurs">
+                                </div>
+                            </div>
+                            }
+                            @if (item.Biaya)
+                            {
+                            <div class="form-group col-md-12">
+                                <label class="col-sm-2 control-label text-right">Biaya</label>
+                                <div class="col-sm-4">
+                                    <input type="text" class="form-control text-right" id="@(set)Biaya" readonly placeholder="Nominal Biaya">
+                                </div>
+                            </div>
+                            }
+                            @if (item.SandiTXN)
+                            {
+                            <div class="form-group col-md-12">
+                                <label class="col-sm-2 control-label text-right">Sandi TXN</label>
+                                <div class="col-sm-4">
+                                    <input type="text" class="form-control" id="@(set)SandiTXN" readonly placeholder="Sandi TXN">
+                                </div>
+                            </div>
+                            }
+                            @if (item.Keterangan1)
+                            {
+
+                            <div class="form-group col-md-12">
+                                <label class="col-sm-2 control-label text-right">Narasi</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" id="@(set)Keterangan1" readonly placeholder="Narasi">
+                                </div>
+                            </div>
+                            }
+                            @if (item.Keterangan2)
+                            {
+
+                            <div class="form-group col-md-12">
+                                <label class="col-sm-2 control-label text-right">Narasi Tambahan</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" id="@(set)Keterangan2" readonly placeholder="Narasi Tambahan">
+                                </div>
+                            </div>
+                            }
+                            @if (item.Keterangan3)
+                            {
+
+                            <div class="form-group col-md-12">
+                                <label class="col-sm-2 control-label text-right">Narasi Tambahan 2</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" id="@(set)Keterangan3" readonly placeholder="Narasi Tambahan 2">
+                                </div>
+                            </div>
+                            }
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <div class="pull-right">
+                            <button type="button" class="btn btn-default" data-dismiss="modal" onclick="ClearScreen()">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<div class="example-modal">
+    <div id="SendingModal" class="modal fade" role="dialog" style="display:none;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="SendingModalLabel"></h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="form-group col-md-12">
+                            <label class="col-sm-4 control-label text-right">Total Slip</label>
+                            <div class="col-sm-6">
+                                <div class="input-group">
+                                    <input type="text" class="form-control text-right" readonly disabled id="BatchingTotal">
+                                    <span class="input-group-addon"> Selected</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <div class="col-sm-6 col-sm-offset-4">
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" id="IsUrgent"> Transaksi Penting <b class="text-red">( Urgent )</b>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12 text-center">
+                            <span class="text-red">* Pastikan akun E-Voucher anda sudah ter sign in dan aktif</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="pull-right">
+                        <button type="button" class="btn btn-default" data-dismiss="modal" onclick="ClearScreen()" ;>Close</button>
+                        <button type="submit" name="submit" class="btn btn-warning" id="sendingbtn" onclick="Sending()">Send</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            var Id = $("#TransId").val();
+            $('.select2').select2();
+            var t = $("#example1").DataTable({
+                //"orderCellsTop": true,
+                "ajax": {
+                    "url": "@Url.Action("GetListSlip", "Verifications")",
+                    "type": "POST",
+                    data: { 'Id': Id },
+                    "datatype": "json"
+                },
+                "columns": [
+                    { "data": null },
+                    { "data": "JenisSlip.Singkatan" },
+                    //{ "data": "OutputSlip.Nama" },
+                    { "data": "NoRekDebit" },
+                    { "data": "NamaRekDebit" },
+                    { "data": "NoRekKredit" },
+                    //{ "data": "NamaRekKredit" },
+                    {
+                        "render": function (data, type, val) {
+                            if (val.NominalKredit != 0) {
+                                return val.CurrencyKredit.Nama + " " + decimal(val.NominalKredit);
+                            } else {
+                                return val.CurrencyDebit.Nama + " " + decimal(val.NominalDebit);
+                            }
+                        }
+                    },
+                    //{ "data": "Keterangan1" },
+                    {
+                        "render": function (data, type, val) {
+                            html = '';
+                            html += '<button class="btn btn-sm btn-info" onclick="ViewModal(' + val.Id + ')" data-placement="bottom" title="View"><i class="fa fa-eye"></i></button>';
+                            html += ' <a href="@Url.Action("Edit", "Verifications")/' + val.Id + '" class="btn btn-sm btn-primary" data-toggle="tooltip" data-placement="bottom" title="Edit"><i class="fa fa-pencil"></i></a>';
+                            if (val.NominalKredit != 0) {
+                                html += ' <button class="btn btn-sm btn-danger" onclick="DeleteModal(' + val.Id + ',\'' + val.NoRekDebit + '\',\'' + val.NoRekKredit + '\',\'' + decimal(val.NominalKredit) + '\')" data-toggle="tooltip" data-placement="bottom" title="Delete"><i class="fa fa-trash-o"></i></button>';
+                            } else {
+                                html += ' <button class="btn btn-sm btn-danger" onclick="DeleteModal(' + val.Id + ',\'' + val.NoRekDebit + '\',\'' + val.NoRekKredit + '\',\'' + decimal(val.NominalDebit) + '\')" data-toggle="tooltip" data-placement="bottom" title="Delete"><i class="fa fa-trash-o"></i></button>';
+                            }
+                            @*html += ' <button class="btn btn-sm btn-default" onclick="InfoModal(' + val.Id + ')" ' + disable + ' data-placement="bottom" title="Info"><i class="fa fa-info"></i></button>';*@
+                            return html;
+                        }
+                    }
+                ],
+                "pageLength": 25,
+                "lengthMenu": [[10, 25, 50, 100, 500, -1], [10, 25, 50, 100, 500, "All"]],
+                //"rowReorder": true,
+                //"scrollX": true,
+                "scrollCollapse": true,
+                //"dom": "<'row'<'col-sm-4'B><'col-sm-2'l><'col-sm-6'p>>" + "<'row'<'col-sm-12'tr>>" + "<'row'<'col-sm-5'i><'col-sm-7'p>>",
+                //"columnDefs": [
+                //    {
+                //        "searchPanes": {
+                //            "show": true,
+                //        },
+                //        "targets": [2, 3, 4, 5, 6, 7, 8],
+                //    }, {
+                //        "searchPanes": {
+                //            "show": false,
+                //        },
+                //        "targets": [0, 1, 9],
+                //    }, {
+                //        "sortable": false,
+                //        "class": "index",
+                //        "targets": [0, 1, 9]
+                //    }, {
+                //        "width": 150,
+                //        "targets": 9
+                //    }, {
+                //        "className": 'text-right',
+                //        "targets": 7
+                //    }],
+                "searchPanes": {
+                    "layout": 'columns-6'
+                },
+                //"select": {
+                //    "style": 'multi'
+                //},
+                //"buttons": {
+                //    "buttons": [
+                //        {
+                //            "extend": 'searchPanes',
+                //            "config": {
+                //                "cascadePanes": true
+                //            },
+                //            "className": 'btn-info'
+                //        }
+                //    ],
+                //    "dom": {
+                //        "button": {
+                //            "className": 'btn btn-sm'
+                //        },
+                //        "buttonLiner": {
+                //            "tag": null
+                //        }
+                //    }
+                //},
+                "language": {
+                    "searchPanes": {
+                        "clearMessage": 'Clear',
+                        "collapse": { 0: '<i class="fa fa-search"></i> Search', _: '<i class="fa fa-search"></i> Search (%d)' }
+                    }
+                }
+            });
+
+            t.on('order.dt search.dt', function () {
+                t.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+                    cell.innerHTML = i + 1;
+                });
+            }).draw();
+        });
+
+        function plustitik(angka) {
+            var rupiah = '';
+            var angkarev = angka.toString().split('').reverse().join('');
+            for (var i = 0; i < angkarev.length; i++) if (i % 3 == 0) rupiah += angkarev.substr(i, 3) + ',';
+            return rupiah.split('', rupiah.length - 1).reverse().join('');
+        }
+
+        function decimal(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+        }
+
+        function formatDateTime(dates) {
+            date = new Date(parseInt(dates.substr(6)));
+            var year = date.getFullYear();
+            var month = (1 + date.getMonth()).toString();
+            month = month.length > 1 ? month : '0' + month;
+            var day = date.getDate().toString();
+            day = day.length > 1 ? day : '0' + day;
+            var hour = date.getHours().toString();
+            hour = hour.length > 1 ? hour : '0' + hour;
+            var minutes = date.getMinutes().toString();
+            minutes = minutes.length > 1 ? minutes : '0' + minutes;
+            var second = date.getSeconds().toString();
+            second = second.length > 1 ? second : '0' + second;
+            return day + '/' + month + '/' + year + ' ' + hour + ':' + minutes + ':' + second;
+        }
+
+        function formatDates(dates) {
+            date = new Date(parseInt(dates.substr(6)));
+            var year = date.getFullYear();
+            var month = (1 + date.getMonth()).toString();
+            month = month.length > 1 ? month : '0' + month;
+            var day = date.getDate().toString();
+            day = day.length > 1 ? day : '0' + day;
+            return day + '/' + month + '/' + year;
+        }
+
+        function formatDate(dates) {
+            date = new Date(dates);
+            var year = date.getFullYear();
+            var month = (1 + date.getMonth()).toString();
+            month = month.length > 1 ? month : '0' + month;
+            var day = date.getDate().toString();
+            day = day.length > 1 ? day : '0' + day;
+            return year + '-' + month + '-' + day;
+        }
+
+        function ClearError() {
+            $(".has-error").removeClass("has-error");
+        }
+
+        function ViewModal(Id) {
+            $.ajax({
+                url: "@Url.Action("GetSlipById", "Verifications")",
+                type: "GET",
+                data: { 'Id': Id },
+                dataType: "json",
+                success: function (result) {
+                    ClearScreen();
+                    var set = result.JenisSlipId + '-' + result.OutputSlipId;
+                    if ($("#" + set + "NoRekDebit").length) { $("#" + set + "NoRekDebit").val(result.NoRekDebit); }
+                    if (result.IsNoRekDebitVA) {
+                        $("#div" + set + "NoRekDebitVA").removeClass("hide");
+                        $("#label" + set + "NoRekDebit").html("No Rekening VA");
+
+                    } else {
+                        $("#div" + set + "NoRekDebitVA").addClass("hide");
+                        $("#label" + set + "NoRekDebit").html("No Rekening");
+                    }
+                    if ($("#" + set + "NoRekDebit2").length) { $("#" + set + "NoRekDebit2").val(result.NoRekDebit2); }
+                    if ($("#" + set + "NamaRekDebit").length) { $("#" + set + "NamaRekDebit").val(result.NamaRekDebit); }
+                    if ($("#" + set + "NamaRekDebit2").length) { $("#" + set + "NamaRekDebit2").val(result.NamaRekDebit2); }
+                    if ($("#" + set + "NamaCabangDebit").length) { $("#" + set + "NamaCabangDebit").val(result.NamaCabangDebit); }
+                    if ($("#" + set + "JenisRekeningDebit").length) { $("#" + set + "JenisRekeningDebit").val(result.JenisRekeningDebit.Nama); }
+                    if ($("#" + set + "PesanDebit").length) { $("#" + set + "PesanDebit").val(result.PesanDebit); }
+                    if ($("#" + set + "PesanDebit2").length) { $("#" + set + "PesanDebit2").val(result.PesanDebit2); }
+                    if ($("#" + set + "CurrencyDebit").length) { $("#" + set + "CurrencyDebit").val(result.CurrencyDebit.Nama); }
+                    if ($("#" + set + "NominalDebit").length) { $("#" + set + "NominalDebit").val(decimal(result.NominalDebit)); }
+
+                    if ($("#" + set + "NoRekKredit").length) { $("#" + set + "NoRekKredit").val(result.NoRekKredit); }
+                    if (result.IsNoRekKreditVA) {
+                        $("#div" + set + "NoRekKreditVA").removeClass("hide");
+                        $("#label" + set + "NoRekKredit").html("No Rekening VA");
+
+                    } else {
+                        $("#div" + set + "NoRekKreditVA").addClass("hide");
+                        $("#label" + set + "NoRekKredit").html("No Rekening");
+                    }
+                    if ($("#" + set + "NoRekKredit2").length) { $("#" + set + "NoRekKredit2").val(result.NoRekKredit2); }
+                    if ($("#" + set + "NamaRekKredit").length) { $("#" + set + "NamaRekKredit").val(result.NamaRekKredit); }
+                    if ($("#" + set + "NamaCabangKredit").length) { $("#" + set + "NamaCabangKredit").val(result.NamaCabangKredit); }
+                    if ($("#" + set + "JenisRekeningKredit").length) { $("#" + set + "JenisRekeningKredit").val(result.JenisRekeningKredit.Nama); }
+                    if ($("#" + set + "BankKredit").length) { $("#" + set + "BankKredit").val(result.BankKredit.Nama + " - " + result.BankKredit.KodeBIC); }
+                    if ($("#" + set + "CurrencyKredit").length) { $("#" + set + "CurrencyKredit").val(result.CurrencyKredit.Nama); }
+                    if ($("#" + set + "NominalKredit").length) { $("#" + set + "NominalKredit").val(decimal(result.NominalKredit)); }
+                    if ($("#" + set + "AddKredit").length) { $("#" + set + "AddKredit").val(result.AddKredit); }
+                    if ($("#" + set + "AddKredit2").length) { $("#" + set + "AddKredit2").val(result.AddKredit2); }
+                    if ($("#" + set + "PhoneKredit").length) { $("#" + set + "PhoneKredit").val(result.PhoneKredit); }
+                    if ($("#" + set + "CityCodeKredit").length) { $("#" + set + "CityCodeKredit").val(result.CityCodeKredit); }
+                    if ($("#" + set + "IdKredit").length) { $("#" + set + "IdKredit").val(result.IdKredit); }
+                    if ($("#" + set + "IdTypeKredit").length) { $("#" + set + "IdTypeKredit").val(result.IdTypeKredit); }
+                    if ($("#" + set + "SandiTXN").length) { $("#" + set + "SandiTXN").val(result.SandiTXN); }
+
+                    if ($("#" + set + "Keterangan1").length) { $("#" + set + "Keterangan1").val(result.Keterangan1); }
+                    if ($("#" + set + "Keterangan2").length) { $("#" + set + "Keterangan2").val(result.Keterangan2); }
+                    if ($("#" + set + "Keterangan3").length) { $("#" + set + "Keterangan3").val(result.Keterangan3); }
+                    if ($("#" + set + "Biaya").length) { $("#" + set + "Biaya").val(decimal(result.Biaya)); }
+                    if ($("#" + set + "Kurs").length) { $("#" + set + "Kurs").val(decimal(result.Kurs)); }
+                    if ($("#" + set + "Tanggal").length) { $("#" + set + "Tanggal").val(formatDates(result.Tanggal)); }
+                    if ($("#" + set + "NoReferensi").length) { $("#" + set + "NoReferensi").val(result.NoReferensi); }
+
+                    $('#' + set + 'ViewModal').modal('show');
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            })
+        }
+
+        function DeleteModal(id, RD, RK, N) {
+            var Ids = new Array();
+            Ids.push(id);
+
+            swal({
+                title: "Are you sure to delete this?",
+                text: "Rek Debit : " + RD + " Rek Kredit : " + RK + " Nominal : " + N,
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                closeOnConfirm: false
+            }, function () {
+                $("body").addClass("loading");
+                $.ajax({
+                    url: "@Url.Action("DeleteSlip", "Verifications")",
+                    type: "POST",
+                    data: { 'Ids': Ids },
+                    success: function (response) {
+                        $("body").removeClass("loading");
+                        swal({
+                            title: "Deleted!",
+                            text: "That data has been delete!",
+                            type: "success",
+                            showCancelButton: false,
+                            showConfirmButton: true
+                        }, function () {
+                            ClearScreen();
+                            $("#example1").DataTable().ajax.reload();
+                        });
+                    },
+                    error: function (response) {
+                        swal("Oops", "We couldn't connect to the server!", "error");
+                    }
+                });
+            });
+        }
+
+        function Send() {
+            var data = $('#example1').DataTable().rows().nodes().to$();
+            var count = data.length;
+
+            $('#BatchingTotal').val(count);
+            $('#SendingModalLabel').html('Sending Data');
+            $('#SendingModal').modal('show');
+        }
+
+        function Sending() {
+            $('#SendingModal').modal('hide');
+            $("body").addClass("loading");
+            $('#sendingbtn').button('loading');
+
+            var Id = $("#TransId").val();
+            var IsUrgent = false;
+            if ($("#IsUrgent").is(':checked')) {
+                IsUrgent = true;
+            }
+
+            $.ajax({
+                url: "@Url.Action("SendingSlip", "Verifications")",
+                type: "POST",
+                data: { 'Id': Id, 'IsUrgent': IsUrgent },
+                dataType: 'json',
+                success: function (result) {
+                    if (result) {
+                        $('#batchingbtn').button('reset');
+                        $("body").removeClass("loading");
+                        swal({
+                            title: "Success!",
+                            text: "The data has been saved!",
+                            type: "success",
+                            showCancelButton: false,
+                            showConfirmButton: true
+                        }, function () {
+                            ClearScreen();
+                            window.location.href = '@Url.Action("Index", "Verifications")';
+
+                        });
+                    } else {
+                        swal("Oops", "You must Login in E-Voucher!", "error");
+                        $('#batchingbtn').button('reset');
+                        $("body").removeClass("loading");
+                    }
+                },
+                error: function (response) {
+                    swal("Oops", "We couldn't connect to the server!", "error");
+                    $('#batchingbtn').button('reset');
+                    $("body").removeClass("loading");
+                }
+            });
+        }
+
+        function ClearScreen() {
+            $('input[type=text]').val('');
+            $('input[type=file]').val('');
+            $('input[type=hidden]').val(0);
+            $('select, textarea').val('');
+            $("#IsUrgent").prop('checked', false);
+        }
+    </script>
+}

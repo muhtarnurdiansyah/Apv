@@ -1,0 +1,72 @@
+﻿@using Apv.Models
+@model LoginViewModel
+@{
+    Layout = null;
+}
+
+<html>
+<head>
+    <title>Login</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!--===============================================================================================-->
+    <link rel="icon" type="image/png" href="~/favicon.ico" />
+    <!--===============================================================================================-->    
+    <link rel="stylesheet" href="~/Content/Login/bootstrap.min.css">
+    <link rel="stylesheet" href="~/Content/Login/normalize.css">
+    <link rel="stylesheet" href="~/Content/Login/style.css">
+    <link rel="stylesheet" href="~/Content/Login/responsive.css">
+    <!--===============================================================================================-->
+    <script src="~/Scripts/Login/vendor/modernizr-2.8.3.min.js"></script>
+</head>
+<body>
+    <div class="mainmenu-area" data-spy="affix" data-offset-top="100">
+        <div class="container">            
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#primary-menu">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a href="#" class="navbar-brand logo">
+                    <h2>A <span>P</span> V</h2>
+                </a>
+            </div>
+        </div>
+    </div>
+    <header class="header-area overlay full-height relative v-center" id="home-page">
+        <div class="absolute anlge-bg"></div>
+        <div class="container">
+            <div class="row v-center">
+                <div class="col-xs-12 col-md-7 header-text">
+                    @*<div class="text-center">
+                        <img src="~/Content/img/dashboard.png" alt="SafeLogo" style="width:150px;">
+                    </div>*@
+                    <h3>Application <span>Payment Vendor</span></h3>
+                    @*<p>Download Manual Book Application <a href="@Url.Content("~/Files/Manual Application APV.pdf")" style="color:yellow;" target="_blank">klik disini</a></p>*@
+                </div>
+                <div class="hidden-xs hidden-sm col-md-offset-1 col-md-4 text-right">     
+                    <p>@ViewBag.status</p>               
+                    @using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form", id= "contact-form", @class="contact-form" }))
+                    {
+                        @Html.AntiForgeryToken()
+                                                                       
+                        @Html.TextBoxFor(m => m.UserName, new { @class = "form-control", placeholder = "Enter Username or NPP" })
+                        @Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = "Enter Password" })
+                        <button type="submit" class="button orange">Sign In</button>                        
+                    }
+                </div>
+            </div>
+        </div>
+    </header>
+    <!--===============================================================================================-->
+    <script src="~/Scripts/Login/vendor/jquery-1.12.4.min.js"></script>
+    <script src="~/Scripts/Login/vendor/bootstrap.min.js"></script>
+    <script src="~/Scripts/Login/owl.carousel.min.js"></script>
+    <script src="~/Scripts/Login/jquery.parallax-1.1.3.js"></script>
+    <script src="~/Scripts/Login/scrollUp.min.js"></script>
+    <script src="~/Scripts/Login/magnific-popup.min.js"></script>
+    <script src="~/Scripts/Login/wow.min.js"></script>
+    <script src="~/Scripts/Login/main.js"></script>
+</body>
+</html>

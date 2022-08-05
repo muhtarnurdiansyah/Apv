@@ -1,0 +1,990 @@
+﻿@model Apv.ViewModels.AddVM
+@{
+    ViewBag.Title = "View Payment";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<section class="content-header">
+    <h1>
+        View Payment
+    </h1>
+</section>
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box box-solid">
+                <div class="box-header">
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="form-group col-md-12">
+                            <input type="hidden" id="TransId" value="@Model.Id" />
+                            <label class="col-sm-2 control-label text-right">Nomor Memo</label>
+                            <div class="col-sm-4" id="divNomorMemo">
+                                <input type="text" class="form-control" id="NomorMemo" readonly disabled placeholder="Nomor Memo">
+                            </div>
+                            <label class="col-sm-2 control-label text-right">Tanggal</label>
+                            <div class="col-sm-4" id="divDocDate">
+                                <div class="input-group">
+                                    <div class="input-group-addon">
+                                        <i class="fa fa-calendar"></i>
+                                    </div>
+                                    <input type="text" class="form-control Tanggal" readonly disabled id="DocDate" autocomplete="off">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label class="col-sm-2 control-label text-right">Nama Rekanan</label>
+                            <div class="col-sm-4" id="divMainId">
+                                <input type="text" class="form-control" id="MainId" readonly disabled placeholder="Nama Rekanan">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12 GKontrak" id="GKontrak0" count="0">
+                            <label class="col-sm-offset-1 col-sm-1 control-label text-right"><i class="fa fa-square"></i></label>
+                            <div class="col-sm-2" id="divMainDetail0">
+                                <input type="text" class="form-control input-sm" id="MainDetail0" readonly disabled placeholder="Nama Kontrak">
+                            </div>
+                            <div class="col-sm-2" id="divNomorKontrak0">
+                                <input type="text" class="form-control input-sm" id="NomorKontrak0" readonly disabled placeholder="Nomor">
+                            </div>
+                            <div class="col-sm-2" id="divTanggalKontrak0">
+                                <div class="input-group input-group-sm">
+                                    <div class="input-group-addon">
+                                        <i class="fa fa-calendar"></i>
+                                    </div>
+                                    <input type="text" class="form-control input-sm" id="TanggalKontrak0" readonly disabled placeholder="Tanggal">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label class="col-sm-2 control-label text-right">Uraian</label>
+                            <div class="col-sm-10" id="divUraian">
+                                <textarea class="form-control" rows="2" id="Uraian" readonly disabled placeholder="Uraian"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label class="col-sm-2 control-label text-right">Nilai Pengadaan</label>
+                            <div class="col-sm-offset-6 col-sm-4">
+                                <input type="text" class="form-control text-right" id="NilaiPengadaan" value="0" readonly disabled placeholder="Total Nilai Pengadaan">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12 GPengadaan" id="GPengadaan0" count="0">
+                            <label class="col-sm-offset-1 col-sm-1 control-label text-right"><i class="fa fa-square"></i></label>
+                            <div class="col-sm-4" id="divPengadaan0">
+                                <input type="text" class="form-control input-sm" id="Pengadaan0" readonly disabled autocomplete="off" placeholder="Pengadaan">
+                            </div>
+                            <div class="col-sm-3" id="divNilaiPengadaan0">
+                                <input type="text" class="form-control text-right input-sm Pengadaan" readonly disabled id="NilaiPengadaan0" oninput="Hitung(); AutoPengadaan(); this.value = decimal(this.value.replace(/[^0-9.]/g, '').replace(/\.(?=.*\.)/g, ''));" autocomplete="off" placeholder="Nominal Pengadaan">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label class="col-sm-2 control-label text-right">Pajak Pertambahan Nilai</label>
+                            <div class="col-sm-offset-6 col-sm-4">
+                                <input type="text" class="form-control text-right" id="PajakPertambahan" value="0" readonly disabled placeholder="Total Pajak Pertambahan Nilai">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12 GPPN" id="GPPN0" count="0">
+                            <label class="col-sm-offset-1 col-sm-1 control-label text-right"><i class="fa fa-square"></i></label>
+                            <div class="col-sm-2" id="divPPN0">
+                                <input type="text" class="form-control input-sm" id="PPN0" readonly disabled placeholder="PPN">
+                            </div>
+                            <div class="col-sm-2" id="divPersenPPN0">
+                                <div class="input-group">
+                                    <input type="text" class="form-control text-right input-sm" id="PersenPPN0" readonly disabled autocomplete="off" placeholder="Nominal">
+                                    <span class="input-group-addon">%</span>
+                                </div>
+                            </div>
+                            <div class="col-sm-2" id="divNilaiPPN0">
+                                <input type="text" class="form-control text-right input-sm" id="NilaiPPN0" readonly disabled oninput="HitungPPN(0); this.value = decimal(this.value.replace(/[^0-9.]/g, '').replace(/\.(?=.*\.)/g, ''));" autocomplete="off" placeholder="Nominal Pajak Pertambahan Nilai">
+                            </div>
+                            <div class="col-sm-2" id="divTotalPPN0">
+                                <input type="text" class="form-control text-right input-sm PPN" id="TotalPPN0" readonly disabled oninput="Hitung(); this.value = decimal(this.value.replace(/[^0-9.]/g, '').replace(/\.(?=.*\.)/g, ''));" autocomplete="off" placeholder="Total Nominal PPN">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label class="col-sm-2 control-label text-right">Nilai Pengadaan Inclusive PPN</label>
+                            <div class="col-sm-offset-6 col-sm-4">
+                                <input type="text" class="form-control text-right" id="InclusivePPN" readonly disabled placeholder="Nilai Pengadaan Inclusive PPN">
+                            </div>
+                        </div>
+                        @*<div class="form-group col-md-12">
+                                <label class="col-sm-2 control-label text-right">Biaya Materai</label>
+                                <div class="col-sm-4" id="divMaterai">
+                                    <input type="text" class="form-control text-right input-sm" id="Materai" readonly disabled oninput="Hitung(); this.value = decimal(this.value.replace(/[^0-9.]/g, '').replace(/\.(?=.*\.)/g, ''));" autocomplete="off" placeholder="Biaya Materai">
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label class="col-sm-2 control-label text-right">Nilai Pengadaan Inclusive PPN & Materai</label>
+                                <div class="col-sm-offset-6 col-sm-4">
+                                    <input type="text" class="form-control text-right" id="InclusivePPNMaterai" readonly disabled placeholder="Nilai Pengadaan Inclusive PPN & Materai">
+                                </div>
+                            </div>*@
+                        <div class="form-group col-md-12">
+                            <label class="col-sm-2 control-label text-right">Pajak Penghasilan</label>
+                            <div class="col-sm-offset-6 col-sm-4">
+                                <input type="text" class="form-control text-right" id="PajakPenghasilan" readonly disabled placeholder="Total Pajak Penghasilan">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12 GPPH" id="GPPH0" count="0">
+                            <label class="col-sm-offset-1 col-sm-1 control-label text-right"><i class="fa fa-square"></i></label>
+                            <div class="col-sm-2" id="divPPH0">
+                                <input type="text" class="form-control input-sm" id="PPH0" readonly disabled placeholder="PPH">
+                            </div>
+                            <div class="col-sm-2" id="divPersenPPH0">
+                                <div class="input-group">
+                                    <input type="text" class="form-control text-right input-sm" id="PersenPPH0" readonly disabled autocomplete="off" placeholder="Nominal">
+                                    <span class="input-group-addon">%</span>
+                                </div>
+                            </div>
+                            <div class="col-sm-2" id="divNilaiPPH0">
+                                <input type="text" class="form-control text-right input-sm" id="NilaiPPH0" readonly disabled oninput="HitungPPH(0); this.value = decimal(this.value.replace(/[^0-9.]/g, '').replace(/\.(?=.*\.)/g, ''));" autocomplete="off" placeholder="Nominal Pajak Penghasilan">
+                            </div>
+                            <div class="col-sm-2" id="divTotalPPH0">
+                                <input type="text" class="form-control text-right input-sm PPH" id="TotalPPH0" readonly disabled oninput="Hitung(); this.value = decimal(this.value.replace(/[^0-9.]/g, '').replace(/\.(?=.*\.)/g, ''));" autocomplete="off" placeholder="Total Nominal PPH">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label class="col-sm-2 control-label text-right">Nilai Pengadaan Dipotong PPH</label>
+                            <div class="col-sm-offset-6 col-sm-4">
+                                <input type="text" class="form-control text-right" id="InclusivePPH" readonly disabled placeholder="Nilai Pengadaan Dipotong PPH">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label class="col-sm-2 control-label text-right">Pembayaran</label>
+                            <label class="col-sm-2 control-label text-right"><i>Nama Rek</i></label>
+                            <div class="col-sm-3" id="divNamaRek">
+                                <input type="text" class="form-control" id="NamaRek" readonly disabled placeholder="Nama Rekening">
+                            </div>
+                            <label class="col-sm-1 control-label text-right"><i>No Rek</i></label>
+                            <div class="col-sm-3" id="divNoRek">
+                                <input type="text" class="form-control" id="NoRek" readonly disabled placeholder="Nomor Rekening">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label class="col-sm-offset-2 col-sm-2 control-label text-right"><i>Bank</i></label>
+                            <div class="col-sm-3" id="divBankRek">
+                                <input type="text" class="form-control input-sm" id="BankRek" readonly disabled placeholder="Bank Rek">
+                            </div>
+                            <label class="col-sm-1 control-label text-right"><i>Cabang</i></label>
+                            <div class="col-sm-3" id="divNamaCab">
+                                <input type="text" class="form-control" id="NamaCab" readonly disabled placeholder="Nama Cabang">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label class="col-sm-offset-2 col-sm-2 control-label text-right"><i>Jumlah Bruto</i></label>
+                            <div class="col-sm-3">
+                                <input type="text" class="form-control text-right" id="BrutoPembayaran" disabled readonly placeholder="Jumlah Bruto">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label class="col-sm-offset-2 col-sm-2 control-label text-right"><i>PPN Yang Dipotong</i></label>
+                            <div class="col-sm-3">
+                                <input type="text" class="form-control text-right" id="PPNPembayaran" disabled readonly placeholder="PPN Yang Dipotong">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label class="col-sm-offset-2 col-sm-2 control-label text-right"><i>Denda Keterlambatan</i></label>
+                            <div class="col-sm-3" id="divDendaPembayaran">
+                                <input type="text" class="form-control text-right" id="DendaPembayaran" readonly disabled oninput="Hitung(); this.value = decimal(this.value.replace(/[^0-9.]/g, '').replace(/\.(?=.*\.)/g, ''));" autocomplete="off" placeholder="Denda Keterlambatan">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label class="col-sm-offset-2 col-sm-2 control-label text-right"><i>Jumlah Bersih</i></label>
+                            <div class="col-sm-3">
+                                <input type="text" class="form-control text-right" id="JumlahPembayaran" disabled readonly placeholder="Jumlah Bersih">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label class="col-sm-offset-2 col-sm-2 control-label text-right"><i>Prestasi Pekerjaan</i></label>
+                            <div class="col-sm-3" id="divPrestasi">
+                                <input type="text" class="form-control" id="Prestasi" autocomplete="off" readonly disabled placeholder="Prestasi Pekerjaan">
+                            </div>
+                            <label class="col-sm-2 control-label text-right"><i>Angsuran / termin ke</i></label>
+                            <div class="col-sm-2" id="divTermin">
+                                <input type="text" class="form-control" id="Termin" readonly disabled autocomplete="off" placeholder="Angsuran / termin ke">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label class="col-sm-2 control-label text-right">Debit</label>
+                            <div class="col-sm-offset-6 col-sm-4">
+                                <input type="text" class="form-control text-right" id="TotalDebit" readonly disabled placeholder="Total Debit">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12 GDebit" id="GDebit0" count="0">
+                            <label class="col-sm-offset-1 col-sm-1 control-label text-right"><i class="fa fa-square"></i></label>
+                            <div class="col-sm-3" id="divDebit0">
+                                <textarea class="form-control input-sm" id="Debit0" readonly disabled rows="1" placeholder="Nama Debit" style="resize:vertical;"></textarea>
+                            </div>
+                            <div class="col-sm-3" id="divNoRekDebit0">
+                                <input type="text" class="form-control input-sm" id="NoRekDebit0" readonly disabled autocomplete="off" placeholder="Nomor Rekening">
+                            </div>
+                            <div class="col-sm-3" id="divNominalDebit0">
+                                <input type="text" class="form-control text-right input-sm Debit" id="NominalDebit0" readonly disabled oninput="Hitung(); this.value = decimal(this.value.replace(/[^0-9.]/g, '').replace(/\.(?=.*\.)/g, ''));" autocomplete="off" placeholder="Nominal Debit">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label class="col-sm-2 control-label text-right">Kredit</label>
+                            <div class="col-sm-offset-6 col-sm-4">
+                                <input type="text" class="form-control text-right" id="TotalKredit" readonly disabled placeholder="Total Kredit">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12 GKredit" id="GKredit0" count="3">
+                            <label class="col-sm-offset-1 col-sm-1 control-label text-right"><i class="fa fa-square"></i></label>
+                            <div class="col-sm-3" id="divKredit0">
+                                <textarea class="form-control input-sm" id="Kredit0" readonly disabled rows="1" placeholder="Nama Kredit" style="resize:vertical;"></textarea>
+                            </div>
+                            <div class="col-sm-3" id="divNoRekKredit0">
+                                <input type="text" class="form-control input-sm" id="NoRekKredit0" readonly disabled autocomplete="off" placeholder="Nomor Rekening">
+                            </div>
+                            <div class="col-sm-3" id="divNominalKredit0">
+                                <input type="text" class="form-control text-right input-sm Kredit" id="NominalKredit0" readonly disabled oninput="Hitung(); this.value = decimal(this.value.replace(/[^0-9.]/g, '').replace(/\.(?=.*\.)/g, ''));" autocomplete="off" placeholder="Nominal Kredit">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12 GKredit" id="GKredit1">
+                            <label class="col-sm-offset-1 col-sm-1 control-label text-right"><i class="fa fa-square"></i></label>
+                            <div class="col-sm-3" id="divKredit1">
+                                <textarea class="form-control input-sm" id="Kredit1" readonly disabled rows="1" placeholder="Nama Kredit" style="resize:vertical;"></textarea>
+                            </div>
+                            <div class="col-sm-3" id="divNoRekKredit1">
+                                <input type="text" class="form-control input-sm" id="NoRekKredit1" readonly disabled autocomplete="off" placeholder="Nomor Rekening">
+                            </div>
+                            <div class="col-sm-3" id="divNominalKredit1">
+                                <input type="text" class="form-control text-right input-sm Kredit" id="NominalKredit1" readonly disabled oninput="Hitung(); this.value = decimal(this.value.replace(/[^0-9.]/g, '').replace(/\.(?=.*\.)/g, ''));" autocomplete="off" placeholder="Nominal Kredit">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12 GKredit" id="GKredit2">
+                            <label class="col-sm-offset-1 col-sm-1 control-label text-right"><i class="fa fa-square"></i></label>
+                            <div class="col-sm-3" id="divKredit2">
+                                <textarea class="form-control input-sm" id="Kredit2" readonly disabled rows="1" placeholder="Nama Kredit" style="resize:vertical;"></textarea>
+                            </div>
+                            <div class="col-sm-3" id="divNoRekKredit2">
+                                <input type="text" class="form-control input-sm" id="NoRekKredit2" readonly disabled autocomplete="off" placeholder="Nomor Rekening">
+                            </div>
+                            <div class="col-sm-3" id="divNominalKredit2">
+                                <input type="text" class="form-control text-right input-sm Kredit" id="NominalKredit2" readonly disabled oninput="Hitung(); this.value = decimal(this.value.replace(/[^0-9.]/g, '').replace(/\.(?=.*\.)/g, ''));" autocomplete="off" placeholder="Nominal Kredit">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12 GKredit" id="GKredit3">
+                            <label class="col-sm-offset-1 col-sm-1 control-label text-right"><i class="fa fa-square"></i></label>
+                            <div class="col-sm-3" id="divKredit3">
+                                <textarea class="form-control input-sm" id="Kredit3" readonly disabled rows="1" placeholder="Nama Kredit" style="resize:vertical;"></textarea>
+                            </div>
+                            <div class="col-sm-3" id="divNoRekKredit3">
+                                <input type="text" class="form-control input-sm" id="NoRekKredit3" readonly disabled autocomplete="off" placeholder="Nomor Rekening">
+                            </div>
+                            <div class="col-sm-3" id="divNominalKredit3">
+                                <input type="text" class="form-control text-right input-sm Kredit" id="NominalKredit3" readonly disabled oninput="Hitung(); this.value = decimal(this.value.replace(/[^0-9.]/g, '').replace(/\.(?=.*\.)/g, ''));" autocomplete="off" placeholder="Nominal Kredit">
+                            </div>
+                        </div>
+                        <div class="GLampiran form-group col-md-12">
+                            <label class="col-sm-2 control-label text-right">Lampiran</label>
+                        </div>
+                        <div class="GLampiran" id="GLampiran0" count="0">
+                            <div class="form-group col-md-12">
+                                <label class="col-sm-offset-1 col-sm-1 control-label text-right"><i class="fa fa-square"></i></label>
+                                <div class="col-sm-10">
+                                    <label class="col-sm-1 control-label text-right">Jenis</label>
+                                    <div class="col-sm-11" id="divSubJenisAttch0">
+                                        <input type="text" class="form-control" id="SubJenisAttch0" readonly disabled placeholder="Jenis Attachment">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <div class="col-sm-offset-2 col-sm-10">
+                                    <label class="col-sm-1 control-label text-right">Tanggal</label>
+                                    <div class="col-sm-3" id="divTanggal0">
+                                        <div class="input-group">
+                                            <div class="input-group-addon">
+                                                <i class="fa fa-calendar"></i>
+                                            </div>
+                                            <input type="text" class="form-control Tanggal" readonly disabled id="Tanggal0" autocomplete="off">
+                                        </div>
+                                    </div>
+                                    <label class="col-sm-1 control-label text-right">Jumlah</label>
+                                    <div class="col-sm-3" id="divJumlah0">
+                                        <input type="text" class="form-control text-right" readonly disabled oninput="this.value = decimal(this.value.replace(/[^0-9.]/g, '').replace(/\.(?=.*\.)/g, ''));" id="Jumlah0" placeholder="Jumlah Lembar">
+                                    </div>
+                                    <label class="col-sm-1 control-label text-right">Nomor</label>
+                                    <div class="col-sm-3" id="divNomor0">
+                                        <input type="text" class="form-control" id="Nomor0" readonly disabled placeholder="Nomor Lampiran">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <div class="col-sm-offset-2 col-sm-10">
+                                    <label class="col-sm-1 control-label text-right">Output</label>
+                                    <div class="col-sm-3" id="divOutputAttch0">
+                                        <input type="text" class="form-control" id="OutputAttch0" readonly disabled placeholder="Output Attachment">
+                                    </div>
+                                    <label class="col-sm-1 control-label text-right" id="labelFile0">File</label>
+                                    <div class="col-sm-3" id="divFile0">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="File0" readonly disabled placeholder="File Lampiran">
+                                            <span class="input-group-btn">
+                                                <a href="" class="btn btn-info btn-flat" id="URLFile0" target="_blank"><i class="fa fa-download"></i></a>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label class="col-sm-2 control-label text-right">Nomor Reg</label>
+                                <div class="col-sm-4" id="divNomorReg">
+                                    <div class="input-group">
+                                        <span class="input-group-addon" id="NomorRegSpan">
+                                        </span>
+                                        <input type="text" class="form-control" id="NomorReg" autocomplete="off">
+                                    </div>
+                                </div>
+                                <label class="col-sm-2 control-label text-right">Nomor CN</label>
+                                <div class="col-sm-4" id="divNomorCN">
+                                    <div class="input-group">
+                                        <span class="input-group-addon" id="NomorCNSpan">
+                                        </span>
+                                        <input type="text" class="form-control" id="NomorCN" autocomplete="off">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label class="col-sm-2 control-label text-right">Nomor CN PPN</label>
+                                <div class="col-sm-4" id="divNomorCNPPN">
+                                    <div class="input-group">
+                                        <span class="input-group-addon" id="NomorCNPPNSpan">
+                                        </span>
+                                        <input type="text" class="form-control" id="NomorCNPPN" autocomplete="off">
+                                    </div>
+                                </div>
+                                <label class="col-sm-2 control-label text-right">Nomor PP</label>
+                                <div class="col-sm-4" id="divNomorPP">
+                                    <div class="input-group">
+                                        <span class="input-group-addon" id="NomorPPSpan">
+                                        </span>
+                                        <input type="text" class="form-control" id="NomorPP" autocomplete="off">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-12">
+            <div class="box box-solid">
+                <div class="box-header">
+                </div>
+                <div class="box-body">
+                    <table id="example1" class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Jenis Slip</th>
+                                <th>Rek Debit</th>
+                                <th>Nama Debit</th>
+                                <th>Rek Kredit</th>
+                                <th>Nominal</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody class="tbody"></tbody>
+                    </table>
+                </div>
+                <div class="box-footer">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="pull-right">
+                                <a href="@Url.Action("Index", "Histories" )" class="btn btn-default">Close</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            $('.select2').select2();
+            $('.Tanggal').datepicker();
+            GetData();
+            GetListData();
+        });
+
+        function plustitik(angka) {
+            var rupiah = '';
+            var angkarev = angka.toString().split('').reverse().join('');
+            for (var i = 0; i < angkarev.length; i++) if (i % 3 == 0) rupiah += angkarev.substr(i, 3) + ',';
+            return rupiah.split('', rupiah.length - 1).reverse().join('');
+        }
+
+        function decimal(num) {
+            var parts = num.toString().split(".");
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            return parts.join(".");
+        }
+
+        //function decimal(num) {
+        //    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+        //}
+
+        function minkoma(angka) {
+            var bil = angka;
+            var loop = Math.floor(angka.length / 3);
+            for (var i = 0; i < loop; i++) {
+                bil = bil.replace(',', '');
+            }
+            return bil;
+        }
+
+        function formatDates(dates) {
+            date = new Date(parseInt(dates.substr(6)));
+            var year = date.getFullYear();
+            var month = (1 + date.getMonth()).toString();
+            month = month.length > 1 ? month : '0' + month;
+            var day = date.getDate().toString();
+            day = day.length > 1 ? day : '0' + day;
+            return day + '/' + month + '/' + year;
+        }
+
+        function formatDateMMyyyy(dates) {
+            date = new Date(parseInt(dates.substr(6)));
+            var year = date.getFullYear();
+            var month = (1 + date.getMonth()).toString();
+            month = month.length > 1 ? month : '0' + month;
+            return month + '' + year;
+        }
+
+        function formatDateyyyy(dates) {
+            date = new Date(parseInt(dates.substr(6)));
+            var year = date.getFullYear();
+            return year;
+        }
+
+        function ClearError() {
+            $(".has-error").removeClass("has-error");
+        }
+
+        function GetData() {
+            var TransId = $("#TransId").val();
+
+            $.ajax({
+                url: "@Url.Action("GetById", "Inputs")",
+                type: "GET",
+                data: { 'Id': TransId },
+                dataType: "json",
+                success: function (result) {
+                    $("#NomorMemo").val(result.Trans.Nomor);
+                    $("#Uraian").val(result.Trans.Uraian);
+                    $("#DocDate").datepicker("setDate", new Date(parseInt(result.Trans.DocDate.substr(6))));
+                    $("#TotalKredit").val(decimal(result.Trans.TotalNominal));
+                    $("#Prestasi").val(result.Trans.Prestasi);
+                    $("#Termin").val(result.Trans.Termin);
+                    $("#MainId").val(result.TransMainDetail[0].MainDetail.Main.Vendor.Nama);
+
+                    $.each(result.TransMainDetail, function (i, value) {
+                        if (i != 0) {
+                            AddKontrak();
+                        }
+                        if (value.MainDetail.JenisDokumenId != 3) {
+                            $("#MainDetail" + i).val(value.MainDetail.JenisDokumen.Nama);
+                        } else {
+                            $("#MainDetail" + i).val(value.MainDetail.JenisDokumen.Nama + " " + value.MainDetail.Index);
+                        }
+
+                        $("#NomorKontrak" + i).val(value.MainDetail.Nomor);
+                        $("#TanggalKontrak" + i).datepicker("setDate", new Date(parseInt(value.MainDetail.DocDate.substr(6))));
+                    });
+
+                    $.each(result.TransPengadaan, function (i, value) {
+                        if (i != 0) {
+                            AddPengadaan();
+                        }
+                        $("#Pengadaan" + i).val(value.Nama);
+                        $("#NilaiPengadaan" + i).val(decimal(value.Nominal));
+                    });
+
+                    $.each(result.TransPotonganPPN, function (i, value) {
+                        if (i != 0) {
+                            AddPPN();
+                        }
+                        $("#PPN" + i).val(value.SubJenisPotongan.Nama);
+                        $("#PersenPPN" + i).val(decimal(value.SubJenisPotongan.Nilai));
+                        $("#NilaiPPN" + i).val(decimal(value.Nominal));
+                        $("#TotalPPN" + i).val(decimal(value.Total));
+                        HitungPPN(i);
+                    });
+
+                    $.each(result.TransPotonganPPH, function (i, value) {
+                        if (i != 0) {
+                            AddPPH();
+                        }
+                        $("#PPH" + i).val(value.SubJenisPotongan.Nama);
+                        $("#PersenPPH" + i).val(decimal(value.SubJenisPotongan.Nilai));
+                        $("#NilaiPPH" + i).val(decimal(value.Nominal));
+                        $("#TotalPPH" + i).val(decimal(value.Total));
+                        HitungPPH(i);
+                    });
+
+                    //$("#Materai").val(decimal(result.TransPotonganMaterai.Nominal));
+                    $("#DendaPembayaran").val(decimal(result.TransPotonganDenda.Nominal));
+
+                    $("#NamaRek").val(result.TransRekeningMain.Nama);
+                    $("#NoRek").val(result.TransRekeningMain.NoRek);
+                    $("#BankRek").val(result.TransRekeningMain.Bank.Nama);
+                    $("#NamaCab").val(result.TransRekeningMain.Cabang);
+                    $("#JumlahPembayaran").val(decimal(result.TransRekeningMain.Nominal));
+
+                    $.each(result.TransRekeningDebit, function (i, value) {
+                        if (i != 0) {
+                            AddDebit();
+                        }
+                        $("#Debit" + i).val(value.Nama);
+                        $("#Debit" + i).prop("rows", Math.ceil(value.Nama.length / 40));
+                        $("#NoRekDebit" + i).val(value.NoRek);
+                        $("#NominalDebit" + i).val(decimal(value.Nominal));
+                    });
+
+                    $.each(result.TransRekeningKredit, function (i, value) {
+                        if (i > 3) {
+                            AddKredit();
+                        }
+                        $("#Kredit" + i).val(value.Nama);
+                        $("#Kredit" + i).prop("rows", Math.ceil(value.Nama.length / 40));
+                        $("#NoRekKredit" + i).val(value.NoRek);
+                        $("#NominalKredit" + i).val(decimal(value.Nominal));
+                    });
+
+                    Hitung();
+
+                    if (result.TransAttachment.length == 0) {
+                        $('.GLampiran').each(function (i, value) {
+                            $(this).remove();
+                        })
+                    } else {
+                        $.each(result.TransAttachment, function (i, value) {
+                            if (i != 0) {
+                                AddLampiran(i);
+                            }
+                            //$("#Nama" + i).val(value.Nama);
+                            $("#SubJenisAttch" + i).val(value.SubJenisAttch.Nama);
+                            $("#Tanggal" + i).datepicker("setDate", new Date(parseInt(value.DocDate.substr(6))));
+                            $("#Jumlah" + i).val(plustitik(value.Jumlah));
+                            $("#Nomor" + i).val(value.Nomor);
+                            $("#OutputAttch" + i).val(value.OutputAttch.Nama);
+                            $("#Nomor" + i).val(value.Nomor);
+                            $("#File" + i).val(value.Path);
+                            $("#URLFile" + i).attr("href", "@Url.Content("~/Files/Attachment")/" + value.Path);
+
+                            if (value.OutputAttchId == 1 || value.OutputAttchId == 3) {
+                                $("#labelFile" + i).remove();
+                                $("#divFile" + i).remove();
+                            }
+                        });
+                    }
+
+                    $("#NomorRegSpan").html('PYN / 760 / ' + formatDateMMyyyy(result.Trans.DocDate) + ' / ');
+                    $("#NomorReg").val(result.Trans.NomorReg);
+                    $("#NomorCNSpan").html(formatDateyyyy(result.Trans.DocDate) + ' / OPR / 4.6 / ');
+                    $("#NomorCN").val(result.Trans.NomorCN);
+                    $("#NomorCNPPNSpan").html(formatDateyyyy(result.Trans.DocDate) + ' / OPR / 4.6 / ');
+                    $("#NomorCNPPN").val(result.Trans.NomorCNPPN);
+                    $("#NomorPPSpan").html(formatDateyyyy(result.Trans.DocDate) + ' / OPR / 4.6 / ');
+                    $("#NomorPP").val(result.Trans.NomorPP);
+
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            })
+        } function GetListData() {
+            var TransId = $("#TransId").val();
+
+            var t = $("#example1").DataTable({
+                "ajax": {
+                    "url": "@Url.Action("GetListSlip", "Histories")",
+                    "type": "POST",
+                    data: { 'Id': TransId },
+                    "datatype": "json"
+                },
+                "columns": [
+                    { "data": null },
+                    { "data": "JenisSlip.Singkatan" },
+                    { "data": "NoRekDebit" },
+                    { "data": "NamaRekDebit" },
+                    { "data": "NoRekKredit" },
+                    {
+                        "render": function (data, type, val) {
+                            if (val.NominalKredit != 0) {
+                                return val.CurrencyKredit.Nama + " " + decimal(val.NominalKredit);
+                            } else {
+                                return val.CurrencyDebit.Nama + " " + decimal(val.NominalDebit);
+                            }
+                        }
+                    },
+                    {
+                        "render": function (data, type, val) {
+                            html = '';
+                            html += '<button class="btn btn-sm btn-info" onclick="ViewModal(' + val.Id + ')" data-placement="bottom" title="View"><i class="fa fa-eye"></i></button>';
+                            return html;
+                        }
+                    }
+                ],
+                "pageLength": 25,
+                "lengthMenu": [[10, 25, 50, 100, 500, -1], [10, 25, 50, 100, 500, "All"]],
+                "scrollCollapse": true,
+                "columnDefs": [
+                    {
+                        "sortable": false,
+                        "class": "index",
+                        "targets": [0, 6]
+                    }, {
+                        "className": 'text-right',
+                        "targets": 5
+                    }],
+                "searchPanes": {
+                    "layout": 'columns-6'
+                },
+                "language": {
+                    "searchPanes": {
+                        "clearMessage": 'Clear',
+                        "collapse": { 0: '<i class="fa fa-search"></i> Search', _: '<i class="fa fa-search"></i> Search (%d)' }
+                    }
+                }
+            });
+
+            t.on('order.dt search.dt', function () {
+                t.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+                    cell.innerHTML = i + 1;
+                });
+            }).draw();
+        }
+
+        function Hitung() {
+            var TotPengadaan = 0;
+            var TotPPN = 0;
+            var TotPengadaanPPN = 0;
+            //var TotPengadaanPPNMat = 0;
+            var TotPPH = 0;
+            var TotPengadaanPPH = 0;
+            var JumlahPembayaran = 0;
+            var Debit = 0;
+            var Kredit = 0;
+            $('.Pengadaan').each(function (i, value) {
+                var nilai = $(this).val();
+                if (isNaN(minkoma(nilai)) || nilai == "") {
+                    nilai = 0;
+                }
+                TotPengadaan = TotPengadaan + parseFloat(minkoma(nilai));
+            })
+
+            $('.PPN').each(function (i, value) {
+                var nilai = $(this).val();
+                if (isNaN(minkoma(nilai)) || nilai == "") {
+                    nilai = 0;
+                }
+                TotPPN = TotPPN + parseFloat(minkoma(nilai));
+            })
+
+            TotPengadaanPPN = TotPengadaan + TotPPN;
+
+            //var Materai = minkoma($('#Materai').val());
+            //if (isNaN(Materai) || Materai == "") {
+            //    Materai = 0;
+            //}
+
+            //TotPengadaanPPNMat = TotPengadaanPPN + parseFloat(Materai);
+
+            $('.PPH').each(function (i, value) {
+                var nilai = $(this).val();
+                if (isNaN(minkoma(nilai)) || nilai == "") {
+                    nilai = 0;
+                }
+                TotPPH = TotPPH + parseFloat(minkoma(nilai));
+            })
+
+            //TotPengadaanPPH = TotPengadaanPPNMat - TotPPH;
+            TotPengadaanPPH = TotPengadaanPPN - TotPPH;
+
+            var Denda = minkoma($('#DendaPembayaran').val());
+            if (isNaN(Denda) || Denda == "") {
+                Denda = 0;
+            }
+
+            JumlahPembayaran = TotPengadaanPPH - TotPPN - parseFloat(Denda);
+
+            $('#NilaiPengadaan').val(decimal(TotPengadaan));
+            $('#PajakPertambahan').val(decimal(TotPPN));
+            $('#InclusivePPN').val(decimal(TotPengadaanPPN));
+            //$('#InclusivePPNMaterai').val(decimal(TotPengadaanPPNMat));
+            $('#PajakPenghasilan').val(decimal(TotPPH));
+            $('#InclusivePPH').val(decimal(TotPengadaanPPH));
+            $('#BrutoPembayaran').val(decimal(TotPengadaanPPH));
+            $('#PPNPembayaran').val(decimal(TotPPN));
+            $('#JumlahPembayaran').val(decimal(JumlahPembayaran));
+            $('#NominalKredit0').val(decimal(JumlahPembayaran));
+            $('#NominalKredit3').val(decimal(Denda));
+
+            $('.Debit').each(function (i, value) {
+                var nilai = $(this).val();
+                if (isNaN(minkoma(nilai)) || nilai == "") {
+                    nilai = 0;
+                }
+                Debit = Debit + parseFloat(minkoma(nilai));
+            })
+            $('.Kredit').each(function (i, value) {
+                var nilai = $(this).val();
+                if (isNaN(minkoma(nilai)) || nilai == "") {
+                    nilai = 0;
+                }
+                Kredit = Kredit + parseFloat(minkoma(nilai));
+            })
+
+            $('#TotalDebit').val(decimal(Debit));
+            $('#TotalKredit').val(decimal(Kredit));
+        }
+
+        function NilaiPPN(Id) {
+            var Persen = $('#PPN' + Id).find('option:selected').attr('nilai');
+
+            $('#PersenPPN' + Id).val(Persen);
+            HitungPPN(Id);
+        }
+
+        function NilaiPPH(Id) {
+            var Persen = $('#PPH' + Id).find('option:selected').attr('nilai');
+
+            $('#PersenPPH' + Id).val(Persen);
+            HitungPPH(Id);
+        }
+
+        function HitungPPN(Id) {
+            var PPN = parseFloat(minkoma($('#PersenPPN' + Id).val())) / 100 * parseFloat(minkoma($('#NilaiPPN' + Id).val()));
+            if (isNaN(PPN)) {
+                PPN = 0;
+            }
+
+            //$('#TotalPPN' + Id).val(decimal(PPN));
+            $('#TotalPPN' + Id).val(decimal(PPN.toFixed(0)));
+            if (Id == 0) {
+                Kredit('PPN', 1);
+            }
+            Hitung();
+        }
+
+        function HitungPPH(Id) {
+            var PPH = parseFloat(minkoma($('#PersenPPH' + Id).val())) / 100 * parseFloat(minkoma($('#NilaiPPH' + Id).val()));
+            if (isNaN(PPH)) {
+                PPH = 0;
+            }
+
+            //$('#TotalPPH' + Id).val(decimal(PPH));
+            $('#TotalPPH' + Id).val(decimal(PPH.toFixed(0)));
+            if (Id == 0) {
+                Kredit('PPH', 2);
+            }
+            Hitung();
+        }
+
+        function Kredit(Pajak, Id) {
+            var Nama = $('#' + Pajak + '0').find('option:selected').attr('Nama2');
+            var Norek = $('#' + Pajak + '0').find('option:selected').attr('Norek');
+
+            if ($("#Kredit" + Id).length) {
+                $("#Kredit" + Id).val(Nama);
+            }
+            if ($("#NoRekKredit" + Id).length) {
+                $("#NoRekKredit" + Id).val(Norek);
+            }
+            if ($("#NominalKredit" + Id).length) {
+                $("#NominalKredit" + Id).val($('#Total' + Pajak + '0').val());
+            }
+        }
+
+        function AddKontrak() {
+            var countawal = $('#GKontrak0').attr('count');
+            var count = parseInt(countawal) + 1;
+            var html = '';
+            html += '<div class="form-group col-md-12 GKontrak" id="GKontrak' + count + '">';
+            html += '<label class="col-sm-offset-1 col-sm-1 control-label text-right"><i class="fa fa-square"></i></label>';
+            html += '<div class="col-sm-2" id="divMainDetail' + count + '">';
+            html += '<input type="text" class="form-control input-sm" id="MainDetail' + count + '" readonly disabled placeholder="Nama Kontrak">';
+            html += '</div>';
+            html += '<div class="col-sm-2" id="divNomorKontrak' + count + '">';
+            html += '<input type="text" class="form-control input-sm" id="NomorKontrak' + count + '" readonly disabled placeholder="Nomor">';
+            html += '</div>';
+            html += '<div class="col-sm-2" id="divTanggalKontrak' + count + '">';
+            html += '<div class="input-group input-group-sm">';
+            html += '<div class="input-group-addon">';
+            html += '<i class="fa fa-calendar"></i>';
+            html += '</div>';
+            html += '<input type="text" class="form-control input-sm" id="TanggalKontrak' + count + '" readonly disabled placeholder="Tanggal">';
+            html += '</div>';
+            html += '</div>';
+            html += '</div>';
+
+            $('.GKontrak').last().after(html);
+            $('#GKontrak0').attr('count', count);
+        }
+
+        function AddPengadaan() {
+            var countawal = $('#GPengadaan0').attr('count');
+            var count = parseInt(countawal) + 1;
+            var html = '';
+            html += '<div class="form-group col-md-12 GPengadaan" id="GPengadaan' + count + '">';
+            html += '<label class="col-sm-offset-1 col-sm-1 control-label text-right"><i class="fa fa-square"></i></label>';
+            html += '<div class="col-sm-4" id="divPengadaan' + count + '">';
+            html += '<input type="text" class="form-control input-sm" id="Pengadaan' + count + '" readonly disabled autocomplete="off" placeholder="Pengadaan">';
+            html += '</div>';
+            html += '<div class="col-sm-3" id="divNilaiPengadaan' + count + '">';
+            html += '<input type="text" class="form-control text-right input-sm Pengadaan" id="NilaiPengadaan' + count + '" readonly disabled oninput="Hitung(); this.value = decimal(this.value.replace(/[^0-9.]/g, \'\').replace(/\\.(?=.*\\.)/g, \'\'));" autocomplete="off" placeholder="Nominal Pengadaan">';
+            html += '</div>';
+            html += '</div>';
+
+            $('.GPengadaan').last().after(html);
+            $('#GPengadaan0').attr('count', count);
+        }
+
+        function AddPPN() {
+            var countawal = $('#GPPN0').attr('count');
+            var count = parseInt(countawal) + 1;
+            var html = '';
+            html += '<div class="form-group col-md-12 GPPN" id="GPPN' + count + '">';
+            html += '<label class="col-sm-offset-1 col-sm-1 control-label text-right"><i class="fa fa-square"></i></label>';
+            html += '<div class="col-sm-2" id="divPPN' + count + '">';
+            html += '<input type="text" class="form-control input-sm" id="PPN' + count + '" readonly disabled placeholder="PPN">';
+            html += '</div>';
+            html += '<div class="col-sm-2" id="divPersenPPN' + count + '">';
+            html += '<div class="input-group">';
+            html += '<input type="text" class="form-control text-right input-sm" id="PersenPPN' + count + '" readonly disabled autocomplete="off" placeholder="Nominal">';
+            html += '<span class="input-group-addon">%</span>';
+            html += '</div>';
+            html += '</div>';
+            html += '<div class="col-sm-2" id="divNilaiPPN' + count + '">';
+            html += '<input type="text" class="form-control text-right input-sm" id="NilaiPPN' + count + '" readonly disabled oninput="HitungPPN(' + count + '); this.value = decimal(this.value.replace(/[^0-9.]/g, \'\').replace(/\\.(?=.*\\.)/g, \'\'));" autocomplete="off" placeholder="Nominal Pajak Pertambahan Nilai">';
+            html += '</div>';
+            html += '<div class="col-sm-2" id="divTotalPPN' + count + '">';
+            html += '<input type="text" class="form-control text-right input-sm PPN" id="TotalPPN' + count + '" readonly disabled oninput="Hitung(); this.value = decimal(this.value.replace(/[^0-9.]/g, \'\').replace(/\\.(?=.*\\.)/g, \'\'));" autocomplete="off" placeholder="Total Nominal PPN">';
+            html += '</div>';
+            html += '</div>';
+
+            $('.GPPN').last().after(html);
+            $('#GPPN0').attr('count', count);
+
+            NilaiPPN(count);
+        }
+
+        function AddPPH() {
+            var countawal = $('#GPPH0').attr('count');
+            var count = parseInt(countawal) + 1;
+            var html = '';
+            html += '<div class="form-group col-md-12 GPPH" id="GPPH' + count + '">';
+            html += '<label class="col-sm-offset-1 col-sm-1 control-label text-right"><i class="fa fa-square"></i></label>';
+            html += '<div class="col-sm-2" id="divPPH' + count + '">';
+            html += '<input type="text" class="form-control input-sm" id="PPH' + count + '" readonly disabled placeholder="PPH">';
+            html += '</div>';
+            html += '<div class="col-sm-2" id="divPersenPPH' + count + '">';
+            html += '<div class="input-group">';
+            html += '<input type="text" class="form-control text-right input-sm" id="PersenPPH' + count + '" readonly disabled autocomplete="off" placeholder="Nominal">';
+            html += '<span class="input-group-addon">%</span>';
+            html += '</div>';
+            html += '</div>';
+            html += '<div class="col-sm-2" id="divNilaiPPH' + count + '">';
+            html += '<input type="text" class="form-control text-right input-sm" id="NilaiPPH' + count + '" readonly disabled oninput="HitungPPH(' + count + '); this.value = decimal(this.value.replace(/[^0-9.]/g, \'\').replace(/\\.(?=.*\\.)/g, \'\'));" autocomplete="off" placeholder="Nominal Pajak Penghasilan">';
+            html += '</div>';
+            html += '<div class="col-sm-2" id="divTotalPPH' + count + '">';
+            html += '<input type="text" class="form-control text-right input-sm PPH" id="TotalPPH' + count + '" readonly disabled oninput="Hitung(); this.value = decimal(this.value.replace(/[^0-9.]/g, \'\').replace(/\\.(?=.*\\.)/g, \'\'));" autocomplete="off" placeholder="Total Nominal PPH">';
+            html += '</div>';
+            html += '</div>';
+
+            $('.GPPH').last().after(html);
+            $('#GPPH0').attr('count', count);
+
+            NilaiPPH(count);
+        }
+
+        function AddDebit() {
+            var countawal = $('#GDebit0').attr('count');
+            var count = parseInt(countawal) + 1;
+            var html = '';
+            html += '<div class="form-group col-md-12 GDebit" id="GDebit' + count + '">';
+            html += '<label class="col-sm-offset-1 col-sm-1 control-label text-right"><i class="fa fa-square"></i></label>';
+            html += '<div class="col-sm-3" id="divDebit' + count + '">';
+            html += '<textarea class="form-control input-sm" id="Debit' + count + '" readonly disabled rows="1" placeholder="Nama Debit" style="resize:vertical;"></textarea>';
+            html += '</div>';
+            html += '<div class="col-sm-3" id="divNoRekDebit' + count + '">';
+            html += '<input type="text" class="form-control input-sm" id="NoRekDebit' + count + '" readonly disabled autocomplete="off" placeholder="Nomor Rekening">';
+            html += '</div>';
+            html += '<div class="col-sm-3" id="divNominalDebit' + count + '">';
+            html += '<input type="text" class="form-control text-right input-sm Debit" id="NominalDebit' + count + '" readonly disabled oninput="Hitung(); this.value = decimal(this.value.replace(/[^0-9.]/g, \'\').replace(/\\.(?=.*\\.)/g, \'\'));" autocomplete="off" placeholder="Nominal Debit">';
+            html += '</div>';
+            html += '</div>';
+
+            $('.GDebit').last().after(html);
+            $('#GDebit0').attr('count', count);
+        }
+
+        function AddKredit() {
+            var countawal = $('#GKredit0').attr('count');
+            var count = parseInt(countawal) + 1;
+            var html = '';
+            html += '<div class="form-group col-md-12 GKredit" id="GKredit' + count + '">';
+            html += '<label class="col-sm-offset-1 col-sm-1 control-label text-right"><i class="fa fa-square"></i></label>';
+            html += '<div class="col-sm-3" id="divKredit' + count + '">';
+            html += '<textarea class="form-control input-sm" id="Kredit' + count + '" readonly disabled rows="1" placeholder="Nama Kredit" style="resize:vertical;"></textarea>';
+            html += '</div>';
+            html += '<div class="col-sm-3" id="divNoRekKredit' + count + '">';
+            html += '<input type="text" class="form-control input-sm" id="NoRekKredit' + count + '" readonly disabled autocomplete="off" placeholder="Nomor Rekening">';
+            html += '</div>';
+            html += '<div class="col-sm-3" id="divNominalKredit' + count + '">';
+            html += '<input type="text" class="form-control text-right input-sm Kredit" id="NominalKredit' + count + '" readonly disabled oninput="Hitung(); this.value = decimal(this.value.replace(/[^0-9.]/g, \'\').replace(/\\.(?=.*\\.)/g, \'\'));" autocomplete="off" placeholder="Nominal Kredit">';
+            html += '</div>';
+            html += '</div>';
+
+            $('.GKredit').last().before(html);
+            $('#GKredit0').attr('count', count);
+        }
+
+        function AddLampiran(i) {
+            var html = '';
+            html += '<div class="GLampiran" id="GLampiran' + i + '">';
+            html += '<div class="form-group col-md-12">';
+            html += '<label class="col-sm-offset-1 col-sm-1 control-label text-right"><i class="fa fa-square"></i></label>';
+            html += '<div class="col-sm-10">';
+            html += '<label class="col-sm-1 control-label text-right">Jenis</label>';
+            html += '<div class="col-sm-11" id="divSubJenisAttch' + i + '"><input type="text" class="form-control" id="SubJenisAttch' + i + '" readonly disabled placeholder="Jenis Attachment"></div>';
+            html += '</div>';
+            html += '</div>';
+            html += '<div class="form-group col-md-12">';
+            html += '<div class="col-sm-offset-2 col-sm-10">';
+            html += '<label class="col-sm-1 control-label text-right">Tanggal</label>';
+            html += '<div class="col-sm-3" id="divTanggal' + i + '">';
+            html += '<div class="input-group">';
+            html += '<div class="input-group-addon"><i class="fa fa-calendar"></i></div>';
+            html += '<input type="text" class="form-control input-sm Tanggal" id="Tanggal' + i + '" readonly disabled autocomplete="off">';
+            html += '</div>';
+            html += '</div>';
+            html += '<label class="col-sm-1 control-label text-right">Lembar</label>';
+            html += '<div class="col-sm-3" id="divJumlah' + i + '"><input type="text" class="form-control input-sm text-right" id="Jumlah' + i + '" readonly disabled oninput="this.value = decimal(this.value.replace(/[^0-9.]/g, \'\').replace(/\\.(?=.*\\.)/g, \'\'));" placeholder="Jumlah Lembar"></div>';
+            html += '<label class="col-sm-1 control-label text-right">Nomor</label>';
+            html += '<div class="col-sm-3" id="divNomor' + i + '"><input type="text" class="form-control input-sm" id="Nomor' + i + '" readonly disabled placeholder="Nomor Lampiran"></div>';
+            html += '</div>';
+            html += '</div>';
+            html += '<div class="form-group col-md-12">';
+            html += '<div class="col-sm-offset-2 col-sm-10">';
+            html += '<label class="col-sm-1 control-label text-right">Output</label>';
+            html += '<div class="col-sm-3" id="divOutputAttch' + i + '"><input type="text" class="form-control input-sm" id="OutputAttch' + i + '" readonly disabled placeholder="Output Attachment"></div>';
+            html += '<label class="col-sm-1 control-label text-right" id="labelFile' + i + '">File</label>';
+            html += '<div class="col-sm-3" id="divFile' + i + '"><div class="input-group input-group-sm"><input type="text" class="form-control input-sm" id="File' + i + '" readonly disabled path="" placeholder="File Lampiran">';
+            html += '<span class="input-group-btn"><a href="#" id="URLFile' + i + '" class="btn btn-info btn-flat" target="_blank"><i class="fa fa-download"></i></a></span>';
+            html += '</div>';
+            html += '</div>';
+            html += '</div>';
+            html += '</div>';
+            html += '</div>';
+
+            $('.GLampiran').last().after(html);
+        }
+    </script>
+}

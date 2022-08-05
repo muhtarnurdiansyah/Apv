@@ -1,0 +1,238 @@
+﻿@using Microsoft.AspNet.Identity
+@using Microsoft.AspNet.Identity.EntityFramework;
+@using Apv.Models;
+@if (Request.IsAuthenticated)
+{
+    var manager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(new ApplicationDbContext()));
+    var currentUser = manager.FindById(User.Identity.GetUserId());
+    var sidebar = "";
+    if (currentUser.IsMiniSidebar)
+    {
+        sidebar = "sidebar-collapse";
+    }
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>@ViewBag.Title - APV</title>
+        @Styles.Render("~/Content/css")
+        @RenderSection("styles", false)
+        @Scripts.Render("~/bundles/modernizr")
+    </head>
+    <body class="hold-transition @currentUser.ColorNavbar sidebar-mini @sidebar">
+        <div class="wrapper">
+            <header class="main-header">
+                <a href="#" class="logo">
+                    <span class="logo-mini"><b>APV</b></span>
+                    <span class="logo-lg"><b>APV</span>
+                </a>
+                <nav class="navbar navbar-static-top">
+                    <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
+                        <span class="sr-only">Toggle navigation</span>
+                    </a>
+                    <div class="navbar-custom-menu">
+                        <ul class="nav navbar-nav">
+                            <li class="active"><a href="@Url.Action("Index", "Home")"><i class="fa fa-home"></i>&nbsp;&nbsp;Home</a></li>
+                            @if (User.IsInRole("Modul Admin"))
+                            {
+                                <li><a href="@Url.Action("Index", "DashConfigs")"><i class="fa fa-gears"></i>&nbsp;&nbsp;Config</a></li>
+                            }
+                            @{Html.RenderAction("GetSessionUser", "Account");}
+                        </ul>
+                    </div>
+                </nav>
+            </header>
+            <aside class="main-sidebar">
+                <section class="sidebar">
+                    <ul class="sidebar-menu" data-widget="tree">
+                        <li class="header">MAIN NAVIGATION</li>
+                        <li><a href="@Url.Action("Index", "Home")"><i class="fa fa-dashboard"></i><span>Dashboard</span></a></li>
+                        <li><a href="@Url.Action("Index", "MasVendors")"><i class="fa fa-building"></i><span>Vendor</span></a></li>
+                        @if (User.IsInRole("Modul Inputer"))
+                        {
+                            <li><a href="@Url.Action("Index", "Contracts")"><i class="fa fa-legal"></i><span>Kontrak</span></a></li>
+                            <li><a href="@Url.Action("Index", "Inputs")"><i class="fa fa-shopping-cart"></i><span>Input Payment</span></a></li>
+                        }
+                        @if (User.IsInRole("Modul Verificator"))
+                        {
+                            <li><a href="@Url.Action("Index", "Verifications")"><i class="fa fa-check"></i><span>Verification Payment</span></a></li>
+                            <li><a href="@Url.Action("Index", "Taxes")"><i class="fa fa-check-square-o"></i><span>Tax Payment</span></a></li>                            
+                        }
+                        @if (User.IsInRole("Modul Riwayat"))
+                        {
+                            <li><a href="@Url.Action("Index", "Histories")"><i class="fa fa-history"></i><span>History</span></a></li>
+                            <li><a href="@Url.Action("Index", "Reports")"><i class="fa fa-file"></i><span>Report</span></a></li>
+                        }
+                    </ul>
+                </section>
+            </aside>
+            <div class="content-wrapper">
+                @RenderBody()
+            </div>
+        </div>
+
+        <div class="loading-modal"></div>
+
+
+        <div id="sound"></div>
+        @Scripts.Render("~/bundles/jquery")
+        @RenderSection("mainscripts", required: false)
+        @Scripts.Render("~/bundles/bootstrap")
+        @RenderSection("scripts", required: false)
+        <script src="~/Scripts/jquery.signalR-2.4.1.min.js"></script>
+        <script src="~/signalr/hubs"></script>
+        <script>
+            $(document).ready(function () {
+                IfLocked();
+                SendNotif(null);
+            });
+            var timeout = null;
+
+            $(document).on('mousemove', function () {
+                $('.input-fix-mousewheel1').on('focus', function (e) {
+                    $(this).on('mousewheel.disableScroll', function (e) {
+                        e.preventDefault();
+                    })
+                }).on('blur', function (e) {
+                    $(this).off('mousewheel.disableScroll')
+                });
+                if (timeout !== null) {
+                    clearTimeout(timeout);
+                }
+                timeout = setTimeout(function () {
+                    setStalog();
+                }, 900000);
+                //900.000 = 15 menit
+            });
+            function setStalog() {
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("LockScreen", "Account")',
+                    success: function (response) {
+                        $('#LockScreenModalLabel').html('LockScreen');
+                        $('#LockScreenModal').modal("show");
+                        $('#LockScreenModal').modal({ backdrop: 'static', keyboard: false })
+                    },
+                    error: function (errResponse) {
+                        // alert(errResponse);
+                    }
+                });
+            }
+            function LoginScreen() {
+                if ($.trim($("#Password").val()) == "") { $("#divPassword").addClass("has-error"); return; }
+                var Password = $("#Password").val();
+                $("body").addClass("loading");
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("LoginScreen", "Account")',
+                    data: { Password: Password },
+                    success: function (response) {
+                        if (response) {
+                            ChangeLock();
+                        } else {
+                            swal("Incorrect!!", "Sorry your Password is Incorrect TT_TT) ", "error");
+                        }
+                    },
+                    error: function (errResponse) {
+                        // alert(errResponse);
+                    }
+                });
+            }
+
+            function ChangeLock() {
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("ChangeLock", "Account")',
+                    success: function (response) {
+                        if (response) {
+                            swal("Success!!", "Password Correct, Welcome Back ^_^) ", "success");
+                            $("#LockScreenModal").modal({ backdrop: false });
+                            $('#LockScreenModal').modal("hide");
+
+                            $("body").removeClass("loading");
+                        } else {
+                            swal("Incorrect!!", "Sorry your Password is Incorrect TT_TT) ", "error");
+                        }
+                    },
+                    error: function (errResponse) {
+                        // alert(errResponse);
+                    }
+                });
+            }
+
+            function IfLocked() {
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("IfLocked", "Account")',
+                    success: function (response) {
+                        if (response) {
+                            $('#LockScreenModalLabel').html('LockScreen');
+                            $('#LockScreenModal').modal("show");
+                            $('#LockScreenModal').modal({ backdrop: 'static', keyboard: false })
+                        }
+                    },
+                    error: function (errResponse) {
+                        // alert(errResponse);
+                    }
+                });
+            }
+            $(function () {
+                // Reference the auto-generated proxy for the hub.
+                var chat = $.connection.notificationHub;
+                chat.client.Kickuser = function (UserId, SessionId) { // Call KickUser Hub at NotificationHub
+                    KickTheUser(UserId);
+                };
+                chat.client.SendNotif = function (UserId, data) {
+                    SendNotif(UserId);
+                }
+
+                $.connection.hub.start().done(function () { });
+            });
+            function ShowData(a) {
+                alert(a);
+            }
+            function KickTheUser(UserId) {
+                $.ajax({
+                    "url": "@Url.Action("KickTheUser", "Account")",
+                    "type": "Post",
+                    "datatype": "json",
+                    "data": { UserId: UserId }
+                }).then((result) => {
+                    if (result) {
+                        location.reload();
+                    }
+                })
+            }
+            function SendNotif(UserId) {
+                $.ajax({
+                    "url": "@Url.Action("SendNotif", "HubSignalR")",
+                    "type": "Post",
+                    "datatype": "json",
+                    "data": { UserId: UserId }
+                }).then((result) => {
+
+                    var count = 0;
+                    var html = '';
+                    $(".Notif").remove();
+                    $.each(result, function (index, row) {
+                        html += row.Button;
+                        count = count + row.Total;
+                    });
+                    $('#notif_detail').html(html);
+                    if (count != 0) {
+
+                        $("#notif_count").html(count);
+                        $("#myAudio").remove();
+                        var mp3Source = '<source src="@Url.Content("~/Content/bbm-tone-notification.mp3")" type="audio/mpeg" />';
+                        var oggSource = '<source src="@Url.Content("~/Content/bbm-tone-notification.ogg")" type="audio/ogg" />';
+                        var embedSource = '<embed hidden="true" autostart="true" loop="false" src="@Url.Content("~/Content/bbm-tone-notification.mp3")">';
+                        document.getElementById("sound").innerHTML = '<audio id="myAudio" autoplay>' + mp3Source + oggSource + embedSource + '</audio>';
+                    }
+                })
+            }
+        </script>
+    </body>
+</html>
+                                }

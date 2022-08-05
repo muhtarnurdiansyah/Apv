@@ -1,0 +1,1284 @@
+﻿@model Apv.ViewModels.AddVM
+@{
+    ViewBag.Title = "Input Payment";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<section class="content-header">
+    <h1>
+        Input Payment
+    </h1>
+</section>
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box box-solid">
+                <div class="box-header">
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="form-group col-md-12">
+                            <input type="hidden" id="TransId" value="@Model.Id" />
+                            <label class="col-sm-2 control-label text-right">Nomor Memo</label>
+                            <div class="col-sm-2" id="divKodeSuratId">
+                                <select required="required" class="form-control select2" id="KodeSuratId" style="width: 100%;">
+                                    @foreach (var data in Model.KodeSurat)
+                                    {
+                                        <option value="@data.Id" selected>@data.Nama</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-sm-2" id="divNomorMemo">
+                                <input type="text" class="form-control" id="NomorMemo" autocomplete="off" placeholder="Nomor Memo">
+                            </div>
+                            <label class="col-sm-2 control-label text-right">Tanggal</label>
+                            <div class="col-sm-4" id="divDocDate">
+                                <div class="input-group">
+                                    <div class="input-group-addon">
+                                        <i class="fa fa-calendar"></i>
+                                    </div>
+                                    <input type="text" class="form-control Tanggal" id="DocDate" autocomplete="off">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label class="col-sm-2 control-label text-right">Nama Rekanan</label>
+                            <div class="col-sm-4" id="divMainId">
+                                <select required="required" class="form-control select2" id="MainId" onchange="GetListKontrak()" style="width: 100%;">
+                                    @foreach (var data in Model.Rekanan)
+                                    {
+                                        <option value="@data.MainId">@data.Main.Vendor.Nama</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12 GKontrak" id="GKontrak0" count="0">
+                            <label class="col-sm-offset-1 col-sm-1 control-label text-right"><i class="fa fa-square"></i></label>
+                            <div class="col-sm-2" id="divMainDetail0">
+                                <select required="required" class="form-control select2 input-sm" onchange="MainDetail(0)" id="MainDetail0" style="width: 100%;"></select>
+                            </div>
+                            <div class="col-sm-2" id="divNomorKontrak0">
+                                <input type="text" class="form-control input-sm" id="NomorKontrak0" readonly disabled placeholder="Nomor">
+                            </div>
+                            <div class="col-sm-2" id="divTangalKontrak0">
+                                <div class="input-group input-group-sm">
+                                    <div class="input-group-addon">
+                                        <i class="fa fa-calendar"></i>
+                                    </div>
+                                    <input type="text" class="form-control input-sm" id="TangalKontrak0" readonly disabled placeholder="Tanggal">
+                                </div>
+                            </div>
+                            <div class="col-sm-1">
+                                <button class="btn btn-default btn-sm" onclick="AddKontrak()"><i class="fa fa-plus-circle"></i></button>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label class="col-sm-2 control-label text-right">Uraian</label>
+                            <div class="col-sm-10" id="divUraian">
+                                <textarea class="form-control" rows="2" id="Uraian" placeholder="Uraian"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label class="col-sm-2 control-label text-right">Nilai Pengadaan</label>
+                            <div class="col-sm-offset-6 col-sm-4">
+                                <input type="text" class="form-control text-right" id="NilaiPengadaan" value="0" readonly disabled placeholder="Total Nilai Pengadaan">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12 GPengadaan" id="GPengadaan0" count="0">
+                            <label class="col-sm-offset-1 col-sm-1 control-label text-right"><i class="fa fa-square"></i></label>
+                            <div class="col-sm-4" id="divPengadaan0">
+                                <input type="text" class="form-control input-sm" id="Pengadaan0" autocomplete="off" placeholder="Pengadaan">
+                            </div>
+                            <div class="col-sm-3" id="divNilaiPengadaan0">
+                                <input type="text" class="form-control text-right input-sm Pengadaan" id="NilaiPengadaan0" oninput="Hitung(); AutoPengadaan(); this.value = decimal(this.value.replace(/[^0-9.]/g, '').replace(/\.(?=.*\.)/g, ''));" autocomplete="off" placeholder="Nominal Pengadaan">
+                            </div>
+                            <div class="col-sm-1">
+                                <button class="btn btn-default btn-sm" onclick="AddPengadaan()"><i class="fa fa-plus-circle"></i></button>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label class="col-sm-2 control-label text-right">Pajak Pertambahan Nilai</label>
+                            <div class="col-sm-offset-6 col-sm-4">
+                                <input type="text" class="form-control text-right" id="PajakPertambahan" value="0" readonly disabled placeholder="Total Pajak Pertambahan Nilai">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12 GPPN" id="GPPN0" count="0">
+                            <label class="col-sm-offset-1 col-sm-1 control-label text-right"><i class="fa fa-square"></i></label>
+                            <div class="col-sm-2" id="divPPN0">
+                                <select required="required" class="form-control select2 input-sm" onchange="NilaiPPN(0)" id="PPN0" style="width: 100%;">
+                                    @foreach (var data in Model.PPN)
+                                    {
+                                        <option value="@data.Id" nilai="@data.Nilai" nama2="@data.Nama2" norek="@data.NoRek" norek2="@data.NoRek2">@data.Nama</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-sm-2" id="divPersenPPN0">
+                                <div class="input-group">
+                                    <input type="text" class="form-control text-right input-sm" id="PersenPPN0" readonly disabled autocomplete="off" placeholder="Nominal">
+                                    <span class="input-group-addon">%</span>
+                                </div>
+                            </div>
+                            <div class="col-sm-2" id="divNilaiPPN0">
+                                <input type="text" class="form-control text-right input-sm" id="NilaiPPN0" oninput="HitungPPN(0); this.value = decimal(this.value.replace(/[^0-9.]/g, '').replace(/\.(?=.*\.)/g, ''));" autocomplete="off" placeholder="Nominal Pajak Pertambahan Nilai">
+                            </div>
+                            <div class="col-sm-2" id="divTotalPPN0">
+                                <input type="text" class="form-control text-right input-sm PPN" id="TotalPPN0" oninput="Hitung(); this.value = decimal(this.value.replace(/[^0-9.]/g, '').replace(/\.(?=.*\.)/g, ''));" autocomplete="off" placeholder="Total Nominal PPN">
+                            </div>
+                            <div class="col-sm-1">
+                                <button class="btn btn-default btn-sm" onclick="AddPPN()"><i class="fa fa-plus-circle"></i></button>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label class="col-sm-2 control-label text-right">Nilai Pengadaan Inclusive PPN</label>
+                            <div class="col-sm-offset-6 col-sm-4">
+                                <input type="text" class="form-control text-right" id="InclusivePPN" readonly disabled placeholder="Nilai Pengadaan Inclusive PPN">
+                            </div>
+                        </div>
+                        @*<div class="form-group col-md-12">
+                                <label class="col-sm-2 control-label text-right">Biaya Materai</label>
+                                <div class="col-sm-4" id="divMaterai">
+                                    <input type="text" class="form-control text-right input-sm" id="Materai" oninput="Hitung(); this.value = decimal(this.value.replace(/[^0-9.]/g, '').replace(/\.(?=.*\.)/g, ''));" autocomplete="off" placeholder="Biaya Materai">
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label class="col-sm-2 control-label text-right">Nilai Pengadaan Inclusive PPN & Materai</label>
+                                <div class="col-sm-offset-6 col-sm-4">
+                                    <input type="text" class="form-control text-right" id="InclusivePPNMaterai" readonly disabled placeholder="Nilai Pengadaan Inclusive PPN & Materai">
+                                </div>
+                            </div>*@
+                        <div class="form-group col-md-12">
+                            <label class="col-sm-2 control-label text-right">Pajak Penghasilan</label>
+                            <div class="col-sm-offset-6 col-sm-4">
+                                <input type="text" class="form-control text-right" id="PajakPenghasilan" readonly disabled placeholder="Total Pajak Penghasilan">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12 GPPH" id="GPPH0" count="0">
+                            <label class="col-sm-offset-1 col-sm-1 control-label text-right"><i class="fa fa-square"></i></label>
+                            <div class="col-sm-2" id="divPPH0">
+                                <select required="required" class="form-control select2 input-sm" onchange="NilaiPPH(0)" id="PPH0" style="width: 100%;">
+                                    @foreach (var data in Model.PPH)
+                                    {
+                                        <option value="@data.Id" nilai="@data.Nilai" nama2="@data.Nama2" norek="@data.NoRek" norek2="@data.NoRek2">@data.Nama</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-sm-2" id="divPersenPPH0">
+                                <div class="input-group">
+                                    <input type="text" class="form-control text-right input-sm" id="PersenPPH0" readonly disabled autocomplete="off" placeholder="Nominal">
+                                    <span class="input-group-addon">%</span>
+                                </div>
+                            </div>
+                            <div class="col-sm-2" id="divNilaiPPH0">
+                                <input type="text" class="form-control text-right input-sm" id="NilaiPPH0" oninput="HitungPPH(0); this.value = decimal(this.value.replace(/[^0-9.]/g, '').replace(/\.(?=.*\.)/g, ''));" autocomplete="off" placeholder="Nominal Pajak Penghasilan">
+                            </div>
+                            <div class="col-sm-2" id="divTotalPPH0">
+                                <input type="text" class="form-control text-right input-sm PPH" id="TotalPPH0" oninput="Hitung(); this.value = decimal(this.value.replace(/[^0-9.]/g, '').replace(/\.(?=.*\.)/g, ''));" autocomplete="off" placeholder="Total Nominal PPH">
+                            </div>
+                            <div class="col-sm-1">
+                                <button class="btn btn-default btn-sm" onclick="AddPPH()"><i class="fa fa-plus-circle"></i></button>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label class="col-sm-2 control-label text-right">Nilai Pengadaan Dipotong PPH</label>
+                            <div class="col-sm-offset-6 col-sm-4">
+                                <input type="text" class="form-control text-right" id="InclusivePPH" readonly disabled placeholder="Nilai Pengadaan Dipotong PPH">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label class="col-sm-2 control-label text-right">Pembayaran</label>
+                            <label class="col-sm-2 control-label text-right"><i>Nama Rek</i></label>
+                            <div class="col-sm-3" id="divNamaRek">
+                                <input type="text" class="form-control" id="NamaRek" placeholder="Nama Rekening">
+                            </div>
+                            <label class="col-sm-1 control-label text-right"><i>No Rek</i></label>
+                            <div class="col-sm-3" id="divNoRek">
+                                <input type="text" class="form-control" id="NoRek" placeholder="Nomor Rekening">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label class="col-sm-offset-2 col-sm-2 control-label text-right"><i>Bank</i></label>
+                            <div class="col-sm-3" id="divBankRek">
+                                <select required="required" class="form-control select2 input-sm" id="BankRek" style="width: 100%;">
+                                    @foreach (var data in Model.Bank)
+                                    {
+                                        <option value="@data.Id">@data.Nama</option>
+                                    }
+                                </select>
+                            </div>
+                            <label class="col-sm-1 control-label text-right"><i>Cabang</i></label>
+                            <div class="col-sm-3" id="divNamaCab">
+                                <input type="text" class="form-control" id="NamaCab" placeholder="Nama Cabang">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label class="col-sm-offset-2 col-sm-2 control-label text-right"><i>Jumlah Bruto</i></label>
+                            <div class="col-sm-3">
+                                <input type="text" class="form-control text-right" id="BrutoPembayaran" disabled readonly placeholder="Jumlah Bruto">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label class="col-sm-offset-2 col-sm-2 control-label text-right"><i>PPN Yang Dipotong</i></label>
+                            <div class="col-sm-3">
+                                <input type="text" class="form-control text-right" id="PPNPembayaran" disabled readonly placeholder="PPN Yang Dipotong">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label class="col-sm-offset-2 col-sm-2 control-label text-right"><i>Denda Keterlambatan</i></label>
+                            <div class="col-sm-3" id="divDendaPembayaran">
+                                <input type="text" class="form-control text-right" id="DendaPembayaran" oninput="Hitung(); this.value = decimal(this.value.replace(/[^0-9.]/g, '').replace(/\.(?=.*\.)/g, ''));" autocomplete="off" placeholder="Denda Keterlambatan">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label class="col-sm-offset-2 col-sm-2 control-label text-right"><i>Jumlah Bersih</i></label>
+                            <div class="col-sm-3">
+                                <input type="text" class="form-control text-right" id="JumlahPembayaran" disabled readonly placeholder="Jumlah Bersih">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label class="col-sm-offset-2 col-sm-2 control-label text-right"><i>Prestasi Pekerjaan</i></label>
+                            <div class="col-sm-3" id="divPrestasi">
+                                <input type="text" class="form-control" id="Prestasi" autocomplete="off" placeholder="Prestasi Pekerjaan">
+                            </div>
+                            <label class="col-sm-2 control-label text-right"><i>Angsuran / termin ke</i></label>
+                            <div class="col-sm-2" id="divTermin">
+                                <input type="text" class="form-control" id="Termin" autocomplete="off" placeholder="Angsuran / termin ke">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label class="col-sm-2 control-label text-right">Debit</label>
+                            <div class="col-sm-offset-5 col-sm-1">
+                                <button class="btn btn-sm btn-success" onclick="ModalDebit()"><i class="fa fa-upload"></i> Upload</button>
+                            </div>
+                            <div class="col-sm-4" id="divTotalDebit">
+                                <input type="text" class="form-control text-right" id="TotalDebit" readonly disabled placeholder="Total Debit">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12 GDebit" id="GDebit0" count="0">
+                            <label class="col-sm-offset-1 col-sm-1 control-label text-right"><i class="fa fa-square"></i></label>
+                            <div class="col-sm-3" id="divDebit0">
+                                <textarea class="form-control input-sm" id="Debit0" autocomplete="off" rows="1" placeholder="Nama Debit" style="resize:vertical;"></textarea>
+                            </div>
+                            <div class="col-sm-3" id="divNoRekDebit0">
+                                <input type="text" class="form-control input-sm NoRek" id="NoRekDebit0" SetId="Debit0" placeholder="Nomor Rekening">
+                            </div>
+                            <div class="col-sm-3" id="divNominalDebit0">
+                                <input type="text" class="form-control text-right input-sm Debit" id="NominalDebit0" oninput="HitungRek(); this.value = decimal(this.value.replace(/[^0-9.]/g, '').replace(/\.(?=.*\.)/g, ''));" autocomplete="off" placeholder="Nominal Debit">
+                            </div>
+                            <div class="col-sm-1">
+                                <button class="btn btn-default btn-sm" onclick="AddDebit()"><i class="fa fa-plus-circle"></i></button>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label class="col-sm-2 control-label text-right">Kredit</label>
+                            <div class="col-sm-offset-6 col-sm-4" id="divTotalKredit">
+                                <input type="text" class="form-control text-right" id="TotalKredit" readonly disabled placeholder="Total Kredit">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12 GKredit" id="GKredit0" count="3">
+                            <label class="col-sm-offset-1 col-sm-1 control-label text-right"><i class="fa fa-square"></i></label>
+                            <div class="col-sm-3" id="divKredit0">                                
+                                <textarea class="form-control input-sm" id="Kredit0" autocomplete="off" rows="1" placeholder="Nama Kredit" style="resize:vertical;"></textarea>
+                            </div>
+                            <div class="col-sm-3" id="divNoRekKredit0">
+                                <input type="text" class="form-control input-sm NoRek" id="NoRekKredit0" SetId="Kredit0" placeholder="Nomor Rekening">
+                            </div>
+                            <div class="col-sm-3" id="divNominalKredit0">
+                                <input type="text" class="form-control text-right input-sm Kredit" id="NominalKredit0" oninput="HitungRek(); this.value = decimal(this.value.replace(/[^0-9.]/g, '').replace(/\.(?=.*\.)/g, ''));" autocomplete="off" placeholder="Nominal Kredit">
+                            </div>
+                            <div class="col-sm-1">
+                                <button class="btn btn-default btn-sm" onclick="AddKredit()"><i class="fa fa-plus-circle"></i></button>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12 GKredit" id="GKredit1">
+                            <label class="col-sm-offset-1 col-sm-1 control-label text-right"><i class="fa fa-square"></i></label>
+                            <div class="col-sm-3" id="divKredit1">
+                                <textarea class="form-control input-sm" id="Kredit1" autocomplete="off" rows="1" placeholder="Nama Kredit" style="resize:vertical;"></textarea>
+                            </div>
+                            <div class="col-sm-3" id="divNoRekKredit1">
+                                <input type="text" class="form-control input-sm NoRek" id="NoRekKredit1" SetId="Kredit1" placeholder="Nomor Rekening">
+                            </div>
+                            <div class="col-sm-3" id="divNominalKredit1">
+                                <input type="text" class="form-control text-right input-sm Kredit" id="NominalKredit1" oninput="HitungRek(); this.value = decimal(this.value.replace(/[^0-9.]/g, '').replace(/\.(?=.*\.)/g, ''));" autocomplete="off" placeholder="Nominal Kredit">
+                            </div>
+                            <div class="col-sm-1">
+                                <button class="btn btn-danger btn-sm" onclick="Remove('GKredit1'); HitungRek()"><i class="fa fa-trash"></i></button>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12 GKredit" id="GKredit2">
+                            <label class="col-sm-offset-1 col-sm-1 control-label text-right"><i class="fa fa-square"></i></label>
+                            <div class="col-sm-3" id="divKredit2">                                
+                                <textarea class="form-control input-sm" id="Kredit2" autocomplete="off" rows="1" placeholder="Nama Kredit" style="resize:vertical;"></textarea>
+                            </div>
+                            <div class="col-sm-3" id="divNoRekKredit2">
+                                <input type="text" class="form-control input-sm NoRek" id="NoRekKredit2" SetId="Kredit2" placeholder="Nomor Rekening">
+                            </div>
+                            <div class="col-sm-3" id="divNominalKredit2">
+                                <input type="text" class="form-control text-right input-sm Kredit" id="NominalKredit2" oninput="HitungRek(); this.value = decimal(this.value.replace(/[^0-9.]/g, '').replace(/\.(?=.*\.)/g, ''));" autocomplete="off" placeholder="Nominal Kredit">
+                            </div>
+                            <div class="col-sm-1">
+                                <button class="btn btn-danger btn-sm" onclick="Remove('GKredit2'); HitungRek()"><i class="fa fa-trash"></i></button>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12 GKredit" id="GKredit3">
+                            <label class="col-sm-offset-1 col-sm-1 control-label text-right"><i class="fa fa-square"></i></label>
+                            <div class="col-sm-3" id="divKredit3">
+                                <textarea class="form-control input-sm" id="Kredit3" autocomplete="off" rows="1" placeholder="Nama Kredit" style="resize:vertical;"></textarea>
+                            </div>
+                            <div class="col-sm-3" id="divNoRekKredit3">
+                                <input type="text" class="form-control input-sm NoRek" id="NoRekKredit3" SetId="Kredit3" placeholder="Nomor Rekening">
+                            </div>
+                            <div class="col-sm-3" id="divNominalKredit3">
+                                <input type="text" class="form-control text-right input-sm Kredit" id="NominalKredit3" oninput="HitungRek(); this.value = decimal(this.value.replace(/[^0-9.]/g, '').replace(/\.(?=.*\.)/g, ''));" autocomplete="off" placeholder="Nominal Kredit">
+                            </div>
+                            <div class="col-sm-1">
+                                <button class="btn btn-danger btn-sm" onclick="Remove('GKredit3'); HitungRek()"><i class="fa fa-trash"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="pull-right">
+                                <a href="@Url.Action("Index", "Inputs" )" class="btn btn-default">Cancel</a>
+                                <button class="btn btn-primary" onclick="Submit()">Next</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="example-modal">
+    <div id="UploadModal" class="modal fade" role="dialog" style="display:none;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="UploadModalLabel"></h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="form-group col-md-12">
+                            <label for="total" class="col-sm-3 control-label text-right">Files</label>
+                            <div class="col-sm-6" id="divUploadFile">
+                                <input type="file" class="form-control" accept="application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" id="UploadFile" style="min-width:100%">
+                            </div>
+                        </div>
+                        <div class="col-md-10 col-md-offset-2">
+                            <p>Download Format Template <a href="@Url.Content("~//Files/File Format Upload Debit Apv.rar")" style="color:red;" target="_blank">klik disini</a></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="pull-right">
+                        <button type="button" class="btn btn-default" data-dismiss="modal" onclick="ClearScreenModal()" ;>Close</button>
+                        <button type="submit" name="submit" class="btn btn-primary" onclick="Upload()">Upload</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section mainscripts{
+    <script src="@Url.Content("~/Scripts/jquery-ui.min.js")"></script>
+}
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            $('.select2').select2();
+            $('.Tanggal').datepicker();
+            AutoComplete();
+            GetData();
+        });
+
+        function plustitik(angka) {
+            var rupiah = '';
+            var angkarev = angka.toString().split('').reverse().join('');
+            for (var i = 0; i < angkarev.length; i++) if (i % 3 == 0) rupiah += angkarev.substr(i, 3) + ',';
+            return rupiah.split('', rupiah.length - 1).reverse().join('');
+        }
+
+        function decimal(num) {
+            var parts = num.toString().split(".");
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            return parts.join(".");
+        }
+
+        function minkoma(angka) {
+            var bil = angka;
+            var loop = Math.floor(angka.length / 3);
+            for (var i = 0; i < loop; i++) {
+                bil = bil.replace(',', '');
+            }
+            return bil;
+        }
+
+        function formatDateTime(dates) {
+            date = new Date(parseInt(dates.substr(6)));
+            var year = date.getFullYear();
+            var month = (1 + date.getMonth()).toString();
+            month = month.length > 1 ? month : '0' + month;
+            var day = date.getDate().toString();
+            day = day.length > 1 ? day : '0' + day;
+            var hour = date.getHours().toString();
+            hour = hour.length > 1 ? hour : '0' + hour;
+            var minutes = date.getMinutes().toString();
+            minutes = minutes.length > 1 ? minutes : '0' + minutes;
+            var second = date.getSeconds().toString();
+            second = second.length > 1 ? second : '0' + second;
+            return day + '/' + month + '/' + year + ' ' + hour + ':' + minutes + ':' + second;
+        }
+
+        function formatDates(dates) {
+            date = new Date(parseInt(dates.substr(6)));
+            var year = date.getFullYear();
+            var month = (1 + date.getMonth()).toString();
+            month = month.length > 1 ? month : '0' + month;
+            var day = date.getDate().toString();
+            day = day.length > 1 ? day : '0' + day;
+            return day + '/' + month + '/' + year;
+        }
+
+        function formatDatesRange(dates) {
+            date = new Date(parseInt(dates.substr(6)));
+            var year = date.getFullYear();
+            var month = (1 + date.getMonth()).toString();
+            month = month.length > 1 ? month : '0' + month;
+            var day = date.getDate().toString();
+            day = day.length > 1 ? day : '0' + day;
+            return month + '-' + day + '-' + year;
+        }
+
+        function formatDate(dates) {
+            date = new Date(dates);
+            var year = date.getFullYear();
+            var month = (1 + date.getMonth()).toString();
+            month = month.length > 1 ? month : '0' + month;
+            var day = date.getDate().toString();
+            day = day.length > 1 ? day : '0' + day;
+            return year + '-' + month + '-' + day;
+        }
+
+        function ClearError() {
+            $(".has-error").removeClass("has-error");
+        }
+
+        function GetData() {
+            var TransId = $("#TransId").val();
+
+            $.ajax({
+                url: "@Url.Action("GetById", "Inputs")",
+                type: "GET",
+                data: { 'Id': TransId },
+                dataType: "json",
+                success: function (result) {
+                    $("#KodeSuratId").val(result.Trans.KodeSuratId);
+                    $("#NomorMemo").val(result.Trans.Nomor);
+                    $("#Uraian").val(result.Trans.Uraian);
+                    $("#DocDate").datepicker("setDate", new Date(parseInt(result.Trans.DocDate.substr(6))));
+                    $("#TotalKredit").val(decimal(result.Trans.TotalNominal));
+                    $("#Prestasi").val(result.Trans.Prestasi);
+                    $("#Termin").val(result.Trans.Termin);
+                    $("#MainId").val(result.TransMainDetail[0].MainDetail.MainId);
+
+                    $.each(result.TransMainDetail, function (i, value) {
+                        if (i != 0) {
+                            AddKontrak();
+                        } else {
+                            var ele = $("#MainDetail" + i);
+                            ele.html('');
+                            $.each(result.MainDetail, function (i, value) {
+                                if (value.JenisDokumenId != 3) {
+                                    $("<option></option>").val(value.Id).text(value.JenisDokumen.Nama).attr("nomor", value.Nomor).attr("tanggal", formatDates(value.DocDate)).attr("namarek", value.NamaRek).attr("norek", value.NoRek).attr("bankid", value.BankId).attr("cabang", value.Cabang).appendTo(ele);
+                                } else {
+                                    $("<option></option>").val(value.Id).text(value.JenisDokumen.Nama + " " + value.Index).attr("nomor", value.Nomor).attr("tanggal", formatDates(value.DocDate)).attr("namarek", value.NamaRek).attr("norek", value.NoRek).attr("bankid", value.BankId).attr("cabang", value.Cabang).appendTo(ele);
+                                }
+                            });
+                        }
+                        $("#MainDetail" + i).val(value.MainDetailId).trigger('change');
+                    });
+
+                    $.each(result.TransPengadaan, function (i, value) {
+                        if (i != 0) {
+                            AddPengadaan();
+                        }
+                        $("#Pengadaan" + i).val(value.Nama);
+                        $("#NilaiPengadaan" + i).val(decimal(value.Nominal));
+                    });
+
+                    $.each(result.TransPotonganPPN, function (i, value) {
+                        if (i != 0) {
+                            AddPPN();
+                        }
+                        $("#PPN" + i).val(value.SubJenisPotonganId).trigger('change');
+                        $("#NilaiPPN" + i).val(decimal(value.Nominal));
+                        $("#TotalPPN" + i).val(decimal(value.Total));
+                    });
+
+                    $.each(result.TransPotonganPPH, function (i, value) {
+                        if (i != 0) {
+                            AddPPH();
+                        }
+                        $("#PPH" + i).val(value.SubJenisPotonganId).trigger('change');
+                        $("#NilaiPPH" + i).val(decimal(value.Nominal));
+                        $("#TotalPPH" + i).val(decimal(value.Total));
+                    });
+
+                    //$("#Materai").val(decimal(result.TransPotonganMaterai.Nominal));
+                    $("#DendaPembayaran").val(decimal(result.TransPotonganDenda.Nominal));
+
+                    $("#NamaRek").val(result.TransRekeningMain.Nama);
+                    $("#NoRek").val(result.TransRekeningMain.NoRek);
+                    $("#BankRek").val(result.TransRekeningMain.BankId).trigger('change');
+                    $("#NamaCab").val(result.TransRekeningMain.Cabang);
+                    $("#JumlahPembayaran").val(decimal(result.TransRekeningMain.Nominal));
+
+                    $.each(result.TransRekeningDebit, function (i, value) {
+                        if (i != 0) {
+                            AddDebit();
+                        }
+                        $("#Debit" + i).val(value.Nama);
+                        $("#Debit" + i).prop("rows", Math.ceil(value.Nama.length / 40));
+                        $("#NoRekDebit" + i).val(value.NoRek);
+                        $("#NominalDebit" + i).val(decimal(value.Nominal));
+                    });
+
+                    $.each(result.TransRekeningKredit, function (i, value) {
+                        if (i > 3) {
+                            AddKredit();
+                        }
+                        $("#Kredit" + i).val(value.Nama);
+                        $("#Kredit" + i).prop("rows", Math.ceil(value.Nama.length / 40));
+                        $("#NoRekKredit" + i).val(value.NoRek);
+                        $("#NominalKredit" + i).val(decimal(value.Nominal));
+                    });
+
+                    Hitung();
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            })
+        }
+
+        function GetListKontrak() {
+            var MainId = $("#MainId").val();
+            $.ajax({
+                url: "@Url.Action("GetListByMain", "Contracts")",
+                type: "GET",
+                data: { 'MainId': MainId },
+                dataType: "json",
+                success: function (result) {
+                    var Kontrak = $('#GKontrak0').attr('count');
+                    for (var i = 0; i <= Kontrak; i++) {
+                        if ($("#MainDetail" + i).length) {
+                            var ele = $("#MainDetail" + i);
+                            ele.html('');
+                            $.each(result.data, function (i, value) {
+                                if (value.JenisDokumenId != 3) {
+                                    $("<option></option>").val(value.Id).text(value.JenisDokumen.Nama).attr("nomor", value.Nomor).attr("tanggal", formatDates(value.DocDate)).attr("namarek", value.NamaRek).attr("norek", value.NoRek).attr("bankid", value.BankId).attr("cabang", value.Cabang).appendTo(ele);
+                                } else {
+                                    $("<option></option>").val(value.Id).text(value.JenisDokumen.Nama + " " + value.Index).attr("nomor", value.Nomor).attr("tanggal", formatDates(value.DocDate)).attr("namarek", value.NamaRek).attr("norek", value.NoRek).attr("bankid", value.BankId).attr("cabang", value.Cabang).appendTo(ele);
+                                }
+                            });
+                            MainDetail(i);
+                        }
+                    }
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            })
+        }
+
+        function MainDetail(Id) {
+            var Nomor = $('#MainDetail' + Id).find('option:selected').attr('nomor');
+            var Tanggal = $('#MainDetail' + Id).find('option:selected').attr('tanggal');
+
+            $('#NomorKontrak' + Id).val(Nomor);
+            $('#TangalKontrak' + Id).val(Tanggal);
+            if (Id == 0) {
+                var NamaRek = $('#MainDetail' + Id).find('option:selected').attr('namarek');
+                var NoRek = $('#MainDetail' + Id).find('option:selected').attr('norek');
+                var BankRek = $('#MainDetail' + Id).find('option:selected').attr('bankid');
+                var NamaCab = $('#MainDetail' + Id).find('option:selected').attr('cabang');
+
+                $("#NamaRek").val(NamaRek);
+                $("#NoRek").val(NoRek);
+                $("#BankRek").val(BankRek).trigger('change');
+                $("#NamaCab").val(NamaCab);
+            }
+        }
+
+        function Hitung() {
+            var TotPengadaan = 0;
+            var TotPPN = 0;
+            var TotPengadaanPPN = 0;
+            //var TotPengadaanPPNMat = 0;
+            var TotPPH = 0;
+            var TotPengadaanPPH = 0;
+            var JumlahPembayaran = 0;
+            var Debit = 0;
+            var Kredit = 0;
+            $('.Pengadaan').each(function (i, value) {
+                var nilai = $(this).val();
+                if (isNaN(minkoma(nilai)) || nilai == "") {
+                    nilai = 0;
+                }
+                TotPengadaan = TotPengadaan + parseFloat(minkoma(nilai));
+            })
+
+            $('.PPN').each(function (i, value) {
+                var nilai = $(this).val();
+                if (isNaN(minkoma(nilai)) || nilai == "") {
+                    nilai = 0;
+                }
+                TotPPN = TotPPN + parseFloat(minkoma(nilai));
+            })
+
+            TotPengadaanPPN = TotPengadaan + TotPPN;
+
+            //var Materai = minkoma($('#Materai').val());
+            //if (isNaN(Materai) || Materai == "") {
+            //    Materai = 0;
+            //}
+
+            //TotPengadaanPPNMat = TotPengadaanPPN + parseFloat(Materai);
+
+            $('.PPH').each(function (i, value) {
+                var nilai = $(this).val();
+                if (isNaN(minkoma(nilai)) || nilai == "") {
+                    nilai = 0;
+                }
+                TotPPH = TotPPH + parseFloat(minkoma(nilai));
+            })
+
+            //TotPengadaanPPH = TotPengadaanPPNMat - TotPPH;
+            TotPengadaanPPH = TotPengadaanPPN - TotPPH;
+
+            var Denda = minkoma($('#DendaPembayaran').val());
+            if (isNaN(Denda) || Denda == "") {
+                Denda = 0;
+            }
+
+            JumlahPembayaran = TotPengadaanPPH - TotPPN - parseFloat(Denda);
+
+            $('#NilaiPengadaan').val(decimal(TotPengadaan));
+            $('#PajakPertambahan').val(decimal(TotPPN));
+            $('#InclusivePPN').val(decimal(TotPengadaanPPN));
+            //$('#InclusivePPNMaterai').val(decimal(TotPengadaanPPNMat));
+            $('#PajakPenghasilan').val(decimal(TotPPH));
+            $('#InclusivePPH').val(decimal(TotPengadaanPPH));
+            $('#BrutoPembayaran').val(decimal(TotPengadaanPPH));
+            $('#PPNPembayaran').val(decimal(TotPPN));
+            $('#JumlahPembayaran').val(decimal(JumlahPembayaran));
+            $('#NominalKredit0').val(decimal(JumlahPembayaran));
+            $('#NominalKredit3').val(decimal(Denda));
+
+            $('.Debit').each(function (i, value) {
+                var nilai = $(this).val();
+                if (isNaN(minkoma(nilai)) || nilai == "") {
+                    nilai = 0;
+                }
+                Debit = Debit + parseFloat(minkoma(nilai));
+            })
+            $('.Kredit').each(function (i, value) {
+                var nilai = $(this).val();
+                if (isNaN(minkoma(nilai)) || nilai == "") {
+                    nilai = 0;
+                }
+                Kredit = Kredit + parseFloat(minkoma(nilai));
+            })
+
+            $('#TotalDebit').val(decimal(Debit));
+            $('#TotalKredit').val(decimal(Kredit));
+        }
+
+        function HitungRek() {
+            var Debit = 0;
+            var Kredit = 0;
+            $('.Debit').each(function (i, value) {
+                var nilai = $(this).val();
+                if (isNaN(minkoma(nilai)) || nilai == "") {
+                    nilai = 0;
+                }
+                Debit = Debit + parseFloat(minkoma(nilai));
+            })
+            $('.Kredit').each(function (i, value) {
+                var nilai = $(this).val();
+                if (isNaN(minkoma(nilai)) || nilai == "") {
+                    nilai = 0;
+                }
+                Kredit = Kredit + parseFloat(minkoma(nilai));
+            })
+
+            $('#TotalDebit').val(decimal(Debit));
+            $('#TotalKredit').val(decimal(Kredit));
+        }
+
+        function AutoPengadaan() {
+            //var Pengadaan = minkoma($('#NilaiPengadaan0').val());
+            var Pengadaan = minkoma($('#NilaiPengadaan').val());
+            if (!isNaN(Pengadaan) && Pengadaan != "") {
+                var PPN = minkoma($('#NilaiPPN0').val());
+                //if (isNaN(PPN) || PPN == "") {
+                $('#NilaiPPN0').val(decimal(Pengadaan));
+                HitungPPN(0);
+                //}
+                var PPH = minkoma($('#NilaiPPH0').val());
+                //if (isNaN(PPH) || PPH == "") {
+                $('#NilaiPPH0').val(decimal(Pengadaan));
+                HitungPPH(0);
+                //}
+            }
+        }
+
+        function NilaiPPN(Id) {
+            var Persen = $('#PPN' + Id).find('option:selected').attr('nilai');
+
+            $('#PersenPPN' + Id).val(Persen);
+            HitungPPN(Id);
+        }
+
+        function NilaiPPH(Id) {
+            var Persen = $('#PPH' + Id).find('option:selected').attr('nilai');
+
+            $('#PersenPPH' + Id).val(Persen);
+            HitungPPH(Id);
+        }
+
+        function HitungPPN(Id) {
+            var PPN = Math.round(parseFloat(minkoma($('#PersenPPN' + Id).val())) / 100 * parseFloat(minkoma($('#NilaiPPN' + Id).val())));
+            if (isNaN(PPN)) {
+                PPN = 0;
+            }
+
+            $('#TotalPPN' + Id).val(decimal(PPN));
+            //$('#TotalPPN' + Id).val(decimal(PPN.toFixed(5)));
+            if (Id == 0) {
+                Kredit('PPN', 1);
+            }
+            Hitung();
+        }
+
+        function HitungPPH(Id) {
+            var PPH = Math.round(parseFloat(minkoma($('#PersenPPH' + Id).val())) / 100 * parseFloat(minkoma($('#NilaiPPH' + Id).val())));
+            if (isNaN(PPH)) {
+                PPH = 0;
+            }
+
+            $('#TotalPPH' + Id).val(decimal(PPH));
+            //$('#TotalPPH' + Id).val(decimal(PPH.toFixed(5)));
+            if (Id == 0) {
+                Kredit('PPH', 2);
+            }
+            Hitung();
+        }
+
+        function Kredit(Pajak, Id) {
+            var Nama = $('#' + Pajak + '0').find('option:selected').attr('Nama2');
+            var Norek = $('#' + Pajak + '0').find('option:selected').attr('Norek');
+
+            if ($("#Kredit" + Id).length) {
+                $("#Kredit" + Id).val(Nama);
+            }
+            if ($("#NoRekKredit" + Id).length) {
+                $("#NoRekKredit" + Id).val(Norek);
+            }
+            if ($("#NominalKredit" + Id).length) {
+                $("#NominalKredit" + Id).val($('#Total' + Pajak + '0').val());
+            }
+        }
+
+        function AddKontrak() {
+            var countawal = $('#GKontrak0').attr('count');
+            var count = parseInt(countawal) + 1;
+            var html = '';
+            html += '<div class="form-group col-md-12 GKontrak" id="GKontrak' + count + '">';
+            html += '<label class="col-sm-offset-1 col-sm-1 control-label text-right"><i class="fa fa-square"></i></label>';
+            html += '<div class="col-sm-2" id="divMainDetail' + count + '">';
+            html += '<select required="required" class="form-control select2 input-sm" onchange="MainDetail(' + count + ')" id="MainDetail' + count + '" style="width: 100%;"></select>';
+            html += '</div>';
+            html += '<div class="col-sm-2" id="divNomorKontrak' + count + '">';
+            html += '<input type="text" class="form-control input-sm" id="NomorKontrak' + count + '" readonly disabled placeholder="Nomor">';
+            html += '</div>';
+            html += '<div class="col-sm-2" id="divTangalKontrak' + count + '">';
+            html += '<div class="input-group input-group-sm">';
+            html += '<div class="input-group-addon">';
+            html += '<i class="fa fa-calendar"></i>';
+            html += '</div>';
+            html += '<input type="text" class="form-control input-sm" id="TangalKontrak' + count + '" readonly disabled placeholder="Tanggal">';
+            html += '</div>';
+            html += '</div>';
+            html += '<div class="col-sm-1">';
+            html += '<button class="btn btn-danger btn-sm" onclick="Remove(\'GKontrak' + count + '\')"><i class="fa fa-trash"></i></button>';
+            html += '</div>';
+            html += '</div>';
+
+            $('.GKontrak').last().after(html);
+            $('#GKontrak0').attr('count', count);
+
+            $('#MainDetail0').find('option').clone().appendTo('#MainDetail' + count);
+            $('.select2').select2();
+            MainDetail(count);
+        }
+
+        function AddPengadaan() {
+            var countawal = $('#GPengadaan0').attr('count');
+            var count = parseInt(countawal) + 1;
+            var html = '';
+            html += '<div class="form-group col-md-12 GPengadaan" id="GPengadaan' + count + '">';
+            html += '<label class="col-sm-offset-1 col-sm-1 control-label text-right"><i class="fa fa-square"></i></label>';
+            html += '<div class="col-sm-4" id="divPengadaan' + count + '">';
+            html += '<input type="text" class="form-control input-sm" id="Pengadaan' + count + '" autocomplete="off" placeholder="Pengadaan">';
+            html += '</div>';
+            html += '<div class="col-sm-3" id="divNilaiPengadaan' + count + '">';
+            html += '<input type="text" class="form-control text-right input-sm Pengadaan" id="NilaiPengadaan' + count + '" oninput="Hitung(); AutoPengadaan(); this.value = decimal(this.value.replace(/[^0-9.]/g, \'\').replace(/\\.(?=.*\\.)/g, \'\'));" autocomplete="off" placeholder="Nominal Pengadaan">';
+            html += '</div>';
+            html += '<div class="col-sm-1">';
+            html += '<button class="btn btn-danger btn-sm" onclick="Remove(\'GPengadaan' + count + '\')"><i class="fa fa-trash"></i></button>';
+            html += '</div>';
+            html += '</div>';
+
+            $('.GPengadaan').last().after(html);
+            $('#GPengadaan0').attr('count', count);
+        }
+
+        function AddPPN() {
+            var countawal = $('#GPPN0').attr('count');
+            var count = parseInt(countawal) + 1;
+            var html = '';
+            html += '<div class="form-group col-md-12 GPPN" id="GPPN' + count + '">';
+            html += '<label class="col-sm-offset-1 col-sm-1 control-label text-right"><i class="fa fa-square"></i></label>';
+            html += '<div class="col-sm-2" id="divPPN' + count + '">';
+            html += '<select required="required" class="form-control select2 input-sm" onchange="NilaiPPN(' + count + ')" id="PPN' + count + '" style="width: 100%;"></select>';
+            html += '</div>';
+            html += '<div class="col-sm-2" id="divPersenPPN' + count + '">';
+            html += '<div class="input-group">';
+            html += '<input type="text" class="form-control text-right input-sm" id="PersenPPN' + count + '" readonly disabled autocomplete="off" placeholder="Nominal">';
+            html += '<span class="input-group-addon">%</span>';
+            html += '</div>';
+            html += '</div>';
+            html += '<div class="col-sm-2" id="divNilaiPPN' + count + '">';
+            html += '<input type="text" class="form-control text-right input-sm" id="NilaiPPN' + count + '" oninput="HitungPPN(' + count + '); this.value = decimal(this.value.replace(/[^0-9.]/g, \'\').replace(/\\.(?=.*\\.)/g, \'\'));" autocomplete="off" placeholder="Nominal Pajak Pertambahan Nilai">';
+            html += '</div>';
+            html += '<div class="col-sm-2" id="divTotalPPN' + count + '">';
+            html += '<input type="text" class="form-control text-right input-sm PPN" id="TotalPPN' + count + '" oninput="Hitung(); this.value = decimal(this.value.replace(/[^0-9.]/g, \'\').replace(/\\.(?=.*\\.)/g, \'\'));" autocomplete="off" placeholder="Total Nominal PPN">';
+            html += '</div>';
+            html += '<div class="col-sm-1">';
+            html += '<button class="btn btn-danger btn-sm" onclick="Remove(\'GPPN' + count + '\')"><i class="fa fa-trash"></i></button>';
+            html += '</div>';
+            html += '</div>';
+
+            $('.GPPN').last().after(html);
+            $('#GPPN0').attr('count', count);
+
+            $('#PPN0').find('option').clone().appendTo('#PPN' + count);
+            $('.select2').select2();
+            NilaiPPN(count);
+        }
+
+        function AddPPH() {
+            var countawal = $('#GPPH0').attr('count');
+            var count = parseInt(countawal) + 1;
+            var html = '';
+            html += '<div class="form-group col-md-12 GPPH" id="GPPH' + count + '">';
+            html += '<label class="col-sm-offset-1 col-sm-1 control-label text-right"><i class="fa fa-square"></i></label>';
+            html += '<div class="col-sm-2" id="divPPH' + count + '">';
+            html += '<select required="required" class="form-control select2 input-sm" onchange="NilaiPPH(' + count + ')" id="PPH' + count + '" style="width: 100%;"></select>';
+            html += '</div>';
+            html += '<div class="col-sm-2" id="divPersenPPH' + count + '">';
+            html += '<div class="input-group">';
+            html += '<input type="text" class="form-control text-right input-sm" id="PersenPPH' + count + '" readonly disabled autocomplete="off" placeholder="Nominal">';
+            html += '<span class="input-group-addon">%</span>';
+            html += '</div>';
+            html += '</div>';
+            html += '<div class="col-sm-2" id="divNilaiPPH' + count + '">';
+            html += '<input type="text" class="form-control text-right input-sm" id="NilaiPPH' + count + '" oninput="HitungPPH(' + count + '); this.value = decimal(this.value.replace(/[^0-9.]/g, \'\').replace(/\\.(?=.*\\.)/g, \'\'));" autocomplete="off" placeholder="Nominal Pajak Penghasilan">';
+            html += '</div>';
+            html += '<div class="col-sm-2" id="divTotalPPH' + count + '">';
+            html += '<input type="text" class="form-control text-right input-sm PPH" id="TotalPPH' + count + '" oninput="Hitung(); this.value = decimal(this.value.replace(/[^0-9.]/g, \'\').replace(/\\.(?=.*\\.)/g, \'\'));" autocomplete="off" placeholder="Total Nominal PPH">';
+            html += '</div>';
+            html += '<div class="col-sm-1">';
+            html += '<button class="btn btn-danger btn-sm" onclick="Remove(\'GPPH' + count + '\')"><i class="fa fa-trash"></i></button>';
+            html += '</div>';
+            html += '</div>';
+
+            $('.GPPH').last().after(html);
+            $('#GPPH0').attr('count', count);
+
+            $('#PPH0').find('option').clone().appendTo('#PPH' + count);
+            $('.select2').select2();
+            NilaiPPH(count);
+        }
+
+        function AddDebit() {
+            var countawal = $('#GDebit0').attr('count');
+            var count = parseInt(countawal) + 1;
+            var html = '';
+            html += '<div class="form-group col-md-12 GDebit" id="GDebit' + count + '">';
+            html += '<label class="col-sm-offset-1 col-sm-1 control-label text-right"><i class="fa fa-square"></i></label>';
+            html += '<div class="col-sm-3" id="divDebit' + count + '">';
+            //html += '<input type="text" class="form-control input-sm" id="Debit' + count + '" placeholder="Nama Debit">';
+            html += '<textarea class="form-control input-sm" id="Debit' + count + '" autocomplete="off" rows="1" placeholder="Nama Debit" style="resize:vertical;"></textarea>';
+            html += '</div>';
+            html += '<div class="col-sm-3" id="divNoRekDebit' + count + '">';
+            html += '<input type="text" class="form-control input-sm NoRek" id="NoRekDebit' + count + '" SetId="Debit' + count + '" placeholder="Nomor Rekening">';
+            html += '</div>';
+            html += '<div class="col-sm-3" id="divNominalDebit' + count + '">';
+            html += '<input type="text" class="form-control text-right input-sm Debit" id="NominalDebit' + count + '" oninput="HitungRek(); this.value = decimal(this.value.replace(/[^0-9.]/g, \'\').replace(/\\.(?=.*\\.)/g, \'\'));" autocomplete="off" placeholder="Nominal Debit">';
+            html += '</div>';
+            html += '<div class="col-sm-1">';
+            html += '<button class="btn btn-danger btn-sm" onclick="Remove(\'GDebit' + count + '\'); HitungRek()"><i class="fa fa-trash"></i></button>';
+            html += '</div>';
+            html += '</div>';
+
+            $('.GDebit').last().after(html);
+            $('#GDebit0').attr('count', count);
+            AutoComplete();
+        }
+
+        function AddKredit() {
+            var countawal = $('#GKredit0').attr('count');
+            var count = parseInt(countawal) + 1;
+            var html = '';
+            html += '<div class="form-group col-md-12 GKredit" id="GKredit' + count + '">';
+            html += '<label class="col-sm-offset-1 col-sm-1 control-label text-right"><i class="fa fa-square"></i></label>';
+            html += '<div class="col-sm-3" id="divKredit' + count + '">';
+            //html += '<input type="text" class="form-control input-sm" id="Kredit' + count + '" placeholder="Nama Kredit">';
+            html += '<textarea class="form-control input-sm" id="Kredit' + count + '" autocomplete="off" rows="1" placeholder="Nama Kredit" style="resize:vertical;"></textarea>';
+            html += '</div>';
+            html += '<div class="col-sm-3" id="divNoRekKredit' + count + '">';
+            html += '<input type="text" class="form-control input-sm NoRek" id="NoRekKredit' + count + '" SetId="Kredit' + count + '" placeholder="Nomor Rekening">';
+            html += '</div>';
+            html += '<div class="col-sm-3" id="divNominalKredit' + count + '">';
+            html += '<input type="text" class="form-control text-right input-sm Kredit" id="NominalKredit' + count + '" oninput="HitungRek(); this.value = decimal(this.value.replace(/[^0-9.]/g, \'\').replace(/\\.(?=.*\\.)/g, \'\'));" autocomplete="off" placeholder="Nominal Kredit">';
+            html += '</div>';
+            html += '<div class="col-sm-1">';
+            html += '<button class="btn btn-danger btn-sm" onclick="Remove(\'GKredit' + count + '\'); HitungRek()"><i class="fa fa-trash"></i></button>';
+            html += '</div>';
+            html += '</div>';
+
+            $('.GKredit').last().before(html);
+            $('#GKredit0').attr('count', count);
+            AutoComplete();
+        }
+
+        function Remove(Name) {
+            $('#' + Name).remove();
+        }
+
+        function ModalDebit() {
+            ClearError();
+            ClearScreenModal();
+            $('#UploadModalLabel').html('Tambah Data Debit');
+            $('#UploadModal').modal('show');
+        }
+
+        function Upload() {
+            ClearError();
+            if ($.trim($("#UploadFile").val()) == "") { $("#divUploadFile").addClass("has-error"); return; }
+            $("body").addClass("loading");
+
+            var formData = new FormData();
+
+            var file = $("#UploadFile").get(0).files[0];
+            formData.append("file", file);
+
+            $.ajax({
+                url: "@Url.Action("UploadDebit", "Inputs")",
+                type: "POST",
+                contentType: false,
+                processData: false,
+                data: formData,
+                success: function (result) {
+                    $("body").removeClass("loading");
+                    $('#UploadModal').modal('hide');
+                    if (result.result) {
+                        $.each(result.data, function (i, value) {
+                            var count = 0;
+                            if ($.trim($("#Debit0").val()) != "" || $.trim($("#NoRekDebit0").val()) != "" || $.trim($("#NominalDebit0").val()) != "") {
+                                AddDebit();
+                                count = $('#GDebit0').attr('count');
+                            }
+
+                            $("#Debit" + count).val(value.Nama);
+                            $("#NoRekDebit" + count).val(value.NoRek);
+                            $("#NominalDebit" + count).val(decimal(parseFloat(value.Nominal)));
+                            swal("Success!", "The data has been uploaded!", "success");
+                        });
+                        Hitung();
+                    } else {
+                        swal("Oops", "Please check format file!", "error");
+                    }
+                },
+                error: function (err) {
+                    swal("Oops", "We couldn't connect to the server!", "error");
+                }
+            });
+        }
+
+        function AutoComplete() {
+            $('.NoRek').autocomplete({
+                source: function (request, response) {
+                    var SetId = $(this.element).attr("SetId");
+                    var val = $(this.element).val();
+                    var key = val.substring(6, val.length);
+                    $.ajax({
+                        type: "POST",
+                        url: '@Url.Action("Auto", "Inputs")',
+                        //data: { Key: $(this.element).val() },
+                        data: { Key: key },
+                        dataType: "json",
+                        success: function (data) {
+                            response($.map(data, function (item) {
+                                return {
+                                    value: val.substring(0, 6) + item,
+                                    description: item,
+                                    set: SetId,
+                                    cab: val.substring(0, 3)
+                                }
+                            }))
+                        },
+                        error: function (error) {
+                            console.log(error);
+                        }
+                    });
+                },
+                minLength: 11,
+                select: function (event, ui) {
+                    var selected_val = ui.item.value;
+                    var description = ui.item.description;
+                    var SetId = ui.item.set;
+                    var Cab = ui.item.cab;
+                    $.ajax({
+                        type: "POST",
+                        url: '@Url.Action("AutoSelected", "Inputs")',
+                        data: { Key: Cab, Key2: description },
+                        dataType: "json",
+                        success: function (data) {
+                            if (data.cabang == null || SetId.includes("Kredit")) {
+                                if ($("#" + SetId).length) {
+                                    $("#" + SetId).val(data.mcoa.Nama);
+                                    $("#" + SetId).prop("rows", Math.ceil($("#" + SetId).val().length / 40));
+                                }
+                            } else {
+                                if ($("#" + SetId).length) {
+                                    $("#" + SetId).val(data.mcoa.Nama + " a/b " + data.cabang.Nama);
+                                    $("#" + SetId).prop("rows", Math.ceil($("#" + SetId).val().length / 40));
+                                }
+                            }
+
+                            if ($("#NoRek" + SetId).length) { $("#NoRek" + SetId).val(selected_val); }
+                        },
+                        error: function (error) {
+                            console.log(error);
+                        }
+                    });
+                }
+            });
+        }
+
+        function ClearScreenModal() {
+            $('input[type=file]').val('');
+        }
+
+        function Submit() {
+            ClearError();
+            var eror = false;
+            if ($("#DocDate").length) { if ($.trim($("#DocDate").val()) == "") { $("#divDocDate").addClass("has-error"); eror = true; } }
+            if ($("#NomorMemo").length) { if ($.trim($("#NomorMemo").val()) == "") { $("#divNomorMemo").addClass("has-error"); eror = true; } }
+            if ($("#MainDetailId").length) { if ($.trim($("#MainDetailId").val()) == "") { $("#divMainDetailId").addClass("has-error"); eror = true; } }
+            if ($("#Uraian").length) { if ($.trim($("#Uraian").val()) == "") { $("#divUraian").addClass("has-error"); eror = true; } }
+            var Pengadaan = $('#GPengadaan0').attr('count');
+            for (var i = 0; i <= Pengadaan; i++) {
+                if ($("#Pengadaan" + i).length) { if ($.trim($("#Pengadaan" + i).val()) == "") { $("#divPengadaan" + i).addClass("has-error"); eror = true; } }
+                if ($("#NilaiPengadaan" + i).length) { if ($.trim($("#NilaiPengadaan" + i).val()) == "" || minkoma($("#NilaiPengadaan" + i).val()) == 0) { $("#divNilaiPengadaan" + i).addClass("has-error"); eror = true; } }
+            }
+            var PPN = $('#GPPN0').attr('count');
+            for (var i = 0; i <= PPN; i++) {
+                if ($("#PPN" + i).length) { if ($.trim($("#PPN" + i).val()) == "") { $("#divPPN" + i).addClass("has-error"); eror = true; } }
+                if ($("#NilaiPPN" + i).length) { if ($.trim($("#NilaiPPN" + i).val()) == "" || minkoma($("#NilaiPPN" + i).val()) == 0) { $("#divNilaiPPN" + i).addClass("has-error"); eror = true; } }
+                if ($("#TotalPPN" + i).length) { if ($.trim($("#TotalPPN" + i).val()) == "" || minkoma($("#TotalPPN" + i).val()) == 0) { $("#divTotalPPN" + i).addClass("has-error"); eror = true; } }
+            }
+            //if ($("#Materai").length) { if ($.trim($("#Materai").val()) == "" || minkoma($("#Materai").val()) == 0) { $("#divMaterai").addClass("has-error"); eror = true; } }
+            var PPH = $('#GPPH0').attr('count');
+            for (var i = 0; i <= PPH; i++) {
+                if ($("#PPH" + i).length) { if ($.trim($("#PPH" + i).val()) == "") { $("#divPPH" + i).addClass("has-error"); eror = true; } }
+                if ($("#NilaiPPH" + i).length) { if ($.trim($("#NilaiPPH" + i).val()) == "" || minkoma($("#NilaiPPH" + i).val()) == 0) { $("#divNilaiPPH" + i).addClass("has-error"); eror = true; } }
+                if ($("#TotalPPH" + i).length) { if ($.trim($("#TotalPPH" + i).val()) == "" || minkoma($("#TotalPPH" + i).val()) == 0) { $("#divTotalPPH" + i).addClass("has-error"); eror = true; } }
+            }
+            if ($("#NamaRek").length) { if ($.trim($("#NamaRek").val()) == "") { $("#divNamaRek").addClass("has-error"); eror = true; } }
+            if ($("#BankRek").length) { if ($.trim($("#BankRek").val()) == "") { $("#divBankRek").addClass("has-error"); eror = true; } }
+            if ($("#NoRek").length) { if ($.trim($("#NoRek").val()) == "") { $("#divNoRek").addClass("has-error"); eror = true; } }
+            if ($("#NamaCab").length) { if ($.trim($("#NamaCab").val()) == "") { $("#divNamaCab").addClass("has-error"); eror = true; } }
+            //if ($("#DendaPembayaran").length) { if ($.trim($("#DendaPembayaran").val()) == "" || minkoma($("#DendaPembayaran").val()) == 0) { $("#divDendaPembayaran").addClass("has-error"); eror = true; } }
+            var Debit = $('#GDebit0').attr('count');
+            for (var i = 0; i <= Debit; i++) {
+                if ($("#Debit" + i).length) { if ($.trim($("#Debit" + i).val()) == "") { $("#divDebit" + i).addClass("has-error"); eror = true; } }
+                if ($("#NoRekDebit" + i).length) { if ($.trim($("#NoRekDebit" + i).val()) == "") { $("#divNoRekDebit" + i).addClass("has-error"); eror = true; } }
+                if ($("#NominalDebit" + i).length) { if ($.trim($("#NominalDebit" + i).val()) == "" || minkoma($("#NominalDebit" + i).val()) == 0) { $("#divNominalDebit" + i).addClass("has-error"); eror = true; } }
+            }
+            var Kredit = $('#GKredit0').attr('count');
+            for (var i = 0; i <= Kredit; i++) {
+                if (i != 3) {
+                    if ($("#Kredit" + i).length) { if ($.trim($("#Kredit" + i).val()) == "") { $("#divKredit" + i).addClass("has-error"); eror = true; } }
+                    if ($("#NoRekKredit" + i).length) { if ($.trim($("#NoRekKredit" + i).val()) == "") { $("#divNoRekKredit" + i).addClass("has-error"); eror = true; } }
+                    if ($("#NominalKredit" + i).length) { if ($.trim($("#NominalKredit" + i).val()) == "" || minkoma($("#NominalKredit" + i).val()) == 0) { $("#divNominalKredit" + i).addClass("has-error"); eror = true; } }
+                }
+            }
+            if (minkoma($("#TotalDebit").val()) != minkoma($("#TotalKredit").val())) { $("#divTotalDebit").addClass("has-error"); $("#divTotalKredit").addClass("has-error"); eror = true; }
+
+            if (!eror) {
+                var Trans = new Object();
+                Trans.Id = $("#TransId").val();
+                Trans.Nomor = $("#NomorMemo").val();
+                Trans.Uraian = $("#Uraian").val();
+                Trans.DocDate = formatDate($("#DocDate").val());
+                Trans.TotalNominal = minkoma($("#TotalKredit").val());
+                Trans.Prestasi = $("#Prestasi").val();
+                Trans.Termin = $("#Termin").val();
+
+                var MainDetail = $('#GKontrak0').attr('count');
+                var TransMainDetail = new Array();
+                for (var i = 0; i <= MainDetail; i++) {
+                    if ($("#MainDetail" + i).length) {
+                        var Obj = new Object();
+                        Obj.MainDetailId = $("#MainDetail" + i).val();
+                        Obj.TotalNominal = 0;
+                        TransMainDetail.push(Obj);
+                    }
+                }
+
+                var TransPengadaan = new Array();
+                for (var i = 0; i <= Pengadaan; i++) {
+                    if ($("#Pengadaan" + i).length) {
+                        var Obj = new Object();
+                        Obj.Nama = $("#Pengadaan" + i).val();
+                        Obj.Nominal = minkoma($("#NilaiPengadaan" + i).val());
+                        TransPengadaan.push(Obj);
+                    }
+                }
+                var TransPotongan = new Array();
+                for (var i = 0; i <= PPN; i++) {
+                    if ($("#PPN" + i).length) {
+                        var Obj = new Object();
+                        Obj.SubJenisPotonganId = $("#PPN" + i).val();
+                        Obj.Nominal = minkoma($("#NilaiPPN" + i).val());
+                        Obj.Total = minkoma($("#TotalPPN" + i).val());
+                        TransPotongan.push(Obj);
+                    }
+                }
+                for (var i = 0; i <= PPH; i++) {
+                    if ($("#PPH" + i).length) {
+                        var Obj = new Object();
+                        Obj.SubJenisPotonganId = $("#PPH" + i).val();
+                        Obj.Nominal = minkoma($("#NilaiPPH" + i).val());
+                        Obj.Total = minkoma($("#TotalPPH" + i).val());
+                        TransPotongan.push(Obj);
+                    }
+                }
+
+                //var Materai = new Object();
+                //Materai.SubJenisPotonganId = '1';
+                //if ($.trim($("#Materai").val()) == "") {
+                //    Materai.Nominal = '0';
+                //} else {
+                //    Materai.Nominal = minkoma($("#Materai").val());
+                //}
+                //Materai.Total = Materai.Nominal;
+                //TransPotongan.push(Materai);
+                var Denda = new Object();
+                Denda.SubJenisPotonganId = '2';
+                if ($.trim($("#DendaPembayaran").val()) == "") {
+                    Denda.Nominal = '0';
+                } else {
+                    Denda.Nominal = minkoma($("#DendaPembayaran").val());
+                }
+                Denda.Total = Denda.Nominal;
+                TransPotongan.push(Denda);
+
+                var TransRekening = new Array();
+                var Main = new Object();
+                Main.Nama = $("#NamaRek").val();
+                Main.NoRek = $("#NoRek").val();
+                Main.BankId = $("#BankRek").val();
+                Main.Cabang = $("#NamaCab").val();
+                Main.Nominal = minkoma($("#JumlahPembayaran").val());
+                Main.CurrencyId = '1';
+                Main.IsMain = true;
+                Main.IsDebit = false;
+                TransRekening.push(Main);
+
+                for (var i = 0; i <= Debit; i++) {
+                    if ($("#Debit" + i).length) {
+                        var Obj = new Object();
+                        Obj.Nama = $("#Debit" + i).val();
+                        Obj.NoRek = $("#NoRekDebit" + i).val();
+                        Obj.Nominal = minkoma($("#NominalDebit" + i).val());
+                        Obj.CurrencyId = '1';
+                        Obj.IsMain = false;
+                        Obj.IsDebit = true;
+                        TransRekening.push(Obj);
+                    }
+                }
+                for (var i = 0; i <= Kredit; i++) {
+                    if ($("#Kredit" + i).length) {
+                        var Obj = new Object();
+                        Obj.Nama = $("#Kredit" + i).val();
+                        Obj.NoRek = $("#NoRekKredit" + i).val();
+                        Obj.Nominal = minkoma($("#NominalKredit" + i).val());
+                        Obj.CurrencyId = '1';
+                        Obj.IsMain = false;
+                        Obj.IsDebit = false;
+                        TransRekening.push(Obj);
+                    }
+                }
+
+                var TransVM = new Object();
+                TransVM.Trans = Trans;
+                TransVM.TransMainDetail = TransMainDetail;
+                TransVM.TransPengadaan = TransPengadaan;
+                TransVM.TransPotongan = TransPotongan;
+                TransVM.TransRekening = TransRekening;
+
+                $.ajax({
+                    url: "@Url.Action("Submit", "Inputs")",
+                    type: 'POST',
+                    data: { 'TransVM': TransVM },
+                    dataType: 'json',
+                    success: function (result) {
+                        if (result.result) {
+                            swal({
+                                title: "Success!",
+                                text: "The data has been saved!",
+                                type: "success",
+                                showCancelButton: false,
+                                showConfirmButton: true
+                            },
+                            function () {
+                                window.location.href = '@Url.Action("Add2", "Inputs")/' + result.Id;
+                            });
+                        } else {
+                            swal("Oops", "Data failed to save!", "error");
+                        }
+                    },
+                    error: function (response) {
+                        swal("Oops", "We couldn't connect to the server!", "error");
+                    }
+                });
+            } else {
+                swal({
+                    title: "Failed!",
+                    text: "Data not completed!",
+                    type: "warning",
+                    showCancelButton: false,
+                    showConfirmButton: false,
+                    timer: 1000,
+                });
+            }
+        }
+    </script>
+}

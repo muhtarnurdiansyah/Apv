@@ -1,0 +1,449 @@
+﻿@model Apv.Models.ApplicationUser
+@{
+    ViewBag.Title = "Profile";
+    Layout = "~/Views/Shared/_LayoutProfile.cshtml";
+}
+
+<section class="content-header">
+    <h1>
+        Account @Model.Nama
+    </h1>
+</section>
+
+<section class="content">
+    <div class="row">
+        <div class="col-md-12">
+            <input type="hidden" id="Id" value="@Model.Id" />
+            <div class="nav-tabs-custom">
+                <ul class="nav nav-tabs">
+                    <li class="active"><a href="#password" data-toggle="tab">Password</a></li>
+                    <li><a href="#layout" data-toggle="tab">Layout</a></li>
+                </ul>
+                <div class="tab-content">
+                    <div class="active tab-pane" id="password">
+                        <div class="row">
+                            <div class="form-group col-md-12">
+                                <label class="col-sm-3 control-label text-right">Current Password</label>
+                                <div class="col-sm-4" id="divCurrentPassword">
+                                    <div class="input-group">
+                                        <input type="password" class="form-control" id="CurrentPassword" placeholder="Current Password">
+                                        <span class="input-group-btn">
+                                            <button type="button" class="btn btn-default btn-flat" id="CurrentPasswordHide" onclick="Hidden('CurrentPassword', true)"><i class="fa fa-eye"></i></button>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label class="col-sm-3 control-label text-right">New Password</label>
+                                <div class="col-sm-4" id="divNewPassword">
+                                    <div class="input-group">
+                                        <input type="password" class="form-control" id="NewPassword" placeholder="New Password">
+                                        <span class="input-group-btn">
+                                            <button type="button" class="btn btn-default btn-flat" id="NewPasswordHide" onclick="Hidden('NewPassword', true)"><i class="fa fa-eye"></i></button>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label class="col-sm-3 control-label text-right">Confirm New Password</label>
+                                <div class="col-sm-4" id="divConfirmNewPassword">
+                                    <div class="input-group">
+                                        <input type="password" class="form-control" id="ConfirmNewPassword" placeholder="New Password">
+                                        <span class="input-group-btn">
+                                            <button type="button" class="btn btn-default btn-flat" id="ConfirmNewPasswordHide" onclick="Hidden('ConfirmNewPassword', true)"><i class="fa fa-eye"></i></button>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="pull-right">
+                                    <a href="@Url.Action("Index", "Home")" class="btn btn-default">Cancel</a>
+                                    <button type="submit" name="submit" class="btn btn-primary" onclick="SavePassword()">Save</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="layout">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h4 class="control-sidebar-heading">Toggle Sidebar</h4>
+                            </div>
+                            <div class="col-md-12">
+                                @{ var collapse = ""; var open = "";}
+                                @if (!Model.IsMiniSidebar)
+                                {
+                                    collapse = "full-opacity-hover";
+                                }
+                                else
+                                {
+                                    open = "full-opacity-hover";
+                                }
+                                <input type="hidden" id="IsMiniSidebar" value="@Model.IsMiniSidebar" />
+                                <ul class="list-unstyled clearfix">
+                                    <li style="float:left; width: 16.66667%; padding: 5px;" onclick="Navbar('Collapse','Open',true)">
+                                        <a href="javascript:void(0)" id="NavCollapse" style="display: block; box-shadow: 0 0 3px rgba(0,0,0,0.4)" class="clearfix @collapse">
+                                            <div>
+                                                <span style="display:block; width: 5%; float: left; height: 17px; background: #367fa9"></span>
+                                                <span class="bg-light-blue" style="display:block; width: 95%; float: left; height: 17px;"></span>
+                                            </div>
+                                            <div>
+                                                <span style="display:block; width: 5%; float: left; height: 70px; background: #222d32"></span>
+                                                <span style="display:block; width: 95%; float: left; height: 70px; background: #f4f5f7"></span>
+                                            </div>
+                                        </a>
+                                        <p class="text-center no-margin">Collapse</p>
+                                    </li>
+                                    <li style="float:left; width: 16.66667%; padding: 5px;" onclick="Navbar('Open','Collapse',false)">
+                                        <a href="javascript:void(0)" id="NavOpen" style="display: block; box-shadow: 0 0 3px rgba(0,0,0,0.4)" class="clearfix @open">
+                                            <div>
+                                                <span style="display:block; width: 20%; float: left; height: 17px; background: #367fa9"></span>
+                                                <span class="bg-light-blue" style="display:block; width: 80%; float: left; height: 17px;"></span>
+                                            </div>
+                                            <div>
+                                                <span style="display:block; width: 20%; float: left; height: 70px; background: #222d32"></span>
+                                                <span style="display:block; width: 80%; float: left; height: 70px; background: #f4f5f7"></span>
+                                            </div>
+                                        </a>
+                                        <p class="text-center no-margin">Open</p>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-md-12">
+                                <h4 class="control-sidebar-heading">Skins Theme</h4>
+                            </div>
+                            <div class="col-md-12">
+                                <input type="hidden" id="ColorNavbar" value="@Model.ColorNavbar" />
+                                <ul class="list-unstyled clearfix">
+                                    @{ var blue = "full-opacity-hover"; var black = "full-opacity-hover"; var purple = "full-opacity-hover"; var green = "full-opacity-hover"; var red = "full-opacity-hover"; var yellow = "full-opacity-hover";
+                                        var bluelight = "full-opacity-hover"; var blacklight = "full-opacity-hover"; var purplelight = "full-opacity-hover"; var greenlight = "full-opacity-hover"; var redlight = "full-opacity-hover"; var yellowlight = "full-opacity-hover";}
+                                    @if (Model.ColorNavbar == "skin-blue")
+                                    {
+                                        blue = "";
+                                    }
+                                    else if (Model.ColorNavbar == "skin-black")
+                                    {
+                                        black = "";
+                                    }
+                                    else if (Model.ColorNavbar == "skin-purple")
+                                    {
+                                        purple = "";
+                                    }
+                                    else if (Model.ColorNavbar == "skin-green")
+                                    {
+                                        green = "";
+                                    }
+                                    else if (Model.ColorNavbar == "skin-yellow")
+                                    {
+                                        yellow = "";
+                                    }
+                                    else if (Model.ColorNavbar == "skin-blue-light")
+                                    {
+                                        bluelight = "";
+                                    }
+                                    else if (Model.ColorNavbar == "skin-black-light")
+                                    {
+                                        blacklight = "";
+                                    }
+                                    else if (Model.ColorNavbar == "skin-purple-light")
+                                    {
+                                        purplelight = "";
+                                    }
+                                    else if (Model.ColorNavbar == "skin-green-light")
+                                    {
+                                        greenlight = "";
+                                    }
+                                    else if (Model.ColorNavbar == "skin-yellow-light")
+                                    {
+                                        yellowlight = "";
+                                    }
+                                    <li style="float:left; width: 16.66667%; padding: 5px;" onclick="Skin('blue')">
+                                        <a href="javascript:void(0)" data-skin="skin-blue" id="Skinblue" style="display: block; box-shadow: 0 0 3px rgba(0,0,0,0.4)" class="clearfix skin @blue">
+                                            <div>
+                                                <span style="display:block; width: 20%; float: left; height: 17px; background: #367fa9"></span>
+                                                <span class="bg-light-blue" style="display:block; width: 80%; float: left; height: 17px;"></span>
+                                            </div>
+                                            <div>
+                                                <span style="display:block; width: 20%; float: left; height: 70px; background: #222d32"></span>
+                                                <span style="display:block; width: 80%; float: left; height: 70px; background: #f4f5f7"></span>
+                                            </div>
+                                        </a>
+                                        <p class="text-center no-margin">Blue</p>
+                                    </li>
+                                    <li style="float:left; width: 16.66667%; padding: 5px;" onclick="Skin('black')">
+                                        <a href="javascript:void(0)" data-skin="skin-black" id="Skinblack" style="display: block; box-shadow: 0 0 3px rgba(0,0,0,0.4)" class="clearfix skin @black">
+                                            <div style="box-shadow: 0 0 2px rgba(0,0,0,0.1)" class="clearfix">
+                                                <span style="display:block; width: 20%; float: left; height: 17px; background: #fefefe"></span>
+                                                <span style="display:block; width: 80%; float: left; height: 17px; background: #fefefe"></span>
+                                            </div>
+                                            <div>
+                                                <span style="display:block; width: 20%; float: left; height: 70px; background: #222"></span>
+                                                <span style="display:block; width: 80%; float: left; height: 70px; background: #f4f5f7"></span>
+                                            </div>
+                                        </a><p class="text-center no-margin">Black</p>
+                                    </li>
+                                    <li style="float:left; width: 16.66667%; padding: 5px;" onclick="Skin('purple')">
+                                        <a href="javascript:void(0)" data-skin="skin-purple" id="Skinpurple" style="display: block; box-shadow: 0 0 3px rgba(0,0,0,0.4)" class="clearfix skin @purple">
+                                            <div>
+                                                <span style="display:block; width: 20%; float: left; height: 17px;" class="bg-purple-active"></span>
+                                                <span class="bg-purple" style="display:block; width: 80%; float: left; height: 17px;"></span>
+                                            </div>
+                                            <div>
+                                                <span style="display:block; width: 20%; float: left; height: 70px; background: #222d32"></span>
+                                                <span style="display:block; width: 80%; float: left; height: 70px; background: #f4f5f7"></span>
+                                            </div>
+                                        </a><p class="text-center no-margin">Purple</p>
+                                    </li>
+                                    <li style="float:left; width: 16.66667%; padding: 5px;" onclick="Skin('green')">
+                                        <a href="javascript:void(0)" data-skin="skin-green" id="Skingreen" style="display: block; box-shadow: 0 0 3px rgba(0,0,0,0.4)" class="clearfix skin @green">
+                                            <div>
+                                                <span style="display:block; width: 20%; float: left; height: 17px;" class="bg-green-active"></span>
+                                                <span class="bg-green" style="display:block; width: 80%; float: left; height: 17px;"></span>
+                                            </div>
+                                            <div>
+                                                <span style="display:block; width: 20%; float: left; height: 70px; background: #222d32"></span>
+                                                <span style="display:block; width: 80%; float: left; height: 70px; background: #f4f5f7"></span>
+                                            </div>
+                                        </a><p class="text-center no-margin">Green</p>
+                                    </li>
+                                    <li style="float:left; width: 16.66667%; padding: 5px;" onclick="Skin('red')">
+                                        <a href="javascript:void(0)" data-skin="skin-red" id="Skinred" style="display: block; box-shadow: 0 0 3px rgba(0,0,0,0.4)" class="clearfix skin @red">
+                                            <div>
+                                                <span style="display:block; width: 20%; float: left; height: 17px;" class="bg-red-active"></span>
+                                                <span class="bg-red" style="display:block; width: 80%; float: left; height: 17px;"></span>
+                                            </div>
+                                            <div>
+                                                <span style="display:block; width: 20%; float: left; height: 70px; background: #222d32"></span>
+                                                <span style="display:block; width: 80%; float: left; height: 70px; background: #f4f5f7"></span>
+                                            </div>
+                                        </a><p class="text-center no-margin">Red</p>
+                                    </li>
+                                    <li style="float:left; width: 16.66667%; padding: 5px;" onclick="Skin('yellow')">
+                                        <a href="javascript:void(0)" data-skin="skin-yellow" id="Skinyellow" style="display: block; box-shadow: 0 0 3px rgba(0,0,0,0.4)" class="clearfix skin @yellow">
+                                            <div>
+                                                <span style="display:block; width: 20%; float: left; height: 17px;" class="bg-yellow-active"></span>
+                                                <span class="bg-yellow" style="display:block; width: 80%; float: left; height: 17px;"></span>
+                                            </div>
+                                            <div>
+                                                <span style="display:block; width: 20%; float: left; height: 70px; background: #222d32"></span>
+                                                <span style="display:block; width: 80%; float: left; height: 70px; background: #f4f5f7"></span>
+                                            </div>
+                                        </a><p class="text-center no-margin">Yellow</p>
+                                    </li>
+                                    <li style="float:left; width: 16.66667%; padding: 5px;" onclick="Skin('bluelight')">
+                                        <a href="javascript:void(0)" data-skin="skin-blue-light" id="Skinbluelight" style="display: block; box-shadow: 0 0 3px rgba(0,0,0,0.4)" class="clearfix skin @bluelight">
+                                            <div>
+                                                <span style="display:block; width: 20%; float: left; height: 17px; background: #367fa9"></span>
+                                                <span class="bg-light-blue" style="display:block; width: 80%; float: left; height: 17px;"></span>
+                                            </div>
+                                            <div>
+                                                <span style="display:block; width: 20%; float: left; height: 70px; background: #f9fafc"></span>
+                                                <span style="display:block; width: 80%; float: left; height: 70px; background: #f4f5f7"></span>
+                                            </div>
+                                        </a><p class="text-center no-margin" style="font-size: 12px">Blue Light</p>
+                                    </li>
+                                    <li style="float:left; width: 16.66667%; padding: 5px;" onclick="Skin('blacklight')">
+                                        <a href="javascript:void(0)" data-skin="skin-black-light" id="Skinblacklight" style="display: block; box-shadow: 0 0 3px rgba(0,0,0,0.4)" class="clearfix skin @blacklight">
+                                            <div style="box-shadow: 0 0 2px rgba(0,0,0,0.1)" class="clearfix">
+                                                <span style="display:block; width: 20%; float: left; height: 17px; background: #fefefe"></span>
+                                                <span style="display:block; width: 80%; float: left; height: 17px; background: #fefefe"></span>
+                                            </div>
+                                            <div>
+                                                <span style="display:block; width: 20%; float: left; height: 70px; background: #f9fafc"></span>
+                                                <span style="display:block; width: 80%; float: left; height: 70px; background: #f4f5f7"></span>
+                                            </div>
+                                        </a><p class="text-center no-margin" style="font-size: 12px">Black Light</p>
+                                    </li>
+                                    <li style="float:left; width: 16.66667%; padding: 5px;" onclick="Skin('purplelight')">
+                                        <a href="javascript:void(0)" data-skin="skin-purple-light" id="Skinpurplelight" style="display: block; box-shadow: 0 0 3px rgba(0,0,0,0.4)" class="clearfix skin @purplelight">
+                                            <div>
+                                                <span style="display:block; width: 20%; float: left; height: 17px;" class="bg-purple-active"></span>
+                                                <span class="bg-purple" style="display:block; width: 80%; float: left; height: 17px;"></span>
+                                            </div>
+                                            <div>
+                                                <span style="display:block; width: 20%; float: left; height: 70px; background: #f9fafc"></span>
+                                                <span style="display:block; width: 80%; float: left; height: 70px; background: #f4f5f7"></span>
+                                            </div>
+                                        </a><p class="text-center no-margin" style="font-size: 12px">Purple Light</p>
+                                    </li>
+                                    <li style="float:left; width: 16.66667%; padding: 5px;" onclick="Skin('greenlight')">
+                                        <a href="javascript:void(0)" data-skin="skin-green-light" id="Skingreenlight" style="display: block; box-shadow: 0 0 3px rgba(0,0,0,0.4)" class="clearfix skin @greenlight">
+                                            <div>
+                                                <span style="display:block; width: 20%; float: left; height: 17px;" class="bg-green-active"></span>
+                                                <span class="bg-green" style="display:block; width: 80%; float: left; height: 17px;"></span>
+                                            </div>
+                                            <div>
+                                                <span style="display:block; width: 20%; float: left; height: 70px; background: #f9fafc"></span>
+                                                <span style="display:block; width: 80%; float: left; height: 70px; background: #f4f5f7"></span>
+                                            </div>
+                                        </a><p class="text-center no-margin" style="font-size: 12px">Green Light</p>
+                                    </li>
+                                    <li style="float:left; width: 16.66667%; padding: 5px;" onclick="Skin('redlight')">
+                                        <a href="javascript:void(0)" data-skin="skin-red-light" id="Skinredlight" style="display: block; box-shadow: 0 0 3px rgba(0,0,0,0.4)" class="clearfix skin @redlight">
+                                            <div>
+                                                <span style="display:block; width: 20%; float: left; height: 17px;" class="bg-red-active"></span>
+                                                <span class="bg-red" style="display:block; width: 80%; float: left; height: 17px;"></span>
+                                            </div>
+                                            <div>
+                                                <span style="display:block; width: 20%; float: left; height: 70px; background: #f9fafc"></span>
+                                                <span style="display:block; width: 80%; float: left; height: 70px; background: #f4f5f7"></span>
+                                            </div>
+                                        </a><p class="text-center no-margin" style="font-size: 12px">Red Light</p>
+                                    </li>
+                                    <li style="float:left; width: 16.66667%; padding: 5px;" onclick="Skin('yellowlight')">
+                                        <a href="javascript:void(0)" data-skin="skin-yellow-light" id="Skinyellowlight" style="display: block; box-shadow: 0 0 3px rgba(0,0,0,0.4)" class="clearfix skin @yellowlight">
+                                            <div>
+                                                <span style="display:block; width: 20%; float: left; height: 17px;" class="bg-yellow-active"></span>
+                                                <span class="bg-yellow" style="display:block; width: 80%; float: left; height: 17px;"></span>
+                                            </div>
+                                            <div>
+                                                <span style="display:block; width: 20%; float: left; height: 70px; background: #f9fafc"></span>
+                                                <span style="display:block; width: 80%; float: left; height: 70px; background: #f4f5f7"></span>
+                                            </div>
+                                        </a><p class="text-center no-margin" style="font-size: 12px">Yellow Light</p>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="pull-right">
+                                    <a href="@Url.Action("Index", "Home")" class="btn btn-default">Cancel</a>
+                                    <button type="submit" name="submit" class="btn btn-primary" onclick="SaveLayout()">Save</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts{
+    <script>
+        function Hidden(param, hide) {
+            if (hide) {
+                $('#' + param).attr('type', 'text');
+                $('#' + param + 'Hide').after('<button type="button" class="btn btn-default btn-flat" id="' + param + 'Unhide" onclick="Hidden(\'' + param + '\', false)"><i class="fa fa-eye-slash"></i></button>');
+                $('#' + param + 'Hide').remove();
+            } else {
+                $('#' + param).attr('type', 'password');
+                $('#' + param + 'Unhide').after('<button type="button" class="btn btn-default btn-flat" id="' + param + 'Hide" onclick="Hidden(\'' + param + '\', true)"><i class="fa fa-eye"></i></button>');
+                $('#' + param + 'Unhide').remove();
+            }
+
+            //$("#Nav" + removeparam).removeClass("full-opacity-hover");
+            //$("#Nav" + addparam).addClass("full-opacity-hover");
+            //if (collap) {
+            //    $('body').addClass("sidebar-collapse");
+            //    $('#IsMiniSidebar').val(true);
+            //} else {
+            //    $('body').removeClass("sidebar-collapse");
+            //    $('#IsMiniSidebar').val(false);
+            //}
+            //$('body').data('lte.layout').fixSidebar();
+        }
+
+        function Navbar(removeparam, addparam, collap) {
+            $("#Nav" + removeparam).removeClass("full-opacity-hover");
+            $("#Nav" + addparam).addClass("full-opacity-hover");
+            if (collap) {
+                $('body').addClass("sidebar-collapse");
+                $('#IsMiniSidebar').val(true);
+            } else {
+                $('body').removeClass("sidebar-collapse");
+                $('#IsMiniSidebar').val(false);
+            }
+            $('body').data('lte.layout').fixSidebar();
+        }
+
+        function Skin(param) {
+            $(".skin").each(function () {
+                $(this).addClass("full-opacity-hover");
+            });
+
+            $("#Skin" + param).removeClass("full-opacity-hover");
+            var get = $('#ColorNavbar').val();
+            $('body').removeClass(get);
+
+            var cls = $("#Skin" + param).data('skin');
+            $('body').addClass(cls);
+            $('#ColorNavbar').val(cls);
+        }
+
+        function SavePassword() {
+            $("#divCurrentPassword").removeClass("has-error");
+            $("#divNewPassword").removeClass("has-error");
+            $("#divConfirmNewPassword").removeClass("has-error");
+            var User = new Object();
+            User.UserId = $("#Id").val();
+            if ($.trim($("#CurrentPassword").val()) == "") { $("#divCurrentPassword").addClass("has-error"); swal("Oops", "password cannot be empty!", "error"); return; }
+            if ($.trim($("#NewPassword").val()) == "" || $.trim($("#NewPassword").val()).length < 5) { $("#divNewPassword").addClass("has-error"); swal("Oops", "Password must contain at least 5 characters!", "error"); return; }
+            if ($.trim($("#ConfirmNewPassword").val()) != $.trim($("#NewPassword").val())) { $("#divConfirmNewPassword").addClass("has-error"); swal("Oops", "New password and Confirm Password Do Not match!!", "error"); return; }
+            User.CurPass = $("#CurrentPassword").val();
+            User.NPass = $("#NewPassword").val();
+            User.ConPass = $("#ConfirmNewPassword").val();            
+            $.ajax({
+                url: "@Url.Action("SavePassword", "Account")",
+                type: 'POST',
+                data: { 'User': User },
+                dataType: 'json',
+                success: function (result) {
+                    if (result) {
+                        swal({
+                            title: "Success!",
+                            text: "The data has been saved!",
+                            type: "success",
+                            showCancelButton: false,
+                            showConfirmButton: true
+                        },
+                    function () {
+                        window.location.href = '@Url.Action("Index", "Home")';
+                    });
+                    } else {
+                        swal("Oops", "Your Current Password Is Incorrect!!", "error");
+                    }
+                },
+                error: function (response) {
+                    swal("Oops", "We couldn't connect to the server!", "error");
+                }
+            });
+
+        }
+
+        function SaveLayout() {
+            var User = new Object();
+            User.Id = $("#Id").val();
+            var IsMiniSidebar = $('#IsMiniSidebar').val();
+            if (IsMiniSidebar == 'value') {
+                User.IsMiniSidebar = true;
+            } else {
+                User.IsMiniSidebar = IsMiniSidebar;
+            }
+
+            User.ColorNavbar = $('#ColorNavbar').val();
+
+            console.log(User)
+
+            $.ajax({
+                url: "@Url.Action("SaveLayout", "Account")",
+                type: 'POST',
+                data: { 'User': User },
+                dataType: 'json',
+                success: function (result) {
+                    swal({
+                        title: "Success!",
+                        text: "The data has been saved!",
+                        type: "success",
+                        showCancelButton: false,
+                        showConfirmButton: true
+                    },
+                    function () {
+                        window.location.href = '@Url.Action("Index", "Home")';
+                    });
+                },
+                error: function (response) {
+                    swal("Oops", "We couldn't connect to the server!", "error");
+                }
+            });
+        }
+    </script>
+}

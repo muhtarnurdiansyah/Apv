@@ -1,0 +1,797 @@
+﻿
+@{
+    ViewBag.Title = "Input Payment - Edit Slip";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<section class="content-header">
+    <h1>
+        Input Payment <small>Edit Slip</small>
+    </h1>
+</section>
+
+<section class="content">
+    <input type="hidden" id="TransId" value="@Model.Id" />
+    <div class="box box-default">
+        <div class="box-body">
+            <div class="row">
+                <div class="col-md-6" style="border-right: 3px solid #000">
+                    <h2 class="page-header">
+                        <b>Pengirim <small>Debit</small></b>
+                    </h2>
+                    <div class="row">
+                        @{var pengirim = ""; var penerima = "";}
+                        @if (Model.SettingSlip.JenisSlipId == 5)
+                        {
+                            penerima = "readonly disabled";
+                        }
+                        @if (Model.SettingSlip.JenisSlipId == 6)
+                        {
+                            pengirim = "readonly disabled";
+                        }
+
+                        <input type="hidden" id="@(Model.SettingSlip.Id)Id" value="@Model.TransSlip.Id" />
+                        <input type="hidden" id="@(Model.SettingSlip.Id)JenisSlipId" value="@Model.TransSlip.JenisSlipId" />
+                        @{
+                            var norekdebit = "No Rekening";
+                            var divnorekdebit = "hide";
+                            var checknorekdebit = "";
+                        }
+                        @if (Model.TransSlip.IsNoRekDebitVA)
+                        {
+                            norekdebit = "No Rekening VA";
+                            divnorekdebit = "";
+                            checknorekdebit = "checked";
+                        }
+                        @if (Model.SettingSlip.NoRekDebit)
+                        {
+                            <div class="form-group col-md-12">
+                                <label class="col-sm-3 control-label text-right" id="label@(Model.SettingSlip.Id)NoRekDebit">@norekdebit</label>
+                                <div class="col-sm-9" id="div@(Model.SettingSlip.Id)NoRekDebit">
+                                    @if (Model.SettingSlip.NoRekDebitText)
+                                    {
+                                        <input type="text" class="form-control NoRekDebit" SetId="@(Model.SettingSlip.Id)" JenisId="@(Model.SettingSlip.JenisSlipId)" @pengirim id="@(Model.SettingSlip.Id)NoRekDebit" oninput="this.value = this.value.replace(/[^A-Za-z0-9]/g, '')" value="@Model.TransSlip.NoRekDebit" placeholder="No Rekening">
+                                    }
+                                    else
+                                    {
+                                        <input type="text" class="form-control NoRekDebit" SetId="@(Model.SettingSlip.Id)" JenisId="@(Model.SettingSlip.JenisSlipId)" @pengirim id="@(Model.SettingSlip.Id)NoRekDebit" oninput="this.value = this.value.replace(/[^0-9]/g, '')" value="@Model.TransSlip.NoRekDebit" placeholder="No Rekening">
+                                    }
+                                </div>
+                            </div>
+                        }
+                        @if (Model.SettingSlip.NoRekDebit2)
+                        {
+                            <div class="form-group col-md-12">
+                                <div class="col-sm-9 col-sm-offset-3">
+                                    <div class="checkbox">
+                                        <label>
+                                            <input type="checkbox" @checknorekdebit id="@(Model.SettingSlip.Id)NoRekDebitVA" onchange="UseVA(@(Model.SettingSlip.Id), 'Debit')"> Menggunakan rekening virtual account
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12 @divnorekdebit" id="div@(Model.SettingSlip.Id)NoRekDebitVA">
+                                <label class="col-sm-3 control-label text-right">No Rekening Asli</label>
+                                <div class="col-sm-9" id="div@(Model.SettingSlip.Id)NoRekDebit2">
+                                    @if (Model.SettingSlip.NoRekDebitText)
+                                    {
+                                        <input type="text" class="form-control" SetId="@(Model.SettingSlip.Id)" JenisId="@(Model.SettingSlip.JenisSlipId)" @pengirim id="@(Model.SettingSlip.Id)NoRekDebit2" oninput="this.value = this.value.replace(/[^A-Za-z0-9]/g, '')" value="@Model.TransSlip.NoRekDebit2" placeholder="No Rekening">
+                                    }
+                                    else
+                                    {
+                                        <input type="text" class="form-control" SetId="@(Model.SettingSlip.Id)" JenisId="@(Model.SettingSlip.JenisSlipId)" @pengirim id="@(Model.SettingSlip.Id)NoRekDebit2" oninput="this.value = this.value.replace(/[^0-9]/g, '')" value="@Model.TransSlip.NoRekDebit2" placeholder="No Rekening">
+                                    }
+                                </div>
+                            </div>
+                        }
+                        @if (Model.SettingSlip.NamaRekDebit)
+                        {
+                            <div class="form-group col-md-12">
+                                <label class="col-sm-3 control-label text-right">Nama Rekening</label>
+                                <div class="col-sm-9" id="div@(Model.SettingSlip.Id)NamaRekDebit">
+                                    <input type="text" class="form-control" @pengirim id="@(Model.SettingSlip.Id)NamaRekDebit" value="@Model.TransSlip.NamaRekDebit" placeholder="Nama Rekening">
+                                </div>
+                            </div>
+                        }
+                        @if (Model.SettingSlip.NamaRekDebit2)
+                        {
+                            <div class="form-group col-md-12">
+                                <label class="col-sm-3 control-label text-right">Nama Rekening</label>
+                                <div class="col-sm-9" id="div@(Model.SettingSlip.Id)NamaRekDebit">
+                                    <input type="text" class="form-control" @pengirim id="@(Model.SettingSlip.Id)NamaRekDebit2" value="@Model.TransSlip.NamaRekDebit2" placeholder="Nama Rekening">
+                                </div>
+                            </div>
+                        }
+                        @if (Model.SettingSlip.NamaCabangDebit)
+                        {
+                            <div class="form-group col-md-12">
+                                <label class="col-sm-3 control-label text-right">Nama Cabang</label>
+                                <div class="col-sm-9" id="div@(Model.SettingSlip.Id)NamaCabangDebit">
+                                    <input type="text" class="form-control" @pengirim id="@(Model.SettingSlip.Id)NamaCabangDebit" value="@Model.TransSlip.NamaCabangDebit" placeholder="Nama Cabang">
+                                </div>
+                            </div>
+                        }
+                        @if (Model.SettingSlip.JenisRekeningDebit)
+                        {
+                            <div class="form-group col-md-12">
+                                <label class="col-sm-3 control-label text-right">Jenis Rekening</label>
+                                <div class="col-sm-9" id="div@(Model.SettingSlip.Id)JenisRekeningDebitId">
+                                    <select required="required" class="form-control select2" @pengirim id="@(Model.SettingSlip.Id)JenisRekeningDebitId" value="@Model.TransSlip.JenisRekeningDebitId" style="width: 100%;">
+                                        <option value="4">-- Pilih Jenis Rekening --</option>
+                                        @foreach (var data in Model.JenisRekening)
+                                        {
+                                            if (data.Id == Model.TransSlip.JenisRekeningDebitId)
+                                            {
+                                                <option selected="selected" value="@data.Id">@data.Nama</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@data.Id">@data.Nama</option>
+                                            }
+
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        }
+                        @if (Model.SettingSlip.NominalDebit && Model.SettingSlip.NominalKredit)
+                        {
+                            <div class="form-group col-md-12">
+                                <label class="col-sm-3 control-label text-right">Nominal</label>
+                                @if (Model.SettingSlip.CurrencyDebit)
+                                {
+                                    <div class="col-sm-3" id="div@(Model.SettingSlip.Id)CurrencyDebitId">
+                                        <select required="required" class="form-control select2 CurrencyDebitId" @pengirim id="@(Model.SettingSlip.Id)CurrencyDebitId" onchange="Kurs(@(Model.SettingSlip.Id))" value="@Model.TransSlip.CurrencyDebitId" style="width: 100%;">
+                                            @foreach (var data in Model.Currency)
+                                            {
+                                                if (data.Id == Model.TransSlip.CurrencyDebitId)
+                                                {
+                                                    <option selected="selected" value="@data.Id">@data.Nama</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="@data.Id">@data.Nama</option>
+                                                }
+                                            }
+                                        </select>
+                                    </div>
+                                    if (Model.TransSlip.CurrencyDebitId == 1)
+                                    {
+                                        <div class="col-sm-6" id="div@(Model.SettingSlip.Id)NominalDebit">
+                                            <input type="text" class="form-control text-right" id="@(Model.SettingSlip.Id)NominalDebit" @pengirim oninput="this.value = decimal(this.value.replace(/[^0-9.]/g, '').replace(/\.(?=.*\.)/g, ''));" value="@Model.TransSlip.NominalDebit.ToString("n0")" autocomplete="off" placeholder="Nominal">
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="col-sm-6" id="div@(Model.SettingSlip.Id)NominalDebit">
+                                            <input type="text" class="form-control text-right" id="@(Model.SettingSlip.Id)NominalDebit" @pengirim oninput="this.value = decimal(this.value.replace(/[^0-9.]/g, '').replace(/\.(?=.*\.)/g, ''));" value="@Model.TransSlip.NominalDebit.ToString("n2")" autocomplete="off" placeholder="Nominal">
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="col-sm-9" id="div@(Model.SettingSlip.Id)NominalDebit">
+                                        <input type="text" class="form-control text-right" id="@(Model.SettingSlip.Id)NominalDebit" @pengirim oninput="this.value = decimal(this.value.replace(/[^0-9.]/g, '').replace(/\.(?=.*\.)/g, ''));" value="@Model.TransSlip.NominalDebit.ToString("n0")" autocomplete="off" placeholder="Nominal">
+                                    </div>
+                                }
+                            </div>
+                        }
+                        @if (Model.SettingSlip.PesanDebit)
+                        {
+                            <div class="form-group col-md-12">
+                                <label class="col-sm-3 control-label text-right">Pesan</label>
+                                <div class="col-sm-9" id="div@(Model.SettingSlip.Id)PesanDebit">
+                                    <textarea class="form-control" @pengirim id="@(Model.SettingSlip.Id)PesanDebit" value="@Model.TransSlip.PesanDebit" placeholder="Pesan">@Model.TransSlip.PesanDebit</textarea>
+                                </div>
+                            </div>
+                        }
+                        @if (Model.SettingSlip.PesanDebit2)
+                        {
+                            <div class="form-group col-md-12">
+                                <label class="col-sm-3 control-label text-right">Pesan</label>
+                                <div class="col-sm-9" id="div@(Model.SettingSlip.Id)PesanDebit">
+                                    <textarea class="form-control" @pengirim id="@(Model.SettingSlip.Id)PesanDebit2" value="@Model.TransSlip.PesanDebit2" placeholder="Pesan">@Model.TransSlip.PesanDebit2</textarea>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <h2 class="page-header">
+                        <b>Penerima <small>Kredit</small></b>
+                    </h2>
+                    <div class="row">
+                        @{
+                            var norekkredit = "No Rekening";
+                            var divnorekkredit = "hide";
+                            var checknorekkredit = "";
+                        }
+                        @if (Model.TransSlip.IsNoRekKreditVA)
+                        {
+                            norekkredit = "No Rekening VA";
+                            divnorekkredit = "";
+                            checknorekkredit = "checked";
+                        }
+                        @if (Model.SettingSlip.NoRekKredit)
+                        {
+                            <div class="form-group col-md-12">
+                                <label class="col-sm-3 control-label text-right" id="label@(Model.SettingSlip.Id)NoRekKredit">@norekkredit</label>
+                                <div class="col-sm-9" id="div@(Model.SettingSlip.Id)NoRekKredit">
+                                    @if (Model.SettingSlip.NoRekKreditText)
+                                    {
+                                        <input type="text" class="form-control NoRekKredit" SetId="@(Model.SettingSlip.Id)" JenisId="@(Model.SettingSlip.JenisSlipId)" @penerima id="@(Model.SettingSlip.Id)NoRekKredit" oninput="this.value = this.value.replace(/[^A-Za-z0-9]/g, '')" value="@Model.TransSlip.NoRekKredit" placeholder="No Rekening">
+                                    }
+                                    else
+                                    {
+                                        <input type="text" class="form-control NoRekKredit" SetId="@(Model.SettingSlip.Id)" JenisId="@(Model.SettingSlip.JenisSlipId)" @penerima id="@(Model.SettingSlip.Id)NoRekKredit" oninput="this.value = this.value.replace(/[^0-9]/g, '')" value="@Model.TransSlip.NoRekKredit" placeholder="No Rekening">
+                                    }
+
+                                </div>
+                            </div>
+                        }
+                        @if (Model.SettingSlip.NoRekKredit2)
+                        {
+                            <div class="form-group col-md-12">
+                                <div class="col-sm-9 col-sm-offset-3">
+                                    <div class="checkbox">
+                                        <label>
+                                            <input type="checkbox" @checknorekkredit id="@(Model.SettingSlip.Id)NoRekKreditVA" onchange="UseVA(@(Model.SettingSlip.Id), 'Kredit')"> Menggunakan rekening virtual account
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12 @divnorekkredit" id="div@(Model.SettingSlip.Id)NoRekKreditVA">
+                                <label class="col-sm-3 control-label text-right">No Rekening Asli</label>
+                                <div class="col-sm-9" id="div@(Model.SettingSlip.Id)NoRekKredit2">
+                                    @if (Model.SettingSlip.NoRekKreditText)
+                                    {
+                                        <input type="text" class="form-control" SetId="@(Model.SettingSlip.Id)" JenisId="@(Model.SettingSlip.JenisSlipId)" @pengirim id="@(Model.SettingSlip.Id)NoRekKredit2" oninput="this.value = this.value.replace(/[^A-Za-z0-9]/g, '')" value="@Model.TransSlip.NoRekKredit2" placeholder="No Rekening">
+                                    }
+                                    else
+                                    {
+                                        <input type="text" class="form-control" SetId="@(Model.SettingSlip.Id)" JenisId="@(Model.SettingSlip.JenisSlipId)" @pengirim id="@(Model.SettingSlip.Id)NoRekKredit2" oninput="this.value = this.value.replace(/[^0-9]/g, '')" value="@Model.TransSlip.NoRekKredit2" placeholder="No Rekening">
+                                    }
+                                </div>
+                            </div>
+                        }
+                        @if (Model.SettingSlip.NamaRekKredit)
+                        {
+                            <div class="form-group col-md-12">
+                                <label class="col-sm-3 control-label text-right">Nama Rekening</label>
+                                <div class="col-sm-9" id="div@(Model.SettingSlip.Id)NamaRekKredit">
+                                    <input type="text" class="form-control" @penerima id="@(Model.SettingSlip.Id)NamaRekKredit" value="@Model.TransSlip.NamaRekKredit" placeholder="Nama Rekening">
+                                </div>
+                            </div>
+                        }
+                        @if (Model.SettingSlip.NamaCabangKredit)
+                        {
+                            <div class="form-group col-md-12">
+                                <label class="col-sm-3 control-label text-right">Nama Cabang</label>
+                                <div class="col-sm-9" id="div@(Model.SettingSlip.Id)NamaCabangKredit">
+                                    <input type="text" class="form-control" @penerima id="@(Model.SettingSlip.Id)NamaCabangKredit" value="@Model.TransSlip.NamaCabangKredit" placeholder="Nama Cabang">
+                                </div>
+                            </div>
+                        }
+                        @if (Model.SettingSlip.JenisRekeningKredit)
+                        {
+                            <div class="form-group col-md-12">
+                                <label class="col-sm-3 control-label text-right">Jenis Rekening</label>
+                                <div class="col-sm-9" id="div@(Model.SettingSlip.Id)JenisRekeningKreditId">
+                                    <select required="required" class="form-control select2" @penerima id="@(Model.SettingSlip.Id)JenisRekeningKreditId" value="@Model.TransSlip.JenisRekeningKreditId" style="width: 100%;">
+                                        <option value="4">-- Pilih Jenis Rekening --</option>
+                                        @foreach (var data in Model.JenisRekening)
+                                        {
+                                            if (data.Id == Model.TransSlip.JenisRekeningKreditId)
+                                            {
+                                                <option selected="selected" value="@data.Id">@data.Nama</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@data.Id">@data.Nama</option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        }
+                        @if (Model.SettingSlip.BankKredit)
+                        {
+                            <div class="form-group col-md-12">
+                                <label class="col-sm-3 control-label text-right">Bank</label>
+                                <div class="col-sm-9" id="div@(Model.SettingSlip.Id)BankKreditId">
+                                    <select required="required" class="form-control select2" @penerima id="@(Model.SettingSlip.Id)BankKreditId" value="@Model.TransSlip.BankKreditId" style="width: 100%;">
+                                        <option value="">-- Pilih Bank --</option>
+                                        @foreach (var data in Model.Bank)
+                                        {
+                                            if (data.Id == Model.TransSlip.BankKreditId)
+                                            {
+                                                <option selected="selected" value="@data.Id">@data.Nama - @data.KodeBIC</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@data.Id">@data.Nama - @data.KodeBIC</option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        }
+                        @if (Model.SettingSlip.NominalDebit && Model.SettingSlip.NominalKredit)
+                        {
+                            <div class="form-group col-md-12">
+                                <label class="col-sm-3 control-label text-right">Nominal</label>
+                                @if (Model.SettingSlip.CurrencyKredit)
+                                {
+                                    <div class="col-sm-3" id="div@(Model.SettingSlip.Id)CurrencyKreditId">
+                                        <select required="required" class="form-control select2 CurrencyKreditId" @penerima id="@(Model.SettingSlip.Id)CurrencyKreditId" onchange="Kurs(@(Model.SettingSlip.Id))" value="@Model.TransSlip.CurrencyKreditId" style="width: 100%;">
+                                            @foreach (var data in Model.Currency)
+                                            {
+                                                if (data.Id == Model.TransSlip.CurrencyKreditId)
+                                                {
+                                                    <option selected="selected" value="@data.Id">@data.Nama</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="@data.Id">@data.Nama</option>
+                                                }
+                                            }
+                                        </select>
+                                    </div>
+                                    if (Model.TransSlip.CurrencyKreditId == 1)
+                                    {
+                                        <div class="col-sm-6" id="div@(Model.SettingSlip.Id)NominalKredit">
+                                            <input type="text" class="form-control text-right" id="@(Model.SettingSlip.Id)NominalKredit" @penerima oninput="this.value = decimal(this.value.replace(/[^0-9.]/g, '').replace(/\.(?=.*\.)/g, ''));" value="@Model.TransSlip.NominalKredit.ToString("n0")" autocomplete="off" placeholder="Nominal">
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="col-sm-6" id="div@(Model.SettingSlip.Id)NominalKredit">
+                                            <input type="text" class="form-control text-right" id="@(Model.SettingSlip.Id)NominalKredit" @penerima oninput="this.value = decimal(this.value.replace(/[^0-9.]/g, '').replace(/\.(?=.*\.)/g, ''));" value="@Model.TransSlip.NominalKredit.ToString("n2")" autocomplete="off" placeholder="Nominal">
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="col-sm-9" id="div@(Model.SettingSlip.Id)NominalKredit">
+                                        <input type="text" class="form-control text-right" id="@(Model.SettingSlip.Id)NominalKredit" @penerima oninput="this.value = decimal(this.value.replace(/[^0-9.]/g, '').replace(/\.(?=.*\.)/g, ''));" value="@Model.TransSlip.NominalKredit.ToString("n0")" autocomplete="off" placeholder="Nominal">
+                                    </div>
+                                }
+                            </div>
+                        }
+                        @if (Model.SettingSlip.AddKredit)
+                        {
+                            <div class="form-group col-md-12">
+                                <label class="col-sm-3 control-label text-right">Add</label>
+                                <div class="col-sm-9" id="div@(Model.SettingSlip.Id)AddKredit">
+                                    <input type="text" class="form-control" @penerima id="@(Model.SettingSlip.Id)AddKredit" value="@Model.TransSlip.AddKredit" placeholder="Add">
+                                </div>
+                            </div>
+                        }
+                        @if (Model.SettingSlip.AddKredit2)
+                        {
+                            <div class="form-group col-md-12">
+                                <label class="col-sm-3 control-label text-right">Add 2</label>
+                                <div class="col-sm-9" id="div@(Model.SettingSlip.Id)AddKredit2">
+                                    <input type="text" class="form-control" @penerima id="@(Model.SettingSlip.Id)AddKredit2" value="@Model.TransSlip.AddKredit2" placeholder="Add">
+                                </div>
+                            </div>
+                        }
+                        @if (Model.SettingSlip.PhoneKredit)
+                        {
+                            <div class="form-group col-md-12">
+                                <label class="col-sm-3 control-label text-right">Phone</label>
+                                <div class="col-sm-9" id="div@(Model.SettingSlip.Id)PhoneKredit">
+                                    <input type="text" class="form-control" @penerima id="@(Model.SettingSlip.Id)PhoneKredit" value="@Model.TransSlip.PhoneKredit" placeholder="Phone">
+                                </div>
+                            </div>
+                        }
+                        @if (Model.SettingSlip.CityCodeKredit)
+                        {
+                            <div class="form-group col-md-12">
+                                <label class="col-sm-3 control-label text-right">City Code</label>
+                                <div class="col-sm-9" id="div@(Model.SettingSlip.Id)CityCodeKredit">
+                                    <input type="text" class="form-control" @penerima id="@(Model.SettingSlip.Id)CityCodeKredit" value="@Model.TransSlip.CityCodeKredit" placeholder="City Code">
+                                </div>
+                            </div>
+                        }
+                        @if (Model.SettingSlip.IdKredit)
+                        {
+                            <div class="form-group col-md-12">
+                                <label class="col-sm-3 control-label text-right">Id</label>
+                                <div class="col-sm-9" id="div@(Model.SettingSlip.Id)IdKredit">
+                                    <input type="text" class="form-control" @penerima id="@(Model.SettingSlip.Id)IdKredit" value="@Model.TransSlip.IdKredit" placeholder="Id">
+                                </div>
+                            </div>
+                        }
+                        @if (Model.SettingSlip.IdTypeKredit)
+                        {
+                            <div class="form-group col-md-12">
+                                <label class="col-sm-3 control-label text-right">Id Type</label>
+                                <div class="col-sm-9" id="div@(Model.SettingSlip.Id)IdTypeKredit">
+                                    <input type="text" class="form-control" @penerima id="@(Model.SettingSlip.Id)IdTypeKredit" value="@Model.TransSlip.IdTypeKredit" placeholder="Id Type">
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <h2 class="page-header">
+                        <b>Informasi Detail</b>
+                    </h2>
+                </div>
+                @if (Model.SettingSlip.Tanggal)
+                {
+                    <div class="form-group col-md-12">
+                        <label class="col-sm-2 control-label text-right">Tanggal</label>
+                        <div class="col-sm-4">
+                            <div class="input-group">
+                                <div class="input-group-addon">
+                                    <i class="fa fa-calendar"></i>
+                                </div>
+                                <input type="text" class="form-control Tanggal" id="@(Model.SettingSlip.Id)Tanggal" value="@Model.TransSlip.Tanggal" readonly autocomplete="off">
+                            </div>
+                        </div>
+                    </div>
+                }
+                @if (Model.SettingSlip.NoReferensi)
+                {
+                    <div class="form-group col-md-12">
+                        <label class="col-sm-2 control-label text-right">No Referensi</label>
+                        <div class="col-sm-4" id="div@(Model.SettingSlip.Id)NoReferensi">
+                            <input type="text" class="form-control" id="@(Model.SettingSlip.Id)NoReferensi" value="@Model.TransSlip.NoReferensi" placeholder="No Referensi">
+                        </div>
+                    </div>
+                }
+                @if (!Model.SettingSlip.NominalDebit || !Model.SettingSlip.NominalKredit)
+                {
+                    <div class="form-group col-md-12">
+                        <label class="col-sm-2 control-label text-right">Nominal</label>
+                        @if (Model.SettingSlip.NominalDebit)
+                        {
+                            if (Model.SettingSlip.CurrencyDebit)
+                            {
+                                <div class="col-sm-1" id="div@(Model.SettingSlip.Id)CurrencyDebitId">
+                                    <select required="required" class="form-control select2 CurrencyDebitId" @pengirim id="@(Model.SettingSlip.Id)CurrencyDebitId" onchange="Kurs(@(Model.SettingSlip.Id))" value="@Model.TransSlip.CurrencyDebitId" style="width: 100%;">
+                                        @foreach (var data in Model.Currency)
+                                        {
+                                            if (data.Id == Model.TransSlip.CurrencyDebitId)
+                                            {
+                                                <option selected="selected" value="@data.Id">@data.Nama</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@data.Id">@data.Nama</option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+                                if (Model.TransSlip.CurrencyDebitId == 1)
+                                {
+                                    <div class="col-sm-3" id="div@(Model.SettingSlip.Id)NominalDebit">
+                                        <input type="text" class="form-control text-right" id="@(Model.SettingSlip.Id)NominalDebit" @pengirim oninput="this.value = decimal(this.value.replace(/[^0-9.]/g, '').replace(/\.(?=.*\.)/g, ''));" value="@Model.TransSlip.NominalDebit.ToString("n0")" autocomplete="off" placeholder="Nominal">
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="col-sm-3" id="div@(Model.SettingSlip.Id)NominalDebit">
+                                        <input type="text" class="form-control text-right" id="@(Model.SettingSlip.Id)NominalDebit" @pengirim oninput="this.value = decimal(this.value.replace(/[^0-9.]/g, '').replace(/\.(?=.*\.)/g, ''));" value="@Model.TransSlip.NominalDebit.ToString("n2")" autocomplete="off" placeholder="Nominal">
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div class="col-sm-4" id="div@(Model.SettingSlip.Id)NominalDebit">
+                                    <input type="text" class="form-control text-right" id="@(Model.SettingSlip.Id)NominalDebit" @pengirim oninput="this.value = decimal(this.value.replace(/[^0-9.]/g, '').replace(/\.(?=.*\.)/g, ''));" value="@Model.TransSlip.NominalDebit.ToString("n0")" autocomplete="off" placeholder="Nominal">
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            if (Model.SettingSlip.CurrencyKredit)
+                            {
+                                <div class="col-sm-1" id="div@(Model.SettingSlip.Id)CurrencyKreditId">
+                                    <select required="required" class="form-control select2 CurrencyKreditId" @penerima id="@(Model.SettingSlip.Id)CurrencyKreditId" onchange="Kurs(@(Model.SettingSlip.Id))" value="@Model.TransSlip.CurrencyKreditId" style="width: 100%;">
+                                        @foreach (var data in Model.Currency)
+                                        {
+                                            if (data.Id == Model.TransSlip.CurrencyKreditId)
+                                            {
+                                                <option selected="selected" value="@data.Id">@data.Nama</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@data.Id">@data.Nama</option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+                                if (Model.TransSlip.CurrencyKreditId == 1)
+                                {
+                                    <div class="col-sm-3" id="div@(Model.SettingSlip.Id)NominalKredit">
+                                        <input type="text" class="form-control text-right" id="@(Model.SettingSlip.Id)NominalKredit" @penerima oninput="this.value = decimal(this.value.replace(/[^0-9.]/g, '').replace(/\.(?=.*\.)/g, ''));" value="@Model.TransSlip.NominalKredit.ToString("n0")" autocomplete="off" placeholder="Nominal">
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="col-sm-3" id="div@(Model.SettingSlip.Id)NominalKredit">
+                                        <input type="text" class="form-control text-right" id="@(Model.SettingSlip.Id)NominalKredit" @penerima oninput="this.value = decimal(this.value.replace(/[^0-9.]/g, '').replace(/\.(?=.*\.)/g, ''));" value="@Model.TransSlip.NominalKredit.ToString("n2")" autocomplete="off" placeholder="Nominal">
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div class="col-sm-4" id="div@(Model.SettingSlip.Id)NominalKredit">
+                                    <input type="text" class="form-control text-right" id="@(Model.SettingSlip.Id)NominalKredit" @penerima oninput="this.value = decimal(this.value.replace(/[^0-9.]/g, '').replace(/\.(?=.*\.)/g, ''));" value="@Model.TransSlip.NominalKredit.ToString("n0")" autocomplete="off" placeholder="Nominal">
+                                </div>
+                            }
+                        }
+                    </div>
+                }
+                @if (Model.SettingSlip.Kurs)
+                {
+                    <div class="form-group col-md-12">
+                        <label class="col-sm-2 control-label text-right">Kurs</label>
+                        <div class="col-sm-4" id="div@(Model.SettingSlip.Id)Kurs">
+                            <input type="text" class="form-control text-right" id="@(Model.SettingSlip.Id)Kurs" readonly oninput="this.value = decimal(this.value.replace(/[^0-9.]/g, '').replace(/\.(?=.*\.)/g, ''));" value="@Model.TransSlip.Kurs.ToString("n2")" autocomplete="off" placeholder="Nominal Kurs">
+                        </div>
+                    </div>
+                }
+                @if (Model.SettingSlip.Biaya)
+                {
+                    <div class="form-group col-md-12">
+                        <label class="col-sm-2 control-label text-right">Biaya</label>
+                        <div class="col-sm-4" id="div@(Model.SettingSlip.Id)Biaya">
+                            <input type="text" class="form-control text-right" id="@(Model.SettingSlip.Id)Biaya" oninput="this.value = decimal(this.value.replace(/[^0-9.]/g, '').replace(/\.(?=.*\.)/g, ''));" value="@Model.TransSlip.Biaya.ToString("n0")" autocomplete="off" placeholder="Nominal Biaya">
+                        </div>
+                    </div>
+                }
+                @if (Model.SettingSlip.SandiTXN)
+                {
+                    <div class="form-group col-md-12">
+                        <label class="col-sm-2 control-label text-right">Sandi TXN</label>
+                        <div class="col-sm-4" id="div@(Model.SettingSlip.Id)SandiTXN">
+                            <input type="text" class="form-control" id="@(Model.SettingSlip.Id)SandiTXN" value="@Model.TransSlip.SandiTXN" placeholder="Sandi TXN">
+                        </div>
+                    </div>
+                }
+                @if (Model.SettingSlip.Keterangan1)
+                {
+
+                    <div class="form-group col-md-12">
+                        <label class="col-sm-2 control-label text-right">Narasi</label>
+                        <div class="col-sm-10" id="div@(Model.SettingSlip.Id)Keterangan1">
+                            <input type="text" class="form-control" id="@(Model.SettingSlip.Id)Keterangan1" value="@Model.TransSlip.Keterangan1" placeholder="Narasi">
+                        </div>
+                    </div>
+                }
+                @if (Model.SettingSlip.Keterangan2)
+                {
+
+                    <div class="form-group col-md-12">
+                        <label class="col-sm-2 control-label text-right">Narasi Tambahan</label>
+                        <div class="col-sm-10" id="div@(Model.SettingSlip.Id)Keterangan2">
+                            <input type="text" class="form-control" id="@(Model.SettingSlip.Id)Keterangan2" value="@Model.TransSlip.Keterangan2" placeholder="Narasi Tambahan">
+                        </div>
+                    </div>
+                }
+                @if (Model.SettingSlip.Keterangan3)
+                {
+
+                    <div class="form-group col-md-12">
+                        <label class="col-sm-2 control-label text-right">Narasi Tambahan 2</label>
+                        <div class="col-sm-10" id="div@(Model.SettingSlip.Id)Keterangan3">
+                            <input type="text" class="form-control" id="@(Model.SettingSlip.Id)Keterangan3" value="@Model.TransSlip.Keterangan3" placeholder="Narasi Tambahan 2">
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+        <div class="box-footer with-border">
+            <div class="pull-right">
+                <a href="@Url.Action("Add3", "Inputs", new { Id = Model.Id})" class="btn btn-default">Cancel</a>
+                <button type="submit" name="submit" class="btn btn-primary" onclick="Submit(@(Model.SettingSlip.Id))">Submit</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            $('#Tanggal').datepicker();
+            Kurs(@(Model.SettingSlip.Id));
+        });
+
+        function decimal(num) {
+            var parts = num.toString().split(".");
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            return parts.join(".");
+        }
+
+        function minkoma(angka) {
+            var bil = angka;
+            var loop = Math.floor(angka.length / 3);
+            for (var i = 0; i < loop; i++) {
+                bil = bil.replace(',', '');
+            }
+            return bil;
+        }
+
+        function formatDate(dates) {
+            date = new Date(dates);
+            var year = date.getFullYear();
+            var month = (1 + date.getMonth()).toString();
+            month = month.length > 1 ? month : '0' + month;
+            var day = date.getDate().toString();
+            day = day.length > 1 ? day : '0' + day;
+            return year + '-' + month + '-' + day;
+        }
+
+        function formatDates(dates) {
+            var result = '';
+            if (dates != null) {
+                date = new Date(parseInt(dates.substr(6)));
+                var year = date.getFullYear();
+                var month = (1 + date.getMonth()).toString();
+                month = month.length > 1 ? month : '0' + month;
+                var day = date.getDate().toString();
+                day = day.length > 1 ? day : '0' + day;
+                result = day + '/' + month + '/' + year;
+            } else {
+                result = 'undefined';
+            }
+            return result;
+        }
+
+        function ClearError() {
+            $(".has-error").removeClass("has-error");
+        }
+
+        function UseVA(Id, Jenis) {
+            if ($("#" + Id + "NoRek" + Jenis + "VA").is(':checked')) {
+                $("#div" + Id + "NoRek" + Jenis + "VA").removeClass("hide");
+                $("#label" + Id + "NoRek" + Jenis).html("No Rekening VA");
+            } else {
+                $("#div" + Id + "NoRek" + Jenis + "VA").addClass("hide");
+                $("#label" + Id + "NoRek" + Jenis).html("No Rekening");
+
+            }
+        }
+
+        function Kurs(Id) {
+            var CurrencyDebitId = 1;
+            var CurrencyKreditId = 1;
+
+            if ($("#" + Id + "CurrencyDebitId").length) { CurrencyDebitId = $("#" + Id + "CurrencyDebitId").val(); }
+            if ($("#" + Id + "CurrencyKreditId").length) { CurrencyKreditId = $("#" + Id + "CurrencyKreditId").val(); }
+
+            if (CurrencyDebitId != 1 || CurrencyKreditId != 1) {
+                if ($("#" + Id + "Kurs").length) { $("#" + Id + "Kurs").prop('readonly', false); }
+            } else {
+                if ($("#" + Id + "Kurs").length) { $("#" + Id + "Kurs").prop('readonly', true); }
+            }
+        }
+
+        function Submit(Id) {
+            ClearError();
+            var eror = false;
+            if ($("#" + Id + "NoRekKredit").length) { if ($.trim($("#" + Id + "NoRekKredit").val()) == "") { $("#div" + Id + "NoRekKredit").addClass("has-error"); eror = true; } }
+            if ($("#" + Id + "BankKreditId").length) { if ($.trim($("#" + Id + "BankKreditId").val()) == "") { $("#div" + Id + "BankKreditId").addClass("has-error"); eror = true; } }
+            if ($("#" + Id + "JenisRekeningKreditId").length) { if ($.trim($("#" + Id + "JenisRekeningKreditId").val()) == "" || $.trim($("#" + Id + "JenisRekeningKreditId").val()) == 4) { $("#div" + Id + "JenisRekeningKreditId").addClass("has-error"); eror = true; } }
+
+            if ($("#" + Id + "NoRekDebit").length) { if ($.trim($("#" + Id + "NoRekDebit").val()) == "") { $("#div" + Id + "NoRekDebit").addClass("has-error"); eror = true; } }
+            if ($("#" + Id + "JenisRekeningDebitId").length) { if ($.trim($("#" + Id + "JenisRekeningDebitId").val()) == "" || $.trim($("#" + Id + "JenisRekeningDebitId").val()) == 4) { $("#div" + Id + "JenisRekeningDebitId").addClass("has-error"); eror = true; } }
+
+            if ($("#" + Id + "NominalKredit").length) { if ($.trim($("#" + Id + "NominalKredit").val()) == "" || minkoma($("#" + Id + "NominalKredit").val()) == 0) { $("#div" + Id + "NominalKredit").addClass("has-error"); eror = true; } }
+            if ($("#" + Id + "NominalDebit").length) { if ($.trim($("#" + Id + "NominalDebit").val()) == "" || minkoma($("#" + Id + "NominalDebit").val()) == 0) { $("#div" + Id + "NominalDebit").addClass("has-error"); eror = true; } }
+
+            if ($("#" + Id + "Kurs").length) { if ($.trim($("#" + Id + "Kurs").val()) == "" && !$("#" + Id + "Kurs").is('[readonly]')) { $("#div" + Id + "Kurs").addClass("has-error"); eror = true; } }
+
+            if (!eror) {
+                var TransId = $("#TransId").val();
+
+                var Slip = new Object();
+                if ($("#" + Id + "Id").length) { Slip.Id = $("#" + Id + "Id").val(); }
+                if ($("#" + Id + "NoRekDebit").length) { Slip.NoRekDebit = $("#" + Id + "NoRekDebit").val(); }
+                if ($("#" + Id + "NoRekDebitVA").length) {
+                    if ($("#" + Id + "NoRekDebitVA").is(':checked')) {
+                        Slip.IsNoRekDebitVA = true;
+                        //if ($("#" + Id + "NoRekDebit2").length) { Slip.NoRekDebit2 = $("#" + Id + "NoRekDebit2").val(); }
+                    } else {
+                        Slip.IsNoRekDebitVA = false;
+                    }
+                } else {
+                    Slip.IsNoRekDebitVA = false;
+                }
+                if ($("#" + Id + "NamaRekDebit").length) { Slip.NamaRekDebit = $("#" + Id + "NamaRekDebit").val(); }
+                if ($("#" + Id + "NamaRekDebit2").length) { Slip.NamaRekDebit2 = $("#" + Id + "NamaRekDebit2").val(); }
+                if ($("#" + Id + "NamaCabangDebit").length) { Slip.NamaCabangDebit = $("#" + Id + "NamaCabangDebit").val(); }
+                if ($("#" + Id + "JenisRekeningDebitId").length) { Slip.JenisRekeningDebitId = $("#" + Id + "JenisRekeningDebitId").val(); }
+                if ($("#" + Id + "PesanDebit").length) { Slip.PesanDebit = $("#" + Id + "PesanDebit").val(); }
+                if ($("#" + Id + "PesanDebit2").length) { Slip.PesanDebit2 = $("#" + Id + "PesanDebit2").val(); }
+                if ($("#" + Id + "CurrencyDebitId").length) { Slip.CurrencyDebitId = $("#" + Id + "CurrencyDebitId").val(); }
+                if ($("#" + Id + "NominalDebit").length) { Slip.NominalDebit = minkoma($("#" + Id + "NominalDebit").val()); }
+
+                if ($("#" + Id + "NoRekKredit").length) { Slip.NoRekKredit = $("#" + Id + "NoRekKredit").val(); }
+                if ($("#" + Id + "NoRekKreditVA").length) {
+                    if ($("#" + Id + "NoRekKreditVA").is(':checked')) {
+                        Slip.IsNoRekKreditVA = true;
+                        //if ($("#" + Id + "NoRekKredit2").length) { Slip.NoRekKredit2 = $("#" + Id + "NoRekKredit2").val(); }
+                    } else {
+                        Slip.IsNoRekKreditVA = false;
+                    }
+                } else {
+                    Slip.IsNoRekKreditVA = false;
+                }
+                if ($("#" + Id + "NamaRekKredit").length) { Slip.NamaRekKredit = $("#" + Id + "NamaRekKredit").val(); }
+                if ($("#" + Id + "NamaCabangKredit").length) { Slip.NamaCabangKredit = $("#" + Id + "NamaCabangKredit").val(); }
+                if ($("#" + Id + "JenisRekeningKreditId").length) { Slip.JenisRekeningKreditId = $("#" + Id + "JenisRekeningKreditId").val(); }
+                if ($("#" + Id + "BankKreditId").length) { Slip.BankKreditId = $("#" + Id + "BankKreditId").val(); }
+                if ($("#" + Id + "CurrencyKreditId").length) { Slip.CurrencyKreditId = $("#" + Id + "CurrencyKreditId").val(); }
+                if ($("#" + Id + "NominalKredit").length) { Slip.NominalKredit = minkoma($("#" + Id + "NominalKredit").val()); }
+                if ($("#" + Id + "AddKredit").length) { Slip.AddKredit = $("#" + Id + "AddKredit").val(); }
+                if ($("#" + Id + "AddKredit2").length) { Slip.AddKredit2 = $("#" + Id + "AddKredit2").val(); }
+                if ($("#" + Id + "PhoneKredit").length) { Slip.PhoneKredit = $("#" + Id + "PhoneKredit").val(); }
+                if ($("#" + Id + "CityCodeKredit").length) { Slip.CityCodeKredit = $("#" + Id + "CityCodeKredit").val(); }
+                if ($("#" + Id + "IdKredit").length) { Slip.IdKredit = $("#" + Id + "IdKredit").val(); }
+                if ($("#" + Id + "IdTypeKredit").length) { Slip.IdTypeKredit = $("#" + Id + "IdTypeKredit").val(); }
+                if ($("#" + Id + "SandiTXN").length) { Slip.SandiTXN = $("#" + Id + "SandiTXN").val(); }
+
+                if ($("#" + Id + "Keterangan1").length) { Slip.Keterangan1 = $("#" + Id + "Keterangan1").val(); }
+                if ($("#" + Id + "Keterangan2").length) { Slip.Keterangan2 = $("#" + Id + "Keterangan2").val(); }
+                if ($("#" + Id + "Keterangan3").length) { Slip.Keterangan3 = $("#" + Id + "Keterangan3").val(); }
+                if ($("#" + Id + "Biaya").length) { Slip.Biaya = minkoma($("#" + Id + "Biaya").val()); }
+                if ($("#" + Id + "Kurs").length) { Slip.Kurs = minkoma($("#" + Id + "Kurs").val()); }
+                if ($("#" + Id + "Tanggal").length) { Slip.Tanggal = formatDate($("#" + Id + "Tanggal").val()); } else { Slip.Tanggal = formatDate(new Date()); }
+                if ($("#" + Id + "NoReferensi").length) { Slip.NoReferensi = $("#" + Id + "NoReferensi").val(); }
+                if ($("#" + Id + "JenisSlipId").length) { Slip.JenisSlipId = $("#" + Id + "JenisSlipId").val(); }
+
+
+                if (!$("#" + Id + "CurrencyDebitId").length && !$("#" + Id + "CurrencyKreditId").length) {
+                    if (Id == 6) {
+                        Slip.CurrencyKreditId = 1;
+                    } else {
+                        Slip.CurrencyDebitId = 1;
+                    }
+                }
+
+                Slip.TransId = TransId;
+
+                $.ajax({
+                    url: "@Url.Action("SaveSlip", "Inputs")",
+                    type: 'POST',
+                    data: { 'Slip': Slip, 'TransId' : TransId },
+                    dataType: 'json',
+                    success: function (result) {
+                        swal({
+                            title: "Success!",
+                            text: "The data has been saved!",
+                            type: "success",
+                            showCancelButton: false,
+                            showConfirmButton: true
+                        },
+                        function () {
+                            window.location.href = '@Url.Action("Add3", "Inputs")/' + TransId;
+                        });
+                    },
+                    error: function (response) {
+                        swal("Oops", "We couldn't connect to the server!", "error");
+                    }
+                });
+            } else {
+                swal({
+                    title: "Failed!",
+                    text: "Data not completed!",
+                    type: "warning",
+                    showCancelButton: false,
+                    showConfirmButton: false,
+                    timer: 1000,
+                });
+            }
+        }
+    </script>
+}
+
+
+
+

@@ -1,0 +1,482 @@
+﻿
+@{
+    ViewBag.Title = "List History Payment";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<section class="content-header">
+    <h1>
+        List History Payment
+    </h1>
+</section>
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box box-info collapsed-box">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Search Another</h3>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                            <i class="fa fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="form-group col-md-12">
+                            <label class="col-sm-2 control-label">Tanggal Buat</label>
+                            <div class="col-sm-4" id="divCreateDate">
+                                <div class="input-group">
+                                    <div class="input-group-addon">
+                                        <i class="fa fa-calendar"></i>
+                                    </div>
+                                    <input type="text" class="form-control pull-right SearchDate" id="CreateDate">
+                                    <span class="input-group-addon">
+                                        <input type="checkbox" class="Checked" value="CreateDate" required>
+                                    </span>
+                                </div>
+                            </div>
+                            <label class="col-sm-2 control-label">Tanggal Doc</label>
+                            <div class="col-sm-4" id="divDocDate">
+                                <div class="input-group">
+                                    <div class="input-group-addon">
+                                        <i class="fa fa-calendar"></i>
+                                    </div>
+                                    <input type="text" class="form-control pull-right SearchDate" id="DocDate">
+                                    <span class="input-group-addon">
+                                        <input type="checkbox" class="Checked" value="DocDate" required>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label class="col-sm-2 control-label">Nomor</label>
+                            <div class="col-sm-2" id="divKodeSuratId">
+                                <select required="required" class="form-control select2" id="KodeSurat" style="width: 100%;">
+                                    @foreach (var data in Model.ListKodeSurat)
+                                    {
+                                        <option value="@data.Id" selected>@data.Nama</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-sm-2" id="divNomor">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="Nomor">
+                                    <span class="input-group-addon">
+                                        <input type="checkbox" class="Checked" value="Nomor">
+                                    </span>
+                                </div>
+                            </div>
+                            <label class="col-sm-2 control-label">Status</label>
+                            <div class="col-sm-4" id="divStatus">
+                                <div class="input-group">
+                                    <select class="form-control" id="Status" style="width: 100%;">
+                                        <option selected="selected" value="">-- Choose Status --</option>
+                                        @foreach (var item in Model.ListStatus)
+                                        {
+                                            <option value="@item.Id">@item.Nama</option>
+                                        }
+                                    </select>
+                                    <span class="input-group-addon">
+                                        <input type="checkbox" class="Checked" value="Status">
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="box-footer with-border">
+                    <div class="pull-right">
+                        <button type="button" class="btn btn-info" onclick="Search()"><i class="fa fa-search"></i> Search</button>
+                        <button type="button" class="btn btn-warning" onclick="Reset()"><i class="fa fa-refresh"></i> Reset</button>
+                    </div>
+                </div>
+            </div>
+            <div class="box">
+                <div class="box-body">
+                    <table id="example1" class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Tanggal</th>
+                                <th>Nomor</th>
+                                <th>Vendor</th>
+                                <th>Uraian</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody class="tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="example-modal">
+    <div id="HistoryModal" class="modal fade" role="dialog" style="display:none;">
+        <div class="modal-dialog" style="width:70%;">
+            <div class="modal-content">
+                <div class="modal-header bg-green">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">History Tracking Data</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-md-12" id="historybody"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="pull-right">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            $('.select2').select2();
+            $('.tanggalrange, .SearchDate').daterangepicker();
+            GetFilter(null, false);
+        });
+
+        function Search() {
+            ClearError();
+            if ($('.Checked:input:checkbox:checked').length > 0) {
+                var gagal = false;
+                var Data = new Object();
+                $('.Checked:input:checkbox:checked').each(function () {
+                    if ($.trim($("#" + $(this).val()).val()) == "" && $(this).val() != "CreateDate" && $(this).val() != "DocDate") {
+                        $("#div" + $(this).val()).addClass("has-error");
+
+                        gagal = true;
+                        return;
+                    } else {
+                        if ($(this).val() == "CreateDate" || $(this).val() == "DocDate") {
+                            var daterange = $("#" + $(this).val()).val();
+                            var start = formatDate(daterange.substring(0, 10));
+                            var end = formatDate(daterange.substring(13, 24));
+                            eval('Data.Start' + $(this).val() + '="' + start + '"');
+                            eval('Data.End' + $(this).val() + '="' + end + '"');
+                        } else if ($(this).val() == "Nomor") {
+                            Data.KodeSurat = $("#KodeSurat").val();
+                            eval('Data.' + $(this).val() + '="' + $("#" + $(this).val()).val() + '"');
+                        } else {
+                            eval('Data.' + $(this).val() + '="' + $("#" + $(this).val()).val() + '"');
+                        }
+                        eval('Data.Option' + $(this).val() + '= true');
+                    }
+                })
+                if (!gagal) {
+                    GetFilter(Data, true);
+                } else {
+                    swal("Oops", "Input your keyword!", "error");
+                }
+            } else {
+                swal("Oops", "Checklist chehckbox first!", "error");
+            }
+        }
+
+        function Reset() {
+            date = new Date();
+            var year = date.getFullYear();
+            var month = (1 + date.getMonth()).toString();
+            month = month.length > 1 ? month : '0' + month;
+            var day = date.getDate().toString();
+            day = day.length > 1 ? day : '0' + day;
+            var tgl = month + '/' + day + '/' + year;
+
+            $('#Status').val('').change();
+            $('input[type=checkbox]').each(function () {
+                this.checked = false;
+            });
+            $('input[type=text]').val('');
+            $('#CreateDate').val(tgl + " - " + tgl).change();
+            $('#DocDate').val(tgl + " - " + tgl).change();
+
+            GetFilter(null, false);
+        }
+
+        function GetFilter(Data, UseFilter) {
+            var t = $("#example1").DataTable({
+                "destroy": true,
+                "orderCellsTop": true,
+                "ajax": {
+                    "url": "@Url.Action("GetFilterList", "Histories")",
+                    "type": "POST",
+                    "data": { Data: Data, UseFilter: UseFilter },
+                    "datatype": "json"
+                },
+                "columns": [
+                    { "data": null },
+                    {
+                        "render": function (data, type, val) {
+                            return formatDates(val.DocDate);
+                        }
+                    },
+                    {
+                        "render": function (data, type, val) {
+                            return val.KodeSurat.Nama + '' + val.Nomor;
+                        }
+                    },
+                    { "data": "Vendor.Nama" },
+                    { "data": "Uraian" },
+                    {
+                        "render": function (data, type, val) {
+                            return plustitik(val.TotalNominal);
+                        }
+                    },
+                    {
+                        "render": function (data, type, val) {
+                            return '<span class="label label-' + val.Status.Warna + '">' + val.Status.Nama + '</span>';
+                        }
+                    },
+                    {
+                        "render": function (data, type, val) {
+                            html = '';
+                            html += '<a href="@Url.Action("View", "Histories")/' + val.Id + '" class="btn btn-sm btn-info" data-toggle="tooltip" data-placement="bottom" title="View"><i class="fa fa-eye"></i></a>';
+                            html += ' <button class="btn btn-sm btn-default" onclick="HistoryModal(' + val.Id + ')" data-placement="bottom" title="History"><i class="fa fa-history"></i></button>';
+                            html += ' <a href="@Url.Action("DownloadPdf", "Histories")/' + val.Id + '" class="btn btn-sm btn-social-icon btn-foursquare" data-toggle="tooltip" data-placement="bottom" title="PDF"><i class="fa fa-file-pdf-o"></i></a>';
+                            if (val.IsTakeBack) {
+                                html += ' <button class="btn btn-sm btn-danger" onclick="TakeBackModal(' + val.Id + ',\'' + val.KodeSurat.Nama + '' + val.Nomor + '\')" data-placement="bottom" title="Take Back"><i class="fa fa-mail-reply"></i></button>';
+                            } else {
+                                html += ' <button class="btn btn-sm btn-danger" disabled readonly data-placement="bottom" title="Take Back"><i class="fa fa-mail-reply"></i></button>';
+                            }
+                            return html;
+                        }
+                    }
+                ],
+                "pageLength": 25,
+                "scrollCollapse": true,
+                "dom": "<'row'<'col-sm-4'B><'col-sm-2'l><'col-sm-6'p>>" + "<'row'<'col-sm-12'tr>>" + "<'row'<'col-sm-5'i><'col-sm-7'p>>",
+                "columnDefs": [
+                    {
+                        "searchPanes": {
+                            "show": true,
+                        },
+                        "targets": [1, 2, 3, 4, 5, 6],
+                    }, {
+                        "searchPanes": {
+                            "show": false,
+                        },
+                        "targets": [0, 7],
+                    }, {
+                        "sortable": false,
+                        "class": "index",
+                        "targets": [0, 7]
+                    }, {
+                        "className": 'text-right',
+                        "targets": 5
+                    }],
+                "searchPanes": {
+                    "layout": 'columns-6'
+                },
+                "buttons": {
+                    "buttons": [
+                        {
+                            "extend": 'searchPanes',
+                            "config": {
+                                "cascadePanes": true
+                            },
+                            "className": 'btn-info'
+                        }
+                    ],
+                    "dom": {
+                        "button": {
+                            "className": 'btn btn-sm'
+                        },
+                        "buttonLiner": {
+                            "tag": null
+                        }
+                    }
+                },
+                "language": {
+                    "searchPanes": {
+                        "clearMessage": 'Clear',
+                        "collapse": { 0: '<i class="fa fa-search"></i> Search', _: '<i class="fa fa-search"></i> Search (%d)' }
+                    }
+                }
+            });
+
+            t.on('order.dt search.dt', function () {
+                t.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+                    cell.innerHTML = i + 1;
+                });
+            }).draw();
+        }
+
+        function plustitik(angka) {
+            var rupiah = '';
+            var angkarev = angka.toString().split('').reverse().join('');
+            for (var i = 0; i < angkarev.length; i++) if (i % 3 == 0) rupiah += angkarev.substr(i, 3) + ',';
+            return rupiah.split('', rupiah.length - 1).reverse().join('');
+        }
+
+        function decimal(num) {
+            var parts = num.toString().split(".");
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            return parts.join(".");
+        }
+
+        function minkoma(angka) {
+            var bil = angka;
+            var loop = Math.floor(angka.length / 3);
+            for (var i = 0; i < loop; i++) {
+                bil = bil.replace(',', '');
+            }
+            return bil;
+        }
+
+        function formatDateTime(dates) {
+            date = new Date(parseInt(dates.substr(6)));
+            var year = date.getFullYear();
+            var month = (1 + date.getMonth()).toString();
+            month = month.length > 1 ? month : '0' + month;
+            var day = date.getDate().toString();
+            day = day.length > 1 ? day : '0' + day;
+            var hour = date.getHours().toString();
+            hour = hour.length > 1 ? hour : '0' + hour;
+            var minutes = date.getMinutes().toString();
+            minutes = minutes.length > 1 ? minutes : '0' + minutes;
+            var second = date.getSeconds().toString();
+            second = second.length > 1 ? second : '0' + second;
+            return day + '/' + month + '/' + year + ' ' + hour + ':' + minutes + ':' + second;
+        }
+
+        function formatDates(dates) {
+            date = new Date(parseInt(dates.substr(6)));
+            var year = date.getFullYear();
+            var month = (1 + date.getMonth()).toString();
+            month = month.length > 1 ? month : '0' + month;
+            var day = date.getDate().toString();
+            day = day.length > 1 ? day : '0' + day;
+            return day + '/' + month + '/' + year;
+        }
+
+        function formatDatesRange(dates) {
+            date = new Date(parseInt(dates.substr(6)));
+            var year = date.getFullYear();
+            var month = (1 + date.getMonth()).toString();
+            month = month.length > 1 ? month : '0' + month;
+            var day = date.getDate().toString();
+            day = day.length > 1 ? day : '0' + day;
+            return month + '-' + day + '-' + year;
+        }
+
+        function formatDate(dates) {
+            date = new Date(dates);
+            var year = date.getFullYear();
+            var month = (1 + date.getMonth()).toString();
+            month = month.length > 1 ? month : '0' + month;
+            var day = date.getDate().toString();
+            day = day.length > 1 ? day : '0' + day;
+            return year + '-' + month + '-' + day;
+        }
+
+        function HistoryModal(Id) {
+            debugger;
+            $.ajax({
+                url: "@Url.Action("GetHistoryById", "Histories")",
+                type: "GET",
+                data: { 'Id': Id },
+                dataType: "json",
+                success: function (result) {
+                    var html = '';
+                    html = '<ul class="timeline">';
+                    html += '<li>'
+                    html += '<i class="fa fa-' + result[0].ReceiverIcon + ' bg-' + result[0].ReceiverColorIcon + '"></i>'
+                    html += '<div class="timeline-item">';
+                    html += '<span class="time"><i class="fa fa-clock-o"></i> ' + formatDateTime(result[0].ReceiveDate) + '</span>';
+                    html += '<h3 class="timeline-header"><a href="#">' + result[0].Receiver.Nama + '</a> ' + result[0].ReceiverActivity + '</h3>';
+                    html += '</div>';
+                    html += '</li>';
+                    debugger;
+                    if (result.length > 1) {
+                        $.each(result, function (index, data) {
+                            if (data.Sender != null) {
+                                html += '<li>'
+                                if (result[index + 1]) {
+                                    html += '<i class="fa fa-' + result[index + 1].ReceiverIcon + ' bg-' + result[index + 1].ReceiverColorIcon + '"></i>'
+                                    html += '<div class="timeline-item">';
+                                    html += '<span class="time"><i class="fa fa-clock-o"></i> ' + formatDateTime(data.SendDate) + '</span>';
+                                    html += '<h3 class="timeline-header"><a href="#">' + data.Sender.Nama + '</a> ' + result[index + 1].ReceiverActivity + ' <a href="#">' + result[index + 1].Receiver.Nama + '</a></h3>';
+                                    if (data.SenderKeterangan != null) {
+                                        html += '<div class="timeline-body">' + data.SenderKeterangan + '</div>';
+                                    }
+                                    html += '</div>';
+                                } else {
+                                    html += '<i class="fa fa-hourglass-2 bg-grey"></i>'
+                                    html += '<div class="timeline-item">';
+                                    html += '<span class="time"><i class="fa fa-clock-o"></i> ' + formatDateTime(data.SendDate) + '</span>';
+                                    html += '<h3 class="timeline-header"><a href="#">' + data.Sender.Nama + '</a> send data to ......</h3>';
+                                    if (data.SenderKeterangan != null) {
+                                        html += '<div class="timeline-body">' + data.SenderKeterangan + '</div>';
+                                    }
+                                    html += '</div>';
+                                }
+                                html += '</li>';
+                            }
+                        });
+                    }
+                    html += '</ul>';
+                    $('#historybody').html(html);
+                    $('#HistoryModal').modal('show');
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            })
+        }
+
+        function ClearError() {
+            $(".has-error").removeClass("has-error");
+        }
+
+        function TakeBackModal(Id, Nomor) {
+            swal({
+                title: "Are you sure to take back this?",
+                text: "Nomor : " + Nomor,
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                closeOnConfirm: false
+            }, function () {
+                $.ajax({
+                    url: "@Url.Action("TakeBack", "Histories")",
+                    type: "POST",
+                    beforeSend: function () {
+                        $("body").addClass("loading");
+                    },
+                    data: { 'Id': Id },
+                    success: function (response) {
+                        $("body").removeClass("loading");
+                        swal({
+                            title: response.title,
+                            text: response.text,
+                            type: response.type,
+                            showCancelButton: false,
+                            showConfirmButton: true
+                        }, function () {
+                            $("#example1").DataTable().ajax.reload();
+                            SendNotif(null);
+                        });
+                    },
+                    error: function (response) {
+                        swal("Oops", "We couldn't connect to the server!", "error");
+                    }
+                });
+            });
+        }
+    </script>
+}
+
+

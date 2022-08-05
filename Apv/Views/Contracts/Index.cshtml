@@ -1,0 +1,1292 @@
+﻿@model Apv.ViewModels.ContractVM
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<section class="content-header">
+    <h1>
+        List Kontrak
+    </h1>
+</section>
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box">
+                <div class="box-header with-border">
+                    <div class="col-md-12">
+                        <div class="pull-right">
+                            <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#AddKModal" data-backdrop="static" data-keyboard="false" onclick="AddKModal()"><i class="fa fa-plus-circle"></i> Tambah Kontrak Baru</button>
+                            <button type="button" class="btn btn-sm btn-success" onclick="AddAModal()"><i class="fa fa-plus-circle"></i> Tambah SPK / Adendum</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <table id="example1" class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Vendor</th>
+                                <th>Uraian</th>
+                                <th>Kontrak/SPK/Adendum</th>
+                                <th>Tanggal Mulai</th>
+                                <th>Tanggal Selesai</th>
+                                <th>Status</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody class="tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="example-modal">
+    <div id="AddKModal" class="modal fade" role="dialog" style="display:none;">
+        <div class="modal-dialog" style="width:70%;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="AddKModalLabel"></h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <input type="hidden" id="AddKMain" />
+                        <input type="hidden" id="AddKMainDetail" />
+                        <input type="hidden" id="AddKIndex" value="0" />
+                        <div class="form-group col-md-12">
+                            <label for="total" class="col-sm-2 control-label text-right">Vendor</label>
+                            <div class="col-sm-4" id="divAddKVendor">
+                                <select required="required" class="form-control select2" id="AddKVendor" onchange="GetByVendor()" style="width: 100%;">
+                                    @foreach (var data in Model.Vendor)
+                                    {
+                                        <option value="@data.Id">@data.Nama</option>
+                                    }
+                                </select>
+                            </div>
+                            <label for="total" class="col-sm-2 control-label text-right">Nomor</label>
+                            <div class="col-sm-4" id="divAddKNomor">
+                                <input type="text" class="form-control" id="AddKNomor" placeholder="Nomor">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label for="total" class="col-sm-2 control-label text-right">Tanggal</label>
+                            <div class="col-sm-4" id="divAddKDocDate">
+                                <div class="input-group">
+                                    <div class="input-group-addon">
+                                        <i class="fa fa-calendar"></i>
+                                    </div>
+                                    <input type="text" class="form-control tanggal" id="AddKDocDate" autocomplete="off">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label for="total" class="col-sm-2 control-label text-right">Uraian</label>
+                            <div class="col-sm-10" id="divAddKUraian">
+                                <textarea class="form-control" rows="3" id="AddKUraian" placeholder="Uraian"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label for="total" class="col-sm-2 control-label text-right">Nominal</label>
+                            <div class="col-sm-4" id="divAddKNominal">
+                                <input type="text" class="form-control text-right" id="AddKNominal" oninput="this.value = decimal(this.value.replace(/[^0-9.]/g, '').replace(/\.(?=.*\.)/g, ''));" placeholder="Nominal">
+                            </div>
+                            <label for="total" class="col-sm-2 control-label text-right">Jumlah Termin</label>
+                            <div class="col-sm-4" id="divAddKTermin">
+                                <input type="text" class="form-control text-right" id="AddKTermin" placeholder="Jumlah Termin">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label for="total" class="col-sm-2 control-label text-right">Jangka Waktu</label>
+                            <div class="col-sm-4" id="divAddKJangkaWaktu">
+                                <div class="input-group">
+                                    <div class="input-group-addon">
+                                        <i class="fa fa-calendar"></i>
+                                    </div>
+                                    <input type="text" class="form-control tanggalrange" id="AddKJangkaWaktu" autocomplete="off">
+                                    <span class="input-group-addon">
+                                        <input type="checkbox" id="AddKJangkaWaktuCheck" onchange="JangkaWaktu('K')">
+                                    </span>
+                                </div>
+                            </div>
+                            <label for="total" class="col-sm-2 control-label text-right">Files</label>
+                            <div class="col-sm-4" id="divAddKFile">
+                                <input type="file" class="form-control" accept="application/pdf" id="AddKFile" style="min-width:100%">
+                                @*<span class="input-group-addon">
+                                    <input type="checkbox" id="AddKFileCheck" onchange="File('K')">
+                                </span>*@
+                            </div>
+
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label for="total" class="col-sm-2 control-label text-right">Nomor Rekening</label>
+                            <div class="col-sm-4" id="divAddKNomorRekening">
+                                <input type="text" class="form-control" id="AddKNomorRekening" placeholder="Nomor Rekening">
+                            </div>
+                            <label for="total" class="col-sm-2 control-label text-right">Nama Rekening</label>
+                            <div class="col-sm-4" id="divAddKNamaRekening">
+                                <input type="text" class="form-control" id="AddKNamaRekening" placeholder="Nama Rekening">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label for="total" class="col-sm-2 control-label text-right">Bank</label>
+                            <div class="col-sm-4" id="divAddKBank">
+                                <select required="required" class="form-control select2" id="AddKBank" style="width: 100%;">
+                                    @foreach (var data in Model.Bank)
+                                    {
+                                        <option value="@data.Id">@data.Nama</option>
+                                    }
+                                </select>
+                            </div>
+                            <label for="total" class="col-sm-2 control-label text-right">Cabang</label>
+                            <div class="col-sm-4" id="divAddKCabang">
+                                <input type="text" class="form-control" id="AddKCabang" placeholder="Cabang">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label for="total" class="col-sm-2 control-label text-right">NPWP Vendor</label>
+                            <div class="col-sm-4" id="divAddKNPWP">
+                                <input type="text" class="form-control" id="AddKNPWP" placeholder="NPWP Vendor">
+                            </div>
+                            <label for="total" class="col-sm-2 control-label text-right">Alamat Vendor</label>
+                            <div class="col-sm-4" id="divAddKAlamat">
+                                <textarea class="form-control" rows="1" id="AddKAlamat" placeholder="Alamat Vendor"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="pull-right">
+                        <button type="button" class="btn btn-default" data-dismiss="modal" onclick="ClearScreen()">Close</button>
+                        <button type="submit" name="submit" class="btn btn-primary" onclick="SaveKontrak()">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="example-modal">
+    <div id="AddAModal" class="modal fade" role="dialog" style="display:none;">
+        <div class="modal-dialog" style="width:70%;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="AddAModalLabel"></h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <input type="hidden" id="AddAVendor" />
+                        <input type="hidden" id="AddAMainDetail" />
+                        <div class="form-group col-md-12">
+                            <label for="total" class="col-sm-2 control-label text-right">Kontrak</label>
+                            <div class="col-sm-4" id="divAddAMain">
+                                <select required="required" class="form-control " id="AddAMain" onchange="GetByMain()" style="width: 100%;"></select>
+                            </div>
+                            <label for="total" class="col-sm-2 control-label text-right">Nomor</label>
+                            <div class="col-sm-4" id="divAddANomor">
+                                <input type="text" class="form-control" min="1" id="AddANomor" placeholder="Nomor">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label for="total" class="col-sm-2 control-label text-right">Tanggal</label>
+                            <div class="col-sm-4" id="divAddADocDate">
+                                <div class="input-group">
+                                    <div class="input-group-addon">
+                                        <i class="fa fa-calendar"></i>
+                                    </div>
+                                    <input type="text" class="form-control tanggal" id="AddADocDate" autocomplete="off">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label for="total" class="col-sm-2 control-label text-right">Uraian</label>
+                            <div class="col-sm-10" id="divAddAUraian">
+                                <textarea class="form-control" rows="3" id="AddAUraian" readonly placeholder="Uraian"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label for="total" class="col-sm-2 control-label text-right">Jenis Dokumen</label>
+                            <div class="col-sm-4 radio radio-inline">
+                                <label class="col-xs-6">
+                                    <input type="radio" name="AddAJenisDokumen" id="AddAJenisDokumen2" onclick="JenisDokumen()" value="2" checked /> SPK
+                                </label>
+                                <label class="col-xs-6">
+                                    <input type="radio" name="AddAJenisDokumen" id="AddAJenisDokumen3" onclick="JenisDokumen()" value="3" /> Adendum
+                                </label>
+                            </div>
+                            <label for="total" class="col-sm-2 control-label text-right">Adendum ke</label>
+                            <div class="col-sm-4" id="divAddAIndex">
+                                <input type="number" class="form-control text-right" id="AddAIndex" placeholder="Adendum ke">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label for="total" class="col-sm-2 control-label text-right">Nominal</label>
+                            <div class="col-sm-4" id="divAddANominal">
+                                <input type="text" class="form-control text-right" id="AddANominal" oninput="this.value = decimal(this.value.replace(/[^0-9.]/g, '').replace(/\.(?=.*\.)/g, ''));" placeholder="Nominal">
+                            </div>
+                            <label for="total" class="col-sm-2 control-label text-right">Jumlah Termin</label>
+                            <div class="col-sm-4" id="divAddATermin">
+                                <input type="text" class="form-control text-right" id="AddATermin" placeholder="Jumlah Termin">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label for="total" class="col-sm-2 control-label text-right">Jangka Waktu</label>
+                            <div class="col-sm-4" id="divAddAJangkaWaktu">
+                                <div class="input-group">
+                                    <div class="input-group-addon">
+                                        <i class="fa fa-calendar"></i>
+                                    </div>
+                                    <input type="text" class="form-control tanggalrange" id="AddAJangkaWaktu" autocomplete="off">
+                                    <span class="input-group-addon">
+                                        <input type="checkbox" id="AddAJangkaWaktuCheck" onchange="JangkaWaktu('A')">
+                                    </span>
+                                </div>
+                            </div>
+                            <label for="total" class="col-sm-2 control-label text-right">Files</label>
+                            <div class="col-sm-4" id="divAddAFile">
+                                <input type="file" class="form-control" accept="application/pdf" id="AddAFile" style="min-width:100%">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label for="total" class="col-sm-2 control-label text-right">Nomor Rekening</label>
+                            <div class="col-sm-4" id="divAddANomorRekening">
+                                <input type="text" class="form-control" id="AddANomorRekening" placeholder="Nomor Rekening">
+                            </div>
+                            <label for="total" class="col-sm-2 control-label text-right">Nama Rekening</label>
+                            <div class="col-sm-4" id="divAddANamaRekening">
+                                <input type="text" class="form-control" id="AddANamaRekening" placeholder="Nama Rekening">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label for="total" class="col-sm-2 control-label text-right">Bank</label>
+                            <div class="col-sm-4" id="divAddABank">
+                                <select required="required" class="form-control select2" id="AddABank" style="width: 100%;">
+                                    @foreach (var data in Model.Bank)
+                                    {
+                                    <option value="@data.Id">@data.Nama</option>
+                                    }
+                                </select>
+                            </div>
+                            <label for="total" class="col-sm-2 control-label text-right">Cabang</label>
+                            <div class="col-sm-4" id="divAddACabang">
+                                <input type="text" class="form-control" id="AddACabang" placeholder="Cabang">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label for="total" class="col-sm-2 control-label text-right">NPWP Vendor</label>
+                            <div class="col-sm-4" id="divAddANPWP">
+                                <input type="text" class="form-control" id="AddANPWP" placeholder="NPWP Vendor">
+                            </div>
+                            <label for="total" class="col-sm-2 control-label text-right">Alamat Vendor</label>
+                            <div class="col-sm-4" id="divAddAAlamat">
+                                <textarea class="form-control" rows="1" id="AddAAlamat" placeholder="Alamat Vendor"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="pull-right">
+                        <button type="button" class="btn btn-default" data-dismiss="modal" onclick="ClearScreen()">Close</button>
+                        <button type="submit" name="submit" class="btn btn-primary" onclick="SaveAdendum()">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="example-modal">
+    <div id="ViewModal" class="modal fade" role="dialog" style="display:none;">
+        <div class="modal-dialog" style="width:85%;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="ViewModalLabel"></h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="form-group col-md-12">
+                            <label class="col-sm-4 control-label text-right">Nama Vendor</label>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control" readonly disabled id="ViewVendor">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label class="col-sm-4 control-label text-right">Uraian</label>
+                            <div class="col-sm-6">
+                                <textarea class="form-control" rows="3" id="ViewUraian" readonly disabled placeholder="Uraian"></textarea>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <table id="example2" class="table table-bordered table-striped" style="width:100%">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Jenis</th>
+                                        <th>Nomor</th>
+                                        <th>Tanggal Dokumen</th>
+                                        <th>Tanggal Mulai</th>
+                                        <th>Tanggal Selesai</th>
+                                        <th>Nominal</th>
+                                        <th>Termin</th>
+                                        <th>Files</th>
+                                        <th>Status</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="tbody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="pull-right">
+                        <button type="button" class="btn btn-default" data-dismiss="modal" onclick="ClearScreen()">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            $('.select2').select2();
+            $('.tanggalrange').daterangepicker();
+            $('.tanggal').datepicker();
+            var t = $("#example1").DataTable({
+                "orderCellsTop": true,
+                "ajax": {
+                    "url": "@Url.Action("GetList", "Contracts")",
+                    "type": "POST",
+                    "datatype": "json"
+                },
+                "columns": [
+                    { "data": null },
+                    { "data": "Main.Vendor.Nama" },
+                    { "data": "Main.Uraian" },
+                    {
+                        "render": function (data, type, val) {
+                            if (val.JenisDokumenId != 3) {
+                                return val.JenisDokumen.Nama;
+                            } else {
+                                return val.JenisDokumen.Nama + " " + val.Index;
+                            }
+                        }
+                    },
+                    {
+                        "render": function (data, type, val) {
+                            return formatDates(val.StartDate);
+                        }
+                    }, {
+                        "render": function (data, type, val) {
+                            return formatDates(val.EndDate);
+                        }
+                    },
+                    {
+                        "render": function (data, type, val) {
+                            if (val.Main.IsActive) {
+                                return '<span class="label label-success">Active</span>';
+                            } else {
+                                return '<span class="label label-danger">Non Active</span>';
+                            }
+                        }
+                    },
+                    {
+                        "render": function (data, type, val) {
+                            html = '';
+                            html += '<button class="btn btn-sm btn-info" onclick="ViewModal(' + val.MainId + ',\'' + val.Main.Vendor.Nama + '\',\'' + val.Main.Uraian + '\')" data-placement="bottom" title="View"><i class="fa fa-eye"></i></button>';
+                            html += ' <button class="btn btn-sm btn-warning" onclick="ChangeStatus(' + val.MainId + ',\'' + val.Main.Vendor.Nama + '\',\'' + val.Main.IsActive + '\')" data-toggle="tooltip" data-placement="bottom" title="Change Status"><i class="fa fa-refresh"></i></button>';
+                            html += ' <button class="btn btn-sm btn-danger" onclick="DeleteKontrak(' + val.MainId + ',\'' + val.Main.Vendor.Nama + '\')" data-toggle="tooltip" data-placement="bottom" title="Delete"><i class="fa fa-trash-o"></i></button>';
+                            return html;
+                        }
+                    }
+                ],
+                "pageLength": 25,
+                //"rowReorder": true,
+                //"scrollX": true,
+                "scrollCollapse": true,
+                "dom": "<'row'<'col-sm-4'B><'col-sm-2'l><'col-sm-6'p>>" + "<'row'<'col-sm-12'tr>>" + "<'row'<'col-sm-5'i><'col-sm-7'p>>",
+                "columnDefs": [
+                    {
+                        "searchPanes": {
+                            "show": true,
+                        },
+                        "targets": [1, 2, 3, 4, 5, 6],
+                    }, {
+                        "searchPanes": {
+                            "show": false,
+                        },
+                        "targets": [0, 7],
+                    }, {
+                        "sortable": false,
+                        "class": "index",
+                        "targets": [0, 7]
+                    }, {
+                        "width": 150,
+                        "targets": 7
+                    }],
+                "searchPanes": {
+                    "layout": 'columns-6'
+                },
+                "buttons": {
+                    "buttons": [
+                        {
+                            "extend": 'searchPanes',
+                            "config": {
+                                "cascadePanes": true
+                            },
+                            "className": 'btn-info'
+                        }
+                    ],
+                    "dom": {
+                        "button": {
+                            "className": 'btn btn-sm'
+                        },
+                        "buttonLiner": {
+                            "tag": null
+                        }
+                    }
+                },
+                "language": {
+                    "searchPanes": {
+                        "clearMessage": 'Clear',
+                        "collapse": { 0: '<i class="fa fa-search"></i> Search', _: '<i class="fa fa-search"></i> Search (%d)' }
+                    }
+                }
+            });
+
+            t.on('order.dt search.dt', function () {
+                t.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+                    cell.innerHTML = i + 1;
+                });
+            }).draw();
+        });
+
+        function plustitik(angka) {
+            var rupiah = '';
+            var angkarev = angka.toString().split('').reverse().join('');
+            for (var i = 0; i < angkarev.length; i++) if (i % 3 == 0) rupiah += angkarev.substr(i, 3) + ',';
+            return rupiah.split('', rupiah.length - 1).reverse().join('');
+        }
+
+        function decimal(num) {
+            var parts = num.toString().split(".");
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            return parts.join(".");
+        }
+
+        function minkoma(angka) {
+            var bil = angka;
+            var loop = Math.floor(angka.length / 3);
+            for (var i = 0; i < loop; i++) {
+                bil = bil.replace(',', '');
+            }
+            return bil;
+        }
+
+        function formatDateTime(dates) {
+            date = new Date(parseInt(dates.substr(6)));
+            var year = date.getFullYear();
+            var month = (1 + date.getMonth()).toString();
+            month = month.length > 1 ? month : '0' + month;
+            var day = date.getDate().toString();
+            day = day.length > 1 ? day : '0' + day;
+            var hour = date.getHours().toString();
+            hour = hour.length > 1 ? hour : '0' + hour;
+            var minutes = date.getMinutes().toString();
+            minutes = minutes.length > 1 ? minutes : '0' + minutes;
+            var second = date.getSeconds().toString();
+            second = second.length > 1 ? second : '0' + second;
+            return day + '/' + month + '/' + year + ' ' + hour + ':' + minutes + ':' + second;
+        }
+
+        function formatDates(dates) {
+            if (dates != null) {
+                date = new Date(parseInt(dates.substr(6)));
+                var year = date.getFullYear();
+                var month = (1 + date.getMonth()).toString();
+                month = month.length > 1 ? month : '0' + month;
+                var day = date.getDate().toString();
+                day = day.length > 1 ? day : '0' + day;
+                return day + '/' + month + '/' + year;
+            } else {
+                return '-';
+            }
+        }
+
+        function formatDatesRange(dates) {
+            date = new Date(parseInt(dates.substr(6)));
+            var year = date.getFullYear();
+            var month = (1 + date.getMonth()).toString();
+            month = month.length > 1 ? month : '0' + month;
+            var day = date.getDate().toString();
+            day = day.length > 1 ? day : '0' + day;
+            return month + '-' + day + '-' + year;
+        }
+
+        function formatDate(dates) {
+            date = new Date(dates);
+            var year = date.getFullYear();
+            var month = (1 + date.getMonth()).toString();
+            month = month.length > 1 ? month : '0' + month;
+            var day = date.getDate().toString();
+            day = day.length > 1 ? day : '0' + day;
+            return year + '-' + month + '-' + day;
+        }
+
+        function JangkaWaktu(Alfa) {
+            if ($("#Add" + Alfa + "JangkaWaktuCheck").is(":checked")) {
+                $("#Add" + Alfa + "JangkaWaktu").daterangepicker({ startDate: new Date(), endDate: new Date() });
+                $("#Add" + Alfa + "JangkaWaktu").prop('readonly', false);
+                $("#Add" + Alfa + "JangkaWaktu").prop('disabled', false);
+            } else {
+                $("#Add" + Alfa + "JangkaWaktu").val('');
+                $("#Add" + Alfa + "JangkaWaktu").prop('readonly', true);
+                $("#Add" + Alfa + "JangkaWaktu").prop('disabled', true);
+            }
+        }
+
+        //function File(Alfa) {
+        //    if ($("#Add" + Alfa + "FileCheck").is(":checked")) {
+        //        $("#Add" + Alfa + "File").prop('readonly', false);
+        //        $("#Add" + Alfa + "File").prop('disabled', false);
+        //    } else {
+        //        $("#Add" + Alfa + "File").val('');
+        //        $("#Add" + Alfa + "File").prop('readonly', true);
+        //        $("#Add" + Alfa + "File").prop('disabled', true);
+        //    }
+        //}
+
+        function ClearError() {
+            $(".has-error").removeClass("has-error");
+        }
+
+        function AddKModal() {
+            ClearError();
+            ClearScreen();
+            $('#AddKJangkaWaktuCheck').prop('checked', true).change();
+
+            //$('#AddKFileCheck').prop('checked', true).change();
+
+            $("#AddKVendor").val(1).change();
+            $("#AddKBank").val(1).change();
+            $('#AddKModalLabel').html('Tambah Data Kontrak');
+        }
+
+        function SaveKontrak() {
+            ClearError();
+            var error = false;
+            if ($.trim($("#AddKVendor").val()) == "") { $("#divAddKVendor").addClass("has-error"); error = true; }
+            if ($.trim($("#AddKNomor").val()) == "") { $("#divAddKNomor").addClass("has-error"); error = true; }
+            if ($.trim($("#AddKUraian").val()) == "") { $("#divAddKUraian").addClass("has-error"); error = true; }
+            if ($.trim($("#AddKDocDate").val()) == "") { $("#divAddKDocDate").addClass("has-error"); error = true; }
+            if ($("#AddKJangkaWaktuCheck").is(":checked")) { if ($.trim($("#AddKJangkaWaktu").val()) == "") { $("#divAddKJangkaWaktu").addClass("has-error"); error = true; } }
+
+            //if ($("#AddKFileCheck").is(":checked")) { if ($.trim($("#AddKFile").val()) == "") { $("#divAddKFile").addClass("has-error"); error = true; } }
+
+            if ($.trim($("#AddKFile").val()) == "") { $("#divAddKFile").addClass("has-error"); error = true; }
+            if ($.trim($("#AddKNominal").val()) == "" || minkoma($("#AddKNominal").val()) == 0) { $("#divAddKNominal").addClass("has-error"); error = true; }
+            if ($.trim($("#AddKTermin").val()) == "") { $("#divAddKTermin").addClass("has-error"); error = true; }
+            if ($.trim($("#AddKNomorRekening").val()) == "") { $("#divAddKNomorRekening").addClass("has-error"); error = true; }
+            if ($.trim($("#AddKNamaRekening").val()) == "") { $("#divAddKNamaRekening").addClass("has-error"); error = true; }
+            if ($.trim($("#AddKBank").val()) == "") { $("#divAddKBank").addClass("has-error"); error = true; }
+            if ($.trim($("#AddKCabang").val()) == "") { $("#divAddKCabang").addClass("has-error"); error = true; }
+
+            if (!error) {
+                $('#AddKModal').modal('hide');
+                $("body").addClass("loading");
+
+                var daterange = $('#AddKJangkaWaktu').val();
+
+                var files = $('#AddKFile').prop('files');
+
+                //var files = $('#AddKFile').replace(/^.*[\\\/]/, '');
+
+                var formData = new FormData();
+                if ($.trim($("#AddKMain").val()) != "") {
+                    formData.append("MainVM.Main.Id", $("#AddKMain").val());
+                }
+                formData.append("MainVM.Main.Uraian", $("#AddKUraian").val());
+                formData.append("MainVM.Main.VendorId", $("#AddKVendor").val());
+                formData.append("MainVM.Main.IsActive", true);
+                if ($.trim($("#AddKMainDetail").val()) != "") {
+                    formData.append("MainVM.MainDetail.Id", $("#AddKMainDetail").val());
+                }
+                formData.append("MainVM.MainDetail.Index", $("#AddKIndex").val());
+                formData.append("MainVM.MainDetail.Nomor", $("#AddKNomor").val());
+                formData.append("MainVM.MainDetail.DocDate", formatDate($("#AddKDocDate").val()));
+
+                if ($.trim(daterange) != "") {
+                    var start = daterange.substring(0, 10);
+                    var end = daterange.substring(13, 24);
+                    formData.append("MainVM.MainDetail.StartDate", formatDate(start));
+                    formData.append("MainVM.MainDetail.EndDate", formatDate(end));
+                } else {
+                    formData.append("MainVM.MainDetail.StartDate", null);
+                    formData.append("MainVM.MainDetail.EndDate", null);
+                }
+                formData.append("MainVM.MainDetail.TotalNominal", minkoma($("#AddKNominal").val()));
+                formData.append("MainVM.MainDetail.TotalTermin", $("#AddKTermin").val());
+                formData.append("MainVM.MainDetail.NoRek", $("#AddKNomorRekening").val());
+                formData.append("MainVM.MainDetail.NamaRek", $("#AddKNamaRekening").val());
+                formData.append("MainVM.MainDetail.BankId", $("#AddKBank").val());
+                formData.append("MainVM.MainDetail.Cabang", $("#AddKCabang").val());
+                formData.append("MainVM.MainDetail.NPWP", $("#AddKNPWP").val());
+                formData.append("MainVM.MainDetail.Alamat", $("#AddKAlamat").val());
+                formData.append("MainVM.MainDetail.JenisDokumenId", 1);
+
+                formData.append("Files", $('#AddKFile').get(0).files[0]);
+
+                //formData.append("MainVM.MainDetail.Path", $("#AddKFile").val());
+
+                $.ajax({
+                    url: "@Url.Action("Save", "Contracts")",
+                    type: "POST",
+                    contentType: false,
+                    processData: false,
+                    data: formData,
+                    success: function (result) {
+                        $("body").removeClass("loading");
+                        if (result) {
+                            swal({
+                                title: "Success!",
+                                text: "The data has been saved!",
+                                type: "success",
+                                showCancelButton: false,
+                                showConfirmButton: true
+                            }, function () {
+                                ClearScreen();
+                                $("#example1").DataTable().ajax.reload();
+                            });
+                        } else {
+                            swal({
+                                title: "Error!",
+                                text: "Check your data!",
+                                type: "error",
+                                showCancelButton: false,
+                                showConfirmButton: true
+                            }, function () {
+                                ClearScreen();
+                                $("#example1").DataTable().ajax.reload();
+                            });
+                        }
+                    },
+                    error: function (err) {
+                        $("body").removeClass("loading");
+                        swal("Oops", "We couldn't connect to the server!", "error");
+                    }
+                });
+            } else {
+                swal("Oops", "Your input not completed", "error");
+            }
+        }
+
+        function AddAModal() {
+            ClearError();
+            ClearScreen();
+            $('#AddAJenisDokumen2').prop('checked', true);
+            $('#AddAJenisDokumen3').prop('checked', false);
+            JenisDokumen();
+            GetSelectMain(null);
+            $("#AddABank").val(1).change();
+            $('#AddAModalLabel').html('Tambah Data SPK / Adendum');
+            $('#AddAModal').modal({ backdrop: 'static', keyboard: false });
+            $('#AddAModal').modal('show');
+        }
+
+        function JenisDokumen() {
+            var Jenis = $('input[name="AddAJenisDokumen"]:checked').val();
+            if (Jenis == 2) {
+                $('#AddAIndex').prop('readonly', true);
+                $('#AddAIndex').prop('disabled', true);
+                $('#AddAIndex').val('');
+            } else {
+                $('#AddAIndex').prop('readonly', false);
+                $('#AddAIndex').prop('disabled', false);
+            }
+        }
+
+        function GetSelectMain(Id) {
+            $.ajax({
+                url: "@Url.Action("GetSelectMain", "Contracts")",
+                type: "GET",
+                dataType: "json",
+                success: function (result) {
+                    var AMain = $("#AddAMain");
+                    AMain.html('');
+                    $.each(result, function (i, value) {
+                        $("<option></option>").val(value.MainId).text(value.Vendor + " - " + value.Nomor).appendTo(AMain);
+                    });
+
+                    if (Id == null) {
+                        $("#AddAMain").val(result[0].MainId).change();
+                    } else {
+                        $("#AddAMain").val(Id).change();
+                    }
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            })
+        }
+
+        function GetByMain() {
+            var MainId = $("#AddAMain").val();
+
+            $.ajax({
+                url: "@Url.Action("GetMainDetailByMainId", "Contracts")",
+                type: "GET",
+                data: { 'MainId': MainId },
+                dataType: "json",
+                success: function (result) {
+                    $("#AddAUraian").val(result.Main.Uraian);
+                    $("#AddAVendor").val(result.Main.VendorId);
+
+                    if ($.trim($("#AddAMainDetail").val()) != "") {
+                        if (result.StartDate != null) {
+                            $('#AddAJangkaWaktuCheck').prop('checked', true).change();
+                            $("#AddAJangkaWaktu").daterangepicker({ startDate: formatDatesRange(result.StartDate), endDate: formatDatesRange(result.EndDate) });
+                        } else {
+                            $('#AddAJangkaWaktuCheck').prop('checked', false).change();
+                        }
+                        $("#AddANomorRekening").val(result.NoRek);
+                        $("#AddANamaRekening").val(result.NamaRek);
+                        $("#AddABank").val(result.BankId).change();
+                        $("#AddACabang").val(result.Cabang);
+                        $("#AddANPWP").val(result.NPWP);
+                        $("#AddAAlamat").val(result.Alamat);
+                    }
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            })
+        }
+
+        function GetByVendor() {
+            var Id = $("#AddKVendor").val();
+
+            $.ajax({
+                url: "@Url.Action("GetById", "MasVendors")",
+                type: "GET",
+                data: { 'Id': Id },
+                dataType: "json",
+                success: function (result) {
+                    $("#AddKNomorRekening").val(result.NoRek);
+                    $("#AddKNamaRekening").val(result.NamaRek);
+                    $("#AddKCabang").val(result.Cabang);
+                    $("#AddKNPWP").val(result.NPWP);
+                    $("#AddKAlamat").val(result.Alamat);
+                    if (result.BankId != null) {
+                        $("#AddKBank").val(result.BankId).change();
+                    }
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            })
+        }
+
+        function SaveAdendum() {
+            ClearError();
+            var error = false;
+            if ($.trim($("#AddAMain").val()) == "") { $("#divAddAMain").addClass("has-error"); error = true; }
+
+            if ($.trim($("#AddANomor").val()) == "") { $("#divAddANomor").addClass("has-error"); error = true; }
+            if ($.trim($("#AddADocDate").val()) == "") { $("#divAddADocDate").addClass("has-error"); error = true; }
+            if ($("#AddAJangkaWaktuCheck").is(":checked")) { if ($.trim($("#AddAJangkaWaktu").val()) == "") { $("#divAddAJangkaWaktu").addClass("has-error"); error = true; } }
+            if ($.trim($("#AddAFile").val()) == "") { $("#divAddAFile").addClass("has-error"); error = true; }
+            //if ($.trim($("#AddANominal").val()) == "" || minkoma($("#AddANominal").val()) == 0) { $("#divAddANominal").addClass("has-error"); error = true; }
+            //if ($.trim($("#AddATermin").val()) == "") { $("#divAddATermin").addClass("has-error"); error = true; }
+            if ($.trim($("#AddANomorRekening").val()) == "") { $("#divAddANomorRekening").addClass("has-error"); error = true; }
+            if ($.trim($("#AddANamaRekening").val()) == "") { $("#divAddANamaRekening").addClass("has-error"); error = true; }
+            if ($.trim($("#AddABank").val()) == "") { $("#divAddABank").addClass("has-error"); error = true; }
+            if ($.trim($("#AddACabang").val()) == "") { $("#divAddACabang").addClass("has-error"); error = true; }
+            var Jenis = $('input[name="AddAJenisDokumen"]:checked').val();
+            if (Jenis == 3) {
+                if ($.trim($("#AddAIndex").val()) == "") { $("#divAddAIndex").addClass("has-error"); error = true; }
+            }
+
+            if (!error) {
+                $('#AddAModal').modal('hide');
+                $("body").addClass("loading");
+
+                var daterange = $('#AddAJangkaWaktu').val();
+                
+                var files = $('#AddAFile').prop('files');
+
+                var formData = new FormData();
+                formData.append("MainVM.Main.Id", $("#AddAMain").val());
+                formData.append("MainVM.Main.Uraian", $("#AddAUraian").val());
+                formData.append("MainVM.Main.VendorId", $("#AddAVendor").val());
+                if ($.trim($("#AddAMainDetail").val()) != "") {
+                    formData.append("MainVM.MainDetail.Id", $("#AddAMainDetail").val());
+                }
+                formData.append("MainVM.MainDetail.Nomor", $("#AddANomor").val());
+                formData.append("MainVM.MainDetail.DocDate", formatDate($("#AddADocDate").val()));
+
+                if ($.trim(daterange) != "") {
+                    var start = daterange.substring(0, 10);
+                    var end = daterange.substring(13, 24);
+                    formData.append("MainVM.MainDetail.StartDate", formatDate(start));
+                    formData.append("MainVM.MainDetail.EndDate", formatDate(end));
+                } else {
+                    formData.append("MainVM.MainDetail.StartDate", null);
+                    formData.append("MainVM.MainDetail.EndDate", null);
+                }
+                formData.append("MainVM.MainDetail.TotalNominal", minkoma($("#AddANominal").val()));
+                formData.append("MainVM.MainDetail.TotalTermin", $("#AddATermin").val());
+                formData.append("MainVM.MainDetail.NoRek", $("#AddANomorRekening").val());
+                formData.append("MainVM.MainDetail.NamaRek", $("#AddANamaRekening").val());
+                formData.append("MainVM.MainDetail.BankId", $("#AddABank").val());
+                formData.append("MainVM.MainDetail.Cabang", $("#AddACabang").val());
+                formData.append("MainVM.MainDetail.NPWP", $("#AddANPWP").val());
+                formData.append("MainVM.MainDetail.Alamat", $("#AddAAlamat").val());
+                formData.append("MainVM.MainDetail.JenisDokumenId", Jenis);
+                if (Jenis == 3) {
+                    formData.append("MainVM.MainDetail.Index", $("#AddAIndex").val());
+                }
+
+                formData.append("Files", $('#AddAFile').get(0).files[0]);
+
+                $.ajax({
+                    url: "@Url.Action("Save", "Contracts")",
+                    type: "POST",
+                    contentType: false,
+                    processData: false,
+                    data: formData,
+                    success: function (result) {
+                        $("body").removeClass("loading");
+                        if (result) {
+                            swal({
+                                title: "Success!",
+                                text: "The data has been saved!",
+                                type: "success",
+                                showCancelButton: false,
+                                showConfirmButton: true
+                            }, function () {
+                                ClearScreen();
+                                $("#example1").DataTable().ajax.reload();
+                            });
+                        } else {
+                            swal({
+                                title: "Error!",
+                                text: "Check your data!",
+                                type: "error",
+                                showCancelButton: false,
+                                showConfirmButton: true
+                            }, function () {
+                                ClearScreen();
+                                $("#example1").DataTable().ajax.reload();
+                            });
+                        }
+                    },
+                    error: function (err) {
+                        $("body").removeClass("loading");
+                        swal("Oops", "We couldn't connect to the server!", "error");
+                    }
+                });
+            } else {
+                swal("Oops", "Your input not completed", "error");
+            }
+        }
+
+        function ViewModal(MainId, Vendor, Uraian) {
+            $("#ViewVendor").val(Vendor);
+            $("#ViewUraian").val(Uraian);
+
+            var t2 = $("#example2").DataTable({
+                "destroy": true,
+                "ajax": {
+                    "url": "@Url.Action("GetListByMain", "Contracts")",
+                    "type": "POST",
+                    "datatype": "json",
+                    "data": { 'MainId': MainId }
+                },
+                "columns": [
+                    { "data": null },
+                    {
+                        "render": function (data, type, val) {
+                            if (val.JenisDokumenId != 3) {
+                                return val.JenisDokumen.Nama;
+                            } else {
+                                return val.JenisDokumen.Nama + " " + val.Index;
+                            }
+                        }
+                    },
+                    { "data": "Nomor" },
+                    {
+                        "render": function (data, type, val) {
+                            return formatDates(val.DocDate);
+                        }
+                    },
+                    {
+                        "render": function (data, type, val) {
+                            return formatDates(val.StartDate);
+                        }
+                    }, {
+                        "render": function (data, type, val) {
+                            return formatDates(val.EndDate);
+                        }
+                    },
+                    {
+                        "render": function (data, type, val) {
+                            return decimal(val.TotalNominal);
+                        }
+                    },
+                    {
+                        "render": function (data, type, val) {
+                            return val.TotalTermin;
+                        }
+                    },
+                    {
+                        "render": function (data, type, val) {
+                            return val.Path;
+                        }
+                    },
+                    {
+                        "render": function (data, type, val) {
+                            if (val.IsActive) {
+                                return '<span class="label label-success">Active</span>';
+                            } else {
+                                return '<span class="label label-danger">Non Active</span>';
+                            }
+                        }
+                    },
+                    {
+                        "render": function (data, type, val) {
+                            var html = '';
+                            if (val.JenisDokumenId != 1) {
+                                if (val.IsActive) {
+                                    html += '<button class="btn btn-xs btn-primary" onclick="EditModal(' + val.Id + ',false)" data-placement="bottom" title="Edit"><i class="fa fa-pencil"></i></button>';
+                                } else {
+                                    html += '<button class="btn btn-xs btn-primary" disabled readonly data-placement="bottom" title="Edit"><i class="fa fa-pencil"></i></button>';
+                                }
+                                if (val.JenisDokumenId != 3) {
+                                    html += ' <button class="btn btn-xs btn-warning" onclick="ChangeStatusDetail(' + val.Id + ',\'' + val.JenisDokumen.Nama + '\',\'' + val.IsActive + '\')" data-toggle="tooltip" data-placement="bottom" title="Change Status"><i class="fa fa-refresh"></i></button>';
+                                } else {
+                                    html += ' <button class="btn btn-xs btn-warning" onclick="ChangeStatusDetail(' + val.Id + ',\'' + val.JenisDokumen.Nama + " " + val.Index + '\',\'' + val.IsActive + '\')" data-toggle="tooltip" data-placement="bottom" title="Change Status"><i class="fa fa-refresh"></i></button>';
+                                }
+                                html += ' <button class="btn btn-xs btn-danger" onclick="DeleteAdendum(' + val.Id + ',\'' + val.Index + '\',\'' + Vendor + '\')" data-toggle="tooltip" data-placement="bottom" title="Delete"><i class="fa fa-trash-o"></i></button>';
+                            } else {
+                                if (val.IsActive) {
+                                    html += '<button class="btn btn-xs btn-primary" onclick="EditModal(' + val.Id + ',true)" data-placement="bottom" title="Edit"><i class="fa fa-pencil"></i></button>';
+                                } else {
+                                    html += '<button class="btn btn-xs btn-primary" disabled readonly data-placement="bottom" title="Edit"><i class="fa fa-pencil"></i></button>';
+                                }
+                                html += ' <button class="btn btn-xs btn-warning" onclick="ChangeStatusDetail(' + val.Id + ',\'' + val.JenisDokumen.Nama + '\',\'' + val.IsActive + '\')" data-toggle="tooltip" data-placement="bottom" title="Change Status"><i class="fa fa-refresh"></i></button>';
+                            }
+                            return html;
+                        }
+                    }
+                ],
+                "scrollCollapse": true,
+                "paging": false,
+                //"dom": "<'row'<'col-sm-4'B><'col-sm-2'l><'col-sm-6'p>>" + "<'row'<'col-sm-12'tr>>" + "<'row'<'col-sm-5'i><'col-sm-7'p>>",
+                "dom": "<'row'<'col-sm-12'tr>>",
+                "ordering": false,
+                "columnDefs": [
+                    {
+                        "className": 'text-right',
+                        "targets": [6, 7]
+                    }, {
+                        "width": "40%",
+                        "targets": 8
+                    }
+                ]
+            });
+
+            t2.on('order.dt search.dt', function () {
+                t2.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+                    cell.innerHTML = i + 1;
+                });
+            }).draw();
+
+            $('#ViewModalLabel').html('View Data');
+            $('#ViewModal').modal('show');
+
+        }
+
+        function EditModal(Id, IsKontrak) {
+            $.ajax({
+                url: "@Url.Action("GetByMainDetail", "Contracts")",
+                type: "GET",
+                data: { 'MainDetailId': Id },
+                dataType: "json",
+                success: function (result) {
+                    $('#ViewModal').modal('hide');
+                    //$('#AddKTutupFile').hide();
+                    var Alfa = '';
+                    if (IsKontrak) {
+                        Alfa = 'K';
+                        $('#Add' + Alfa + 'ModalLabel').html('Edit Data Kontrak');
+
+                    } else {
+                        Alfa = 'A';
+                        GetSelectMain(result.MainId);
+                        $('#Add' + Alfa + 'ModalLabel').html('Edit Data SPK / Adendum');
+                        $('input[name="AddAJenisDokumen"]').prop('checked', false);
+                        $('#AddAJenisDokumen' + result.JenisDokumenId).prop('checked', true);
+                        JenisDokumen();
+                        if (result.JenisDokumenId == 3) {
+                            $("#Add" + Alfa + "Index").val(result.Index);
+                        } else {
+                            $("#Add" + Alfa + "Index").val('');
+                        }
+                    }
+                    ClearScreen();
+
+                    $("#Add" + Alfa + "Main").val(result.MainId);
+                    $("#Add" + Alfa + "Uraian").val(result.Main.Uraian);
+                    $("#Add" + Alfa + "Vendor").val(result.Main.VendorId).change();
+                    $("#Add" + Alfa + "MainDetail").val(result.Id);
+                    $("#Add" + Alfa + "Nomor").val(result.Nomor);
+                    $("#Add" + Alfa + "Nominal").val(plustitik(result.TotalNominal));
+                    $("#Add" + Alfa + "Termin").val(result.TotalTermin);
+                    $("#Add" + Alfa + "DocDate").datepicker("setDate", formatDatesRange(result.DocDate));
+                    if (result.StartDate != null) {
+                        $("#Add" + Alfa + "JangkaWaktuCheck").prop('checked', true).change();
+                        $("#Add" + Alfa + "JangkaWaktu").daterangepicker({ startDate: formatDatesRange(result.StartDate), endDate: formatDatesRange(result.EndDate) });
+                    } else {
+                        $("#Add" + Alfa + "JangkaWaktuCheck").prop('checked', false).change();
+                    }
+                    //$("#Add" + Alfa + "File").hide();
+                    //$("#Add" + Alfa + "File").attr("disabled", "disabled");
+
+                    //if (result.Path != null) {
+                    //    $("#Add" + Alfa + "File").prop('checked', true).change();
+                    //} else {
+                    //    $("#Add" + Alfa + "File").prop('checked', false).change();
+                    //}
+
+                    //$("#Add" + Alfa + "File").val(result.Path);
+
+                    $("#Add" + Alfa + "NomorRekening").val(result.NoRek);
+                    $("#Add" + Alfa + "NamaRekening").val(result.NamaRek);
+                    $("#Add" + Alfa + "Bank").val(result.BankId).change();
+                    $("#Add" + Alfa + "Cabang").val(result.Cabang);
+                    $("#Add" + Alfa + "NPWP").val(result.NPWP);
+                    $("#Add" + Alfa + "Alamat").val(result.Alamat);
+
+                    $('#Add' + Alfa + 'Modal').modal({ backdrop: 'static', keyboard: false });
+                    $('#Add' + Alfa + 'Modal').modal('show');
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            })
+        }
+
+        function DeleteAdendum(Id, Add, Vendor) {
+            swal({
+                title: "Are you sure to delete Adendum " + Add + "?",
+                text: "All documents about Adendum " + Add + " - " + Vendor + " will be lost",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                closeOnConfirm: false
+            }, function () {
+                $("body").addClass("loading");
+                $.ajax({
+                    url: "@Url.Action("DeleteAdendum", "Contracts")",
+                    type: "POST",
+                    data: { 'Id': Id },
+                    success: function (response) {
+                        $("body").removeClass("loading");
+                        swal({
+                            title: "Deleted!",
+                            text: "That data has been delete!",
+                            type: "success",
+                            showCancelButton: false,
+                            showConfirmButton: true
+                        }, function () {
+                            $("#example2").DataTable().ajax.reload();
+                            $("#example1").DataTable().ajax.reload();
+                        });
+                    },
+                    error: function (response) {
+                        swal("Oops", "We couldn't connect to the server!", "error");
+                    }
+                });
+            });
+        }
+
+        function ChangeStatus(Id, Vendor, Value) {
+            bootbox.prompt({
+                title: "Please select below to make change status " + Vendor,
+                inputType: 'select',
+                value: Value,
+                inputOptions: [
+                {
+                    text: 'Active',
+                    value: 'true',
+                },
+                {
+                    text: 'Non Active',
+                    value: 'false',
+                }
+                ],
+                buttons: {
+                    cancel: {
+                        label: 'Cancel'
+                    },
+                    confirm: {
+                        label: 'Save',
+                        className: 'btn-success'
+                    }
+                },
+                callback: function (result) {
+                    if (result) {
+                        items = JSON.stringify({ 'Id': Id, 'Status': result });
+                        $("body").addClass("loading");
+                        $.ajax({
+                            url: "@Url.Action("ChangeStatusMain", "Contracts")",
+                            type: 'POST',
+                            dataType: 'json',
+                            contentType: 'application/json; charset=utf-8',
+                            data: items,
+                            success: function () {
+                                $("body").removeClass("loading");
+                                swal({
+                                    title: "Success!",
+                                    text: "The data has been saved!",
+                                    type: "success",
+                                    showCancelButton: false,
+                                    showConfirmButton: true
+                                }, function () {
+                                    $("#example1").DataTable().ajax.reload();
+                                });
+                            },
+                            error: function (response) {
+                                swal("Oops", "We couldn't connect to the server!", "error");
+                            }
+                        });
+                    } else if (result == "") {
+                        swal({
+                            title: "Failed!",
+                            text: "Please Status!",
+                            type: "warning",
+                            showCancelButton: false,
+                            showConfirmButton: false,
+                            timer: 1000,
+                        });
+                    }
+                }
+            });
+        }
+
+        function ChangeStatusDetail(Id, Vendor, Value) {
+            bootbox.prompt({
+                title: "Please select below to make change status " + Vendor,
+                inputType: 'select',
+                value: Value,
+                inputOptions: [
+                {
+                    text: 'Active',
+                    value: 'true',
+                },
+                {
+                    text: 'Non Active',
+                    value: 'false',
+                }
+                ],
+                buttons: {
+                    cancel: {
+                        label: 'Cancel'
+                    },
+                    confirm: {
+                        label: 'Save',
+                        className: 'btn-success'
+                    }
+                },
+                callback: function (result) {
+                    if (result) {
+                        items = JSON.stringify({ 'Id': Id, 'Status': result });
+                        $("body").addClass("loading");
+                        $.ajax({
+                            url: "@Url.Action("ChangeStatusDetail", "Contracts")",
+                            type: 'POST',
+                            dataType: 'json',
+                            contentType: 'application/json; charset=utf-8',
+                            data: items,
+                            success: function () {
+                                $("body").removeClass("loading");
+                                swal({
+                                    title: "Success!",
+                                    text: "The data has been saved!",
+                                    type: "success",
+                                    showCancelButton: false,
+                                    showConfirmButton: true
+                                }, function () {
+                                    $("#example1").DataTable().ajax.reload();
+                                    $("#example2").DataTable().ajax.reload();
+                                });
+                            },
+                            error: function (response) {
+                                swal("Oops", "We couldn't connect to the server!", "error");
+                            }
+                        });
+                    } else if (result == "") {
+                        swal({
+                            title: "Failed!",
+                            text: "Please Status!",
+                            type: "warning",
+                            showCancelButton: false,
+                            showConfirmButton: false,
+                            timer: 1000,
+                        });
+                    }
+                }
+            });
+        }
+
+        function DeleteKontrak(Id, Vendor) {
+            swal({
+                title: "Are you sure to delete this?",
+                text: "All documents about " + Vendor + " will be lost",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                closeOnConfirm: false
+            }, function () {
+                $("body").addClass("loading");
+                $.ajax({
+                    url: "@Url.Action("DeleteKontrak", "Contracts")",
+                    type: "POST",
+                    data: { 'Id': Id },
+                    success: function (response) {
+                        $("body").removeClass("loading");
+                        swal({
+                            title: "Deleted!",
+                            text: "That data has been delete!",
+                            type: "success",
+                            showCancelButton: false,
+                            showConfirmButton: true
+                        }, function () {
+                            $("#example1").DataTable().ajax.reload();
+                        });
+                    },
+                    error: function (response) {
+                        swal("Oops", "We couldn't connect to the server!", "error");
+                    }
+                });
+            });
+        }
+
+        function ClearScreen() {
+            $('input[type=text]').val('');
+            $('input[type=file]').val('');
+            $('input[type=hidden]').val(0);
+            $('select, textarea').val('');
+            //$('select').val(0).change();
+            $("#IsUrgent").prop('checked', false);
+        }
+    </script>
+}
